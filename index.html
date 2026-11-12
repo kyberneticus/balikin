@@ -1,2703 +1,351 @@
 <!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
-    <meta name="theme-color" content="#f8faf8" />
-    <meta
-      name="description"
-      content="Balikin — tempat menemukan dan mengembalikan barang di kampus"
-    />
-    <title>Balikin — Lost & Found Kampus</title>
-    <style>
-      :root {
-        color-scheme: light;
-        --ink: #24322c;
-        --muted: #6d786f;
-        --line: #dbe2db;
-        --green: #21644f;
-        --green-dark: #174e3f;
-        --green-pale: #eaf2ec;
-        --paper: #f8faf8;
-        --white: #fff;
-        --danger: #9c452f;
-        --radius: 14px;
-        font-family:
-          Inter,
-          ui-sans-serif,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          Roboto,
-          Arial,
-          sans-serif;
-      }
-      * {
-        box-sizing: border-box;
-      }
-      html {
-        scroll-behavior: smooth;
-      }
-      body {
-        margin: 0;
-        color: var(--ink);
-        background: var(--paper);
-        line-height: 1.5;
-      }
-      button,
-      input,
-      select,
-      textarea {
-        font: inherit;
-      }
-      button {
-        cursor: pointer;
-      }
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-      svg {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1.85;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        flex-shrink: 0;
-      }
-      .svg-sprite {
-        position: absolute;
-        width: 0;
-        height: 0;
-        overflow: hidden;
-      }
-      button:focus-visible,
-      input:focus-visible,
-      select:focus-visible,
-      textarea:focus-visible,
-      a:focus-visible {
-        outline: 3px solid #78b79b;
-        outline-offset: 3px;
-      }
-      button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      [hidden] {
-        display: none !important;
-      }
-      .site-header {
-        background: rgba(248, 250, 248, 0.97);
-        border-bottom: 1px solid var(--line);
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        backdrop-filter: blur(10px);
-      }
-      .header-inner {
-        max-width: 1190px;
-        min-height: 74px;
-        padding: 0 28px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: auto;
-        gap: 18px;
-      }
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 11px;
-        font-size: 25px;
-        font-weight: 760;
-        letter-spacing: -1.3px;
-      }
-      .brand-period {
-        color: var(--green);
-      }
-      .brand-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: 11px;
-        background: var(--green);
-        color: white;
-        display: grid;
-        place-items: center;
-      }
-      .brand-icon svg {
-        width: 20px;
-        height: 20px;
-      }
-      .topnav,
-      .user-tools {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-      .nav-button {
-        background: transparent;
-        border: 1px solid transparent;
-        border-radius: 9px;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 12px;
-        color: #354a3d;
-        font-weight: 600;
-      }
-      .nav-button:hover {
-        background: #eaf0e9;
-      }
-      .nim-chip {
-        font-size: 12px;
-        font-weight: 600;
-        padding: 8px 12px;
-        background: #edf1ec;
-        border-radius: 30px;
-        color: #496052;
-        white-space: nowrap;
-      }
-      .auth-layout {
-        max-width: 1190px;
-        min-height: calc(100svh - 166px);
-        margin: auto;
-        display: grid;
-        grid-template-columns: minmax(0, 1.05fr) minmax(350px, 0.95fr);
-        gap: 80px;
-        align-items: center;
-        padding: 70px 28px;
-      }
-      .section-kicker,
-      .eyebrow {
-        font-size: 11px;
-        letter-spacing: 0.11em;
-        font-weight: 770;
-        color: #49715e;
-      }
-      .auth-visual h1 {
-        font-size: clamp(40px, 5.8vw, 78px);
-        letter-spacing: -0.058em;
-        line-height: 1.06;
-        margin: 20px 0 24px;
-        font-weight: 760;
-      }
-      .auth-visual h1 em {
-        color: var(--green);
-        font-style: normal;
-      }
-      .auth-visual p {
-        font-size: 17px;
-        line-height: 1.75;
-        color: var(--muted);
-        max-width: 480px;
-      }
-      .auth-visual-footer {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 20px;
-        margin-top: 58px;
-      }
-      .auth-minifeature {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        font-size: 13px;
-        color: #506558;
-      }
-      .auth-minifeature svg {
-        width: 17px;
-        height: 17px;
-      }
-      .auth-card {
-        padding: 38px;
-        background: var(--white);
-        border: 1px solid var(--line);
-        border-radius: 18px;
-        box-shadow: 0 12px 42px rgba(36, 50, 44, 0.035);
-      }
-      h1,
-      h2,
-      h3,
-      p {
-        margin-top: 0;
-      }
-      .auth-card h2 {
-        font-size: 27px;
-        letter-spacing: -0.035em;
-        margin: 10px 0 5px;
-      }
-      .muted {
-        color: var(--muted);
-      }
-      .small {
-        font-size: 13px;
-      }
-      .auth-card .muted {
-        font-size: 14px;
-        margin-bottom: 24px;
-      }
-      .auth-tabs {
-        padding: 4px;
-        border: 1px solid var(--line);
-        background: #f5f7f4;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        border-radius: 10px;
-        gap: 5px;
-        margin-bottom: 24px;
-      }
-      .auth-tabs button {
-        padding: 11px;
-        background: transparent;
-        border: 0;
-        border-radius: 7px;
-        color: #63716a;
-        font-weight: 650;
-      }
-      .auth-tabs button.active {
-        background: white;
-        color: var(--green);
-        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
-      }
-      .field {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-bottom: 17px;
-      }
-      .field > span:first-child {
-        font-size: 13px;
-        font-weight: 650;
-      }
-      .field input,
-      .field select,
-      .field textarea {
-        display: block;
-        width: 100%;
-        min-height: 46px;
-        padding: 11px 12px;
-        background: white;
-        border: 1px solid #cdd8cf;
-        border-radius: 9px;
-        color: var(--ink);
-        outline: 0;
-      }
-      .field textarea {
-        resize: vertical;
-        min-height: 75px;
-      }
-      .field input:focus,
-      .field select:focus,
-      .field textarea:focus {
-        border-color: var(--green);
-        box-shadow: 0 0 0 3px #dcebe3;
-      }
-      .field input::placeholder,
-      .field textarea::placeholder {
-        color: #99a69d;
-      }
-      .field small {
-        font-size: 12px;
-        line-height: 1.55;
-        color: var(--muted);
-      }
-      .passfield {
-        display: flex;
-        position: relative;
-      }
-      .passfield input {
-        padding-right: 49px;
-      }
-      .eye-button {
-        position: absolute;
-        right: 6px;
-        top: 4px;
-        width: 39px;
-        height: 38px;
-        border: 0;
-        background: transparent;
-        display: grid;
-        place-items: center;
-        color: #6e8374;
-      }
-      .button {
-        border: 1px solid var(--line);
-        border-radius: 9px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 12px 17px;
-        min-height: 46px;
-        font-weight: 670;
-        transition: background 0.14s;
-      }
-      .button svg {
-        width: 17px;
-        height: 17px;
-      }
-      .button-main {
-        background: var(--green);
-        color: white;
-        border-color: var(--green);
-      }
-      .button-main:hover {
-        background: var(--green-dark);
-      }
-      .button-outline {
-        background: white;
-        color: var(--ink);
-      }
-      .button-outline:hover {
-        background: #f3f7f3;
-      }
-      .button-ghost {
-        border-color: transparent;
-        background: transparent;
-      }
-      .button-ghost:hover {
-        background: #f4f6f3;
-      }
-      .full {
-        width: 100%;
-      }
-      .auth-footnote {
-        font-size: 12px;
-        line-height: 1.5;
-        color: var(--muted);
-        margin: 19px 0 0;
-      }
-      .app-layout {
-        max-width: 1190px;
-        margin: 0 auto;
-        padding: 35px 28px 68px;
-      }
-      .app-titlebar {
-        padding: 12px 0 28px;
-      }
-      .app-titlebar h1 {
-        font-size: clamp(26px, 3.2vw, 39px);
-        letter-spacing: -0.046em;
-        margin: 9px 0 8px;
-      }
-      .app-titlebar p {
-        color: var(--muted);
-        font-size: 14px;
-        margin: 0;
-      }
-      .desktop-tabs {
-        display: flex;
-        gap: 5px;
-        border-bottom: 1px solid var(--line);
-        margin-bottom: 30px;
-      }
-      .tab-button {
-        background: transparent;
-        border: 0;
-        border-bottom: 2px solid transparent;
-        margin-bottom: -1px;
-        padding: 14px 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #728178;
-        font-size: 14px;
-        font-weight: 650;
-      }
-      .tab-button.active {
-        border-color: var(--green);
-        color: var(--green);
-      }
-      .tab-button:hover {
-        color: var(--green);
-      }
-      .content-section {
-        padding-bottom: 45px;
-        animation: appear 0.14s ease-out;
-      }
-      @keyframes appear {
-        from {
-          opacity: 0.75;
-          transform: translateY(3px);
-        }
-        to {
-          opacity: 1;
-          transform: none;
-        }
-      }
-      .section-heading {
-        margin-bottom: 24px;
-      }
-      .section-heading h2 {
-        font-size: 26px;
-        letter-spacing: -0.035em;
-        margin: 6px 0 5px;
-      }
-      .section-heading p {
-        font-size: 14px;
-        color: var(--muted);
-        margin: 0;
-      }
-      .form-layout {
-        display: grid;
-        grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
-        gap: 20px;
-        align-items: start;
-      }
-      .panel {
-        background: white;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 24px;
-      }
-      .panel h3 {
-        font-size: 17px;
-        letter-spacing: -0.02em;
-        margin: 0 0 5px;
-      }
-      .photo-panel .muted {
-        margin-bottom: 18px;
-      }
-      .required {
-        color: var(--danger);
-      }
-      .photo-preview {
-        height: 260px;
-        background: #f1f4f0;
-        border: 1px dashed #c9d6cc;
-        border-radius: 11px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        gap: 10px;
-        color: #85948a;
-        font-size: 13px;
-      }
-      .photo-preview svg {
-        width: 31px;
-        height: 31px;
-      }
-      .photo-preview img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-      .two-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 9px;
-        margin-top: 12px;
-      }
-      .two-actions .button {
-        font-size: 13px;
-        padding: 11px 8px;
-      }
-      .item-form-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 21px;
-      }
-      .private-tag {
-        color: #557864;
-        font-size: 11px;
-        white-space: nowrap;
-      }
-      .fieldgrid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0 15px;
-      }
-      .item-form > .button {
-        margin-top: 7px;
-      }
-      .processing {
-        margin-top: 16px;
-        background: #f1f7f2;
-        border-radius: 10px;
-        padding: 14px;
-      }
-      .processing-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        font-weight: 650;
-        color: var(--green);
-        margin-bottom: 12px;
-      }
-      .processing-label svg {
-        width: 17px;
-        height: 17px;
-      }
-      .processing-label span:nth-child(3) {
-        margin-left: auto;
-        font-variant-numeric: tabular-nums;
-      }
-      .progress-track {
-        height: 6px;
-        border-radius: 10px;
-        background: #d7e5da;
-        overflow: hidden;
-      }
-      .progress-bar {
-        width: 0%;
-        height: 100%;
-        background: var(--green);
-        transition: width 0.28s ease;
-      }
-      .search-field {
-        height: 52px;
-        border: 1px solid #d0dad1;
-        border-radius: 11px;
-        background: white;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 0 17px;
-        max-width: 670px;
-      }
-      .search-field svg {
-        width: 19px;
-        color: var(--muted);
-      }
-      .search-field input {
-        border: 0;
-        outline: 0;
-        width: 100%;
-        height: 100%;
-        background: transparent;
-      }
-      .result-count {
-        font-size: 13px;
-        color: var(--muted);
-        margin: 17px 0;
-      }
-      .item-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-      }
-      .item-card {
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        background: white;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-      }
-      .item-image {
-        height: 195px;
-        display: grid;
-        place-items: center;
-        background: #edf3ef;
-        overflow: hidden;
-      }
-      .item-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      .item-image svg {
-        width: 52px;
-        height: 52px;
-        color: #a8bdb0;
-      }
-      .item-info {
-        padding: 17px;
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        gap: 5px;
-      }
-      .item-info h3 {
-        margin: 4px 0 0;
-        font-size: 16px;
-        line-height: 1.4;
-      }
-      .item-subtitle {
-        font-size: 12px;
-        color: var(--muted);
-      }
-      .item-desc {
-        font-size: 13px;
-        color: #596b5f;
-        margin: 5px 0 14px;
-        flex: 1;
-      }
-      .item-info .button {
-        width: 100%;
-        font-size: 13px;
-      }
-      .chip {
-        font-size: 10px;
-        letter-spacing: 0.05em;
-        display: inline-flex;
-        align-items: center;
-        background: #edf4ef;
-        color: var(--green);
-        border-radius: 5px;
-        padding: 4px 7px;
-        font-weight: 700;
-        align-self: flex-start;
-      }
-      .empty-state {
-        grid-column: 1/-1;
-        text-align: center;
-        padding: 55px 15px;
-        background: white;
-        border: 1px dashed var(--line);
-        border-radius: 12px;
-        color: var(--muted);
-        font-size: 14px;
-      }
-      .locker-layout {
-        display: grid;
-        grid-template-columns: 1fr 310px;
-        gap: 20px;
-        align-items: start;
-      }
-      .lockers-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        max-width: 610px;
-        margin: auto;
-      }
-      .locker-cell {
-        min-height: 112px;
-        border: 1.5px solid #d4e3d8;
-        background: #f3f8f4;
-        border-radius: 8px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 8px;
-        font-weight: 740;
-        letter-spacing: 0.04em;
-      }
-      .locker-cell small {
-        font-weight: 580;
-        font-size: 11px;
-        letter-spacing: normal;
-        color: #54765f;
-      }
-      .locker-cell.held {
-        background: #fbf5e8;
-        border-color: #e9d4a5;
-      }
-      .locker-cell.held small {
-        color: #9b7540;
-      }
-      .locker-cell.filled {
-        background: #e9efec;
-        border-color: #bdcfc3;
-      }
-      .locker-cell.filled small {
-        color: #315b48;
-      }
-      .legend {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        margin: 24px 0;
-      }
-      .legend > span {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        font-size: 14px;
-      }
-      .dot {
-        display: inline-block;
-        width: 11px;
-        height: 11px;
-        border-radius: 50%;
-      }
-      .dot-available {
-        background: #88c09a;
-      }
-      .dot-held {
-        background: #c6a563;
-      }
-      .dot-filled {
-        background: #537e66;
-      }
-      .locker-help p {
-        font-size: 13px;
-        line-height: 1.7;
-      }
-      .site-footer {
-        text-align: center;
-        color: #879489;
-        padding: 28px 20px;
-        border-top: 1px solid var(--line);
-        font-size: 12px;
-        margin-top: 30px;
-      }
-      .mobile-bottom-nav {
-        display: none;
-      }
-      .toast-zone {
-        position: fixed;
-        z-index: 70;
-        right: 20px;
-        bottom: 25px;
-        display: grid;
-        gap: 8px;
-        max-width: min(360px, calc(100vw - 36px));
-      }
-      .toast {
-        background: #1e362c;
-        color: white;
-        border-radius: 9px;
-        padding: 14px 18px;
-        box-shadow: 0 8px 30px #1d302833;
-        font-size: 13px;
-      }
-      .modal-layer {
-        position: fixed;
-        z-index: 60;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        padding: 20px;
-      }
-      .modal-backdrop {
-        position: absolute;
-        inset: 0;
-        background: #17271fd9;
-        backdrop-filter: blur(2px);
-      }
-      .modal-panel {
-        position: relative;
-        background: white;
-        border-radius: 16px;
-        padding: 25px;
-        width: min(560px, 100%);
-        max-height: calc(100svh - 45px);
-        overflow: auto;
-        box-shadow: 0 20px 70px #0004;
-      }
-      .modal-close {
-        background: #f3f6f2;
-        border: 0;
-        display: grid;
-        place-items: center;
-        width: 34px;
-        height: 34px;
-        border-radius: 8px;
-        float: right;
-        color: #536457;
-      }
-      .modal-panel h2 {
-        margin: 8px 0 10px;
-        font-size: 25px;
-        letter-spacing: -0.03em;
-      }
-      .modal-panel > p {
-        font-size: 14px;
-        color: var(--muted);
-        margin: 0 0 23px;
-      }
-      .modal-actions {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-        margin-top: 20px;
-      }
-      .pin-display {
-        background: #edf5ee;
-        border: 1px solid #d0e4d5;
-        border-radius: 11px;
-        padding: 21px;
-        text-align: center;
-        margin: 22px 0;
-      }
-      .pin-display strong {
-        display: block;
-        color: var(--green);
-        font-size: 34px;
-        letter-spacing: 0.18em;
-        font-variant-numeric: tabular-nums;
-      }
-      .pin-display small {
-        font-size: 11px;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-      }
-      .modal-two-photos {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin: 15px 0;
-      }
-      .comparison-frame {
-        height: 168px;
-        background: #f3f6f2;
-        border: 1px solid var(--line);
-        border-radius: 9px;
-        overflow: hidden;
-        position: relative;
-      }
-      .comparison-frame img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-      .comparison-frame .scanline {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: -2%;
-        height: 2px;
-        background: #2cc681;
-        box-shadow:
-          0 0 15px #2cc681,
-          0 0 3px #2cc681;
-        animation: scan 1.65s ease-in-out infinite alternate;
-      }
-      @keyframes scan {
-        to {
-          top: 102%;
-        }
-      }
-      .photo-caption {
-        font-size: 11px;
-        color: var(--muted);
-        margin-top: 5px;
-        text-align: center;
-      }
-      .video-stage {
-        height: 260px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        background: #eaf2ec;
-        border: 1px solid #d8e7da;
-        border-radius: 12px;
-        text-align: center;
-        padding: 20px;
-      }
-      .video-stage svg {
-        height: 42px;
-        width: 42px;
-        color: var(--green);
-      }
-      .video-stage h3 {
-        font-size: 21px;
-        margin: 0;
-      }
-      .video-stage p {
-        font-size: 13px;
-        color: var(--muted);
-        margin: 0;
-      }
-      .video-controls {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 15px;
-      }
-      .video-timeline {
-        flex: 1;
-        height: 5px;
-        background: #e0e9e1;
-        border-radius: 10px;
-        overflow: hidden;
-      }
-      .video-timeline > div {
-        height: 100%;
-        background: var(--green);
-        width: 0%;
-        transition: width 0.35s;
-      }
-      .video-control-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        border: 1px solid var(--line);
-        display: grid;
-        place-items: center;
-        background: white;
-      }
-      .video-count {
-        font-size: 12px;
-        color: var(--muted);
-        font-variant-numeric: tabular-nums;
-      }
-      @media (max-width: 900px) {
-        .auth-layout {
-          gap: 28px;
-          grid-template-columns: 1fr 1fr;
-        }
-        .auth-visual h1 {
-          font-size: 49px;
-        }
-        .auth-visual-footer {
-          margin-top: 30px;
-          gap: 10px;
-        }
-        .form-layout {
-          grid-template-columns: 1fr;
-        }
-        .locker-layout {
-          grid-template-columns: 1fr;
-        }
-        .item-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-      @media (max-width: 670px) {
-        .site-header .header-inner {
-          padding: 0 18px;
-          min-height: 62px;
-        }
-        .brand {
-          font-size: 23px;
-        }
-        .brand-icon {
-          width: 34px;
-          height: 34px;
-        }
-        .topnav {
-          gap: 4px;
-        }
-        .nav-button {
-          padding: 9px 7px;
-          font-size: 12px;
-          gap: 4px;
-        }
-        .nav-button svg {
-          width: 18px;
-        }
-        .nim-chip {
-          font-size: 10px;
-          max-width: 86px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          padding: 7px 8px;
-        }
-        .auth-layout {
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-          padding: 28px 19px 48px;
-          gap: 24px;
-          min-height: unset;
-        }
-        .auth-visual h1 {
-          font-size: 39px;
-          margin: 11px 0;
-        }
-        .auth-visual p {
-          font-size: 14px;
-          line-height: 1.6;
-          margin-bottom: 0;
-        }
-        .auth-visual-footer {
-          display: none;
-        }
-        .auth-card {
-          padding: 24px 19px;
-          border-radius: 14px;
-        }
-        .auth-card h2 {
-          font-size: 23px;
-        }
-        .app-layout {
-          padding: 22px 17px 95px;
-        }
-        .app-titlebar {
-          padding: 2px 0 23px;
-        }
-        .app-titlebar h1 {
-          font-size: 26px;
-        }
-        .app-titlebar p {
-          font-size: 13px;
-        }
-        .desktop-tabs {
-          display: none;
-        }
-        .mobile-bottom-nav:not([hidden]) {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          padding: 9px 14px calc(9px + env(safe-area-inset-bottom));
-          background: rgba(255, 255, 255, 0.97);
-          z-index: 30;
-          border-top: 1px solid var(--line);
-          box-shadow: 0 -4px 22px #182f2113;
-        }
-        .mobile-nav-item {
-          border: 0;
-          background: transparent;
-          color: #79867c;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          gap: 3px;
-          padding: 6px 0;
-          font-size: 10px;
-          font-weight: 600;
-          border-radius: 10px;
-        }
-        .mobile-nav-item svg {
-          width: 23px;
-          height: 23px;
-        }
-        .mobile-nav-item.active {
-          color: var(--green);
-          background: #ecf3ed;
-        }
-        .section-heading h2 {
-          font-size: 23px;
-        }
-        .panel {
-          padding: 18px;
-        }
-        .fieldgrid {
-          grid-template-columns: 1fr;
-        }
-        .two-actions .button {
-          font-size: 12px;
-        }
-        .photo-preview {
-          height: 220px;
-        }
-        .item-grid {
-          grid-template-columns: 1fr;
-        }
-        .item-card {
-          flex-direction: row;
-          min-height: 164px;
-        }
-        .item-image {
-          width: 115px;
-          min-width: 115px;
-          height: auto;
-        }
-        .item-info {
-          padding: 13px;
-        }
-        .item-info h3 {
-          font-size: 14px;
-        }
-        .item-info .button {
-          font-size: 12px;
-          min-height: 39px;
-        }
-        .item-desc {
-          margin-bottom: 6px;
-        }
-        .item-card .chip {
-          font-size: 9px;
-        }
-        .locker-layout {
-          gap: 12px;
-        }
-        .lockers-grid {
-          gap: 7px;
-        }
-        .locker-cell {
-          min-height: 93px;
-        }
-        .site-footer {
-          padding-bottom: 110px;
-          font-size: 11px;
-        }
-        .modal-layer {
-          padding: 12px;
-        }
-        .modal-panel {
-          padding: 19px;
-          border-radius: 13px;
-        }
-        .comparison-frame {
-          height: 140px;
-        }
-        .toast-zone {
-          left: 15px;
-          right: 15px;
-          bottom: 88px;
-          max-width: none;
-        }
-        .modal-panel h2 {
-          font-size: 23px;
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-          animation-duration: 0.01ms !important;
-          scroll-behavior: auto !important;
-          transition-duration: 0.01ms !important;
-        }
-      }
-      /* Elemen tambahan untuk jalur klaim dengan/tanpa foto */
-      .claim-path {
-        border: 1px solid var(--line);
-        border-radius: 11px;
-        padding: 16px;
-        margin: 14px 0;
-      }
-      .claim-path .claim-heading {
-        display: flex;
-        gap: 9px;
-        align-items: center;
-        font-size: 14px;
-        font-weight: 720;
-      }
-      .claim-heading svg {
-        width: 19px;
-        color: var(--green);
-      }
-      .claim-path p {
-        font-size: 12px;
-        color: var(--muted);
-        margin: 7px 0 15px;
-      }
-      .claim-path .button {
-        font-size: 13px;
-      }
-      .claim-separator {
-        color: var(--muted);
-        font-size: 12px;
-        text-align: center;
-      }
-      .claim-secret {
-        display: block;
-        width: 100%;
-        border-radius: 8px;
-        border: 1px solid #cdd8cf;
-        padding: 12px;
-        resize: vertical;
-        margin-bottom: 14px;
-      }
-      .claim-photo-preview {
-        margin: 13px 0;
-        text-align: center;
-        border-radius: 9px;
-        overflow: hidden;
-        background: #f1f6f2;
-      }
-      .claim-photo-preview img {
-        max-width: 100%;
-        max-height: 190px;
-        object-fit: contain;
-      }
-      .claim-photo-preview p {
-        margin: 5px 0 9px !important;
-      }
-      .result-check {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--green);
-        font-size: 16px;
-        font-weight: 700;
-        padding: 8px 0 15px;
-      }
-      .result-check svg {
-        width: 23px;
-        height: 23px;
-      }
-      .modal-panel .processing {
-        margin-top: 14px;
-      }
-      .modal-panel .modal-two-photos + .processing {
-        margin-bottom: 12px;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f8f5" />
+  <meta name="description" content="Balikin — prototipe layanan barang hilang kampus" />
+  <title>Balikin — Lost &amp; Found Kampus</title>
+  <style>
+:root{color-scheme:light;--ink:#20332b;--muted:#68776e;--line:#d8e2d9;--green:#1f6b52;--green-dark:#174d3d;--green-pale:#e7f1e9;--paper:#f6f8f5;--white:#fff;--amber:#a97626;--amber-pale:#fbf4e5;--red:#a74336;--red-pale:#f9ece9;--radius:16px;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);line-height:1.5}button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #8ac3a5;outline-offset:3px}svg{display:inline-block;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round;flex:none}.svg-sprite{position:absolute;width:0;height:0;overflow:hidden}[hidden]{display:none!important}.site-header{position:sticky;top:0;z-index:20;background:#f6f8f5eb;border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.header-inner{max-width:1200px;min-height:74px;padding:0 28px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;gap:10px;align-items:center;text-decoration:none;color:var(--ink);font-size:25px;font-weight:780;letter-spacing:-1.5px}.brand-period{color:var(--green)}.brand-icon{width:38px;height:38px;border-radius:12px;background:var(--green);color:white;display:grid;place-items:center}.brand-icon svg{width:21px}.header-context,.user-tools{display:flex;align-items:center;gap:12px}.campus-status,.nim-chip,.service-chip,.flow-tag,.queue-count{display:inline-flex;align-items:center;gap:7px;border-radius:99px;background:#eaf0ea;color:#476052;font-size:12px;font-weight:700;padding:8px 11px;white-space:nowrap}.campus-status i{width:7px;height:7px;border-radius:50%;background:#55a973}.nav-button,.button{border:1px solid var(--line);border-radius:10px;min-height:43px;padding:10px 15px;display:inline-flex;justify-content:center;align-items:center;gap:8px;background:white;color:var(--ink);font-weight:700;text-decoration:none;transition:.15s ease}.nav-button:hover,.button-outline:hover{background:#edf3ee}.button-main{background:var(--green);border-color:var(--green);color:white}.button-main:hover{background:var(--green-dark)}.button-outline{background:white}.full{width:100%}.section-kicker,.eyebrow{display:block;color:#47755f;font-size:11px;font-weight:800;letter-spacing:.12em}.auth-layout{max-width:1200px;min-height:calc(100svh - 75px);margin:auto;padding:72px 28px;display:grid;grid-template-columns:1.1fr .9fr;gap:88px;align-items:center}.auth-visual h1{font-size:clamp(44px,6vw,78px);line-height:1.02;letter-spacing:-.065em;margin:18px 0 25px;max-width:700px}.auth-visual h1 em{font-style:normal;color:var(--green)}.auth-visual p{color:var(--muted);font-size:17px;line-height:1.75;max-width:580px}.auth-flow-preview{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:47px;font-size:13px;font-weight:750;color:#4f6559}.auth-flow-preview b{width:28px;height:1px;background:#b7c9ba}.auth-card,.panel{background:var(--white);border:1px solid var(--line);border-radius:var(--radius)}.auth-card{padding:35px}.auth-card h2{font-size:29px;letter-spacing:-.04em;margin:10px 0 6px}.muted{color:var(--muted);font-size:14px;margin:0 0 25px}.field{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}.field>span{font-size:13px;font-weight:750}.field em{font-style:normal;font-size:11px;color:#a46929}.field input,.field select,.field textarea,.search-controls select{width:100%;min-height:46px;border:1px solid #cad8cd;border-radius:9px;background:white;padding:10px 12px;color:var(--ink);outline:0}.field textarea{resize:vertical}.passfield{position:relative;display:block}.passfield input{padding-right:46px}.eye-button{position:absolute;right:4px;top:4px;border:0;border-radius:8px;width:38px;height:38px;background:transparent;color:#5d7566;display:grid;place-items:center}.auth-footnote{font-size:12px;line-height:1.55;color:var(--muted);margin:18px 0 0}.auth-footnote code{font-size:11px;background:#edf2ed;padding:2px 5px;border-radius:4px;color:var(--ink)}.app-layout,.admin-layout{max-width:1200px;margin:auto;padding:38px 28px 72px}.app-titlebar,.admin-titlebar{display:flex;justify-content:space-between;align-items:end;gap:20px;padding:9px 0 28px}.app-titlebar h1,.admin-titlebar h1{font-size:clamp(30px,4vw,48px);letter-spacing:-.055em;margin:7px 0}.app-titlebar p,.admin-titlebar p{color:var(--muted);font-size:14px;margin:0;max-width:640px}.workspace-tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:32px}.tab-button{border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;margin-bottom:-1px;padding:13px 17px;color:#718078;min-height:48px}.tab-button.active{color:var(--green);border-color:var(--green)}.tab-button:hover{color:var(--green)}.content-section{padding-bottom:40px;animation:rise .18s ease-out}@keyframes rise{from{opacity:.7;transform:translateY(4px)}to{opacity:1;transform:none}}.flow-heading{display:flex;align-items:start;justify-content:space-between;gap:18px;margin-bottom:22px}.flow-heading h2{font-size:28px;letter-spacing:-.04em;margin:6px 0}.flow-heading p{font-size:14px;color:var(--muted);margin:0;max-width:660px}.flow-tag{background:var(--amber-pale);color:#8b6425}.flow-steps{display:flex;list-style:none;padding:0;margin:0 0 24px;border:1px solid var(--line);border-radius:12px;background:white;overflow:hidden}.flow-steps li{position:relative;flex:1;padding:13px 15px;color:#77847c;font-size:12px;font-weight:700;display:flex;gap:9px;align-items:center;border-right:1px solid var(--line)}.flow-steps li:last-child{border:0}.flow-steps b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:11px;background:#eef2ee;color:#62746a}.flow-steps .active{background:#eff7f1;color:var(--green)}.flow-steps .active b{background:var(--green);color:white}.finder-layout{display:grid;grid-template-columns:.78fr 1.22fr;gap:20px}.panel{padding:23px}.panel-title,.section-row,.admin-monitoring-head{display:flex;align-items:start;justify-content:space-between;gap:16px}.panel-title h3,.section-row h2,.admin-monitoring h2{font-size:18px;letter-spacing:-.025em;margin:0 0 4px}.panel-title p,.panel-title+ p{font-size:12px;color:var(--muted);margin:0}.status-pill,.ai-note,.admin-status{display:inline-flex;align-items:center;white-space:nowrap;border-radius:99px;padding:5px 8px;font-size:10px;font-weight:800;letter-spacing:.04em}.status-pill.ready,.ai-note{background:#e7f2e9;color:var(--green)}.photo-preview{min-height:258px;margin:18px 0 12px;border:1px dashed #bfd0c2;border-radius:12px;background:#f1f5f1;color:#577063;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:7px}.photo-preview svg{width:38px;height:38px;color:var(--green)}.photo-preview strong{font-size:15px;color:var(--ink)}.photo-preview span{font-size:12px;max-width:230px}.identity-notice{display:flex;gap:10px;padding:13px;margin-top:13px;border-radius:10px;background:var(--amber-pale);color:#76531d}.identity-notice svg{color:#a97626}.identity-notice strong{font-size:13px}.identity-notice p{font-size:12px;line-height:1.5;margin:2px 0 0}.fieldgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.recommendation{margin-top:20px;padding:23px;border:1px solid #b9d7c0;background:#f0f7f1;border-radius:var(--radius)}.recommendation-grid{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}.recommendation h3{font-size:20px;letter-spacing:-.03em;margin:5px 0}.recommendation p{font-size:13px;color:#52695b;margin:0}.recommendation .pin-display{margin:13px 0 0}.pin-display{display:flex;gap:11px;align-items:center;background:white;border:1px solid #c9ddce;border-radius:10px;padding:11px 13px;font-size:12px}.pin-display strong{font-size:22px;letter-spacing:.13em;color:var(--green)}.search-controls{display:flex;gap:10px;align-items:center;margin-bottom:12px}.search-field{min-height:50px;border:1px solid #cad8cd;background:white;border-radius:10px;padding:0 14px;display:flex;align-items:center;gap:10px;flex:1}.search-field svg{color:var(--muted)}.search-field input{border:0;background:transparent;outline:0;width:100%;height:100%}.search-controls select{width:auto;min-height:50px}.result-count{font-size:13px;color:var(--muted);margin:16px 0}.item-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.item-card{border:1px solid var(--line);background:white;border-radius:13px;overflow:hidden;display:flex;flex-direction:column}.item-cover{height:120px;background:#ecf3ed;display:grid;place-items:center;color:#7a9884}.item-cover svg{width:42px;height:42px}.item-info{display:flex;flex-direction:column;gap:6px;padding:16px;flex:1}.item-info h3{font-size:17px;letter-spacing:-.02em;margin:2px 0}.item-info p,.item-info small{font-size:12px;color:var(--muted);margin:0}.item-info .button{margin-top:auto;font-size:13px}.item-meta{display:flex;justify-content:space-between;align-items:center;gap:8px}.chip{display:inline-flex;align-items:center;background:#edf4ef;color:var(--green);font-size:10px;font-weight:800;letter-spacing:.04em;border-radius:5px;padding:4px 6px}.risk-chip{background:var(--amber-pale);color:#8b6425}.lost-report{display:flex;justify-content:space-between;gap:30px;align-items:center;margin-top:23px;background:#f2f7f2}.lost-report h3{margin:6px 0;font-size:19px}.lost-report p,.lost-report small{font-size:12px;color:var(--muted);margin:0}.lost-report-actions{display:grid;gap:7px;max-width:260px;text-align:right}.location-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.location-card{border:1px solid var(--line);border-radius:14px;background:white;padding:20px;display:grid;gap:14px}.location-card.offline{border-color:#e8c8c1}.location-card-head{display:flex;justify-content:space-between;gap:8px;align-items:start}.location-card h3{font-size:20px;letter-spacing:-.03em;margin:3px 0}.location-card p{font-size:12px;color:var(--muted);margin:0}.location-status{font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--green);background:#e7f2e9;padding:5px 7px;border-radius:99px}.offline .location-status{color:var(--red);background:var(--red-pale)}.capacity-line{display:flex;justify-content:space-between;font-size:12px;font-weight:700}.capacity-bar{height:7px;border-radius:99px;background:#e6ece6;overflow:hidden}.capacity-bar>span{display:block;height:100%;background:var(--green);border-radius:inherit}.offline .capacity-bar>span{background:#c57465}.size-row{display:flex;gap:6px}.size-row span{padding:4px 7px;border:1px solid var(--line);border-radius:5px;font-size:10px;font-weight:700;color:#5b7062}.route-note{margin-top:20px;display:flex;gap:13px;background:var(--amber-pale);border-color:#efd7a9}.route-note svg{color:var(--amber);margin-top:2px}.route-note h3{font-size:15px;margin:0 0 3px}.route-note p{font-size:13px;margin:0;color:#6e592e}.exception-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.exception-card{border:1px solid var(--line);border-radius:13px;background:white;padding:18px}.exception-card svg{color:var(--green);width:23px;height:23px}.exception-card h3{font-size:16px;margin:11px 0 4px;letter-spacing:-.02em}.exception-card p{font-size:12px;color:var(--muted);margin:0}.exception-card strong{display:block;font-size:11px;color:#596f60;margin-top:12px}.admin-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 24px}.admin-summary-card{border:1px solid var(--line);border-top:3px solid var(--green);border-radius:12px;background:white;padding:18px;display:flex;flex-direction:column;gap:3px}.admin-summary-card span,.admin-summary-card small{font-size:12px;color:var(--muted)}.admin-summary-card strong{font-size:35px;line-height:1}.admin-summary-card.alert{border-top-color:#be705d}.admin-summary-card.waiting{border-top-color:#c99e4c}.admin-summary-card.available{border-top-color:#85bd98}.admin-queue-section{border:1px solid var(--line);border-radius:var(--radius);background:white;padding:23px;margin-bottom:20px}.section-row{align-items:center;margin-bottom:15px}.queue-count{background:var(--red-pale);color:var(--red)}.admin-queue{display:grid;gap:9px}.queue-item{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:12px}.queue-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:9px;background:#f0f4f0;color:var(--green)}.queue-item.alert .queue-icon{background:var(--red-pale);color:var(--red)}.queue-item h3{font-size:14px;margin:0 0 1px}.queue-item p{font-size:12px;color:var(--muted);margin:0}.queue-item button{font-size:12px;min-height:35px;padding:7px 10px}.admin-columns{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}.admin-columns h2{font-size:19px;letter-spacing:-.03em;margin:5px 0 15px}.admin-locations,.audit-log{display:grid;gap:10px}.admin-location,.audit-item{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--line)}.admin-location:last-child,.audit-item:last-child{padding-bottom:0;border-bottom:0}.admin-location small,.audit-item small{color:var(--muted)}.admin-monitoring{padding:0;overflow:hidden}.admin-monitoring-head{padding:23px;border-bottom:1px solid var(--line)}.admin-monitoring-head p{font-size:12px;color:var(--muted);margin:0}.admin-updated{white-space:nowrap}.admin-locker-list{display:grid}.admin-locker-row{display:grid;grid-template-columns:150px 1fr;gap:18px;padding:16px 23px;border-bottom:1px solid var(--line)}.admin-locker-row:last-child{border:0}.admin-locker-code{display:flex;align-items:center;gap:9px}.admin-locker-code strong{font-size:22px;letter-spacing:-.04em}.admin-status{background:#edf4ef;color:var(--green)}.admin-status.held{background:var(--amber-pale);color:#8b6425}.admin-status.claimed{background:#e4f0e8;color:var(--green-dark)}.admin-empty{font-size:13px;color:var(--muted);margin:3px 0}.admin-locker-detail{display:grid;gap:2px;font-size:13px;color:#596b5f}.admin-locker-detail>strong{font-size:15px;color:var(--ink)}.modal-layer{position:fixed;z-index:50;inset:0;display:grid;place-items:center;padding:20px}.modal-backdrop{position:absolute;inset:0;background:#18291fd9;backdrop-filter:blur(3px)}.modal-panel{position:relative;background:white;border-radius:16px;padding:25px;width:min(550px,100%);box-shadow:0 20px 70px #0004}.modal-panel h2{font-size:25px;letter-spacing:-.04em;margin:0 0 8px}.modal-panel p{font-size:14px;color:var(--muted)}.modal-close{float:right;border:0;border-radius:8px;background:#eef3ef;width:34px;height:34px;color:#506257;display:grid;place-items:center}.claim-form{display:grid;gap:12px;margin-top:18px}.claim-result{margin-top:15px;padding:13px;border-radius:10px;background:#f0f7f1;color:#305d47;font-size:13px}.toast-zone{position:fixed;right:20px;bottom:22px;z-index:60;display:grid;gap:8px;max-width:min(360px,calc(100vw - 36px))}.toast{background:#203b2e;color:white;padding:13px 16px;border-radius:9px;font-size:13px;box-shadow:0 9px 25px #1c302522}.site-footer{border-top:1px solid var(--line);padding:28px 20px;text-align:center;font-size:12px;color:#87938a}@media(max-width:900px){.auth-layout{gap:38px;grid-template-columns:1fr}.finder-layout{grid-template-columns:1fr}.item-grid,.exception-grid{grid-template-columns:repeat(2,1fr)}.location-grid{grid-template-columns:1fr}.admin-summary{grid-template-columns:repeat(2,1fr)}.admin-columns{grid-template-columns:1fr}}@media(max-width:670px){.header-inner{min-height:63px;padding:0 17px}.brand{font-size:22px}.brand-icon{width:33px;height:33px}.campus-status,.nim-chip{display:none}.nav-button{min-height:38px;padding:8px}.nav-button span{display:none}.auth-layout{padding:31px 18px 48px;gap:25px}.auth-visual h1{font-size:42px}.auth-visual p{font-size:14px}.auth-flow-preview{margin-top:26px;gap:7px;font-size:11px}.auth-flow-preview b{width:15px}.auth-card{padding:22px 18px}.app-layout,.admin-layout{padding:24px 17px 48px}.app-titlebar,.admin-titlebar{display:block;padding:1px 0 20px}.app-titlebar h1,.admin-titlebar h1{font-size:31px}.service-chip{margin-top:12px}.workspace-tabs{overflow:auto;margin-right:-17px;padding-right:17px}.tab-button{white-space:nowrap;font-size:12px;padding:12px 13px}.flow-heading{display:block}.flow-heading h2{font-size:24px}.flow-tag{margin-top:12px}.flow-steps{display:grid;grid-template-columns:1fr 1fr}.flow-steps li{border-bottom:1px solid var(--line)}.flow-steps li:nth-child(2){border-right:0}.flow-steps li:nth-last-child(-n+2){border-bottom:0}.panel{padding:18px}.fieldgrid,.item-grid,.exception-grid,.recommendation-grid{grid-template-columns:1fr}.recommendation .button{width:100%}.search-controls{display:grid}.search-controls select{width:100%}.lost-report{display:grid;gap:16px}.lost-report-actions{max-width:none;text-align:left}.location-grid{gap:11px}.admin-summary{gap:9px;margin-bottom:16px}.admin-summary-card{padding:14px}.admin-summary-card strong{font-size:29px}.admin-queue-section{padding:18px}.queue-item{grid-template-columns:auto 1fr}.queue-item button{grid-column:2}.admin-monitoring-head{display:block;padding:18px}.admin-updated{margin-top:12px!important}.admin-locker-row{grid-template-columns:1fr;gap:8px;padding:16px 18px}.admin-locker-code{justify-content:space-between}.modal-layer{padding:12px}.modal-panel{padding:20px}.toast-zone{left:14px;right:14px;bottom:16px;max-width:none}}
 
-      @media (max-width: 670px) {
-        .site-header .header-inner {
-          padding: 0 12px;
-          gap: 8px;
-        }
-        .brand {
-          font-size: 20px;
-          gap: 6px;
-        }
-        .brand-icon {
-          width: 31px;
-          height: 31px;
-        }
-        .brand-icon svg {
-          width: 19px;
-          height: 19px;
-        }
-        .topnav {
-          margin-left: auto;
-          gap: 0;
-        }
-        .user-tools {
-          gap: 0;
-        }
-        .nim-chip {
-          display: none;
-        }
-        .nav-button {
-          padding: 8px 7px;
-        }
-        .nav-button#logoutBtn span {
-          display: none;
-        }
-        .nav-button#logoutBtn {
-          margin-left: 2px;
-        }
-        .nav-button#videoBtn span {
-          display: inline;
-        }
-      }
-      .admin-layout {
-        max-width: 1190px;
-        margin: 0 auto;
-        padding: 42px 28px 68px;
-      }
-      .admin-titlebar {
-        padding: 12px 0 28px;
-      }
-      .admin-titlebar h1 {
-        font-size: clamp(30px, 4vw, 48px);
-        letter-spacing: -0.05em;
-        margin: 8px 0;
-      }
-      .admin-titlebar p {
-        color: var(--muted);
-        margin: 0;
-      }
-      .admin-summary {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin: 0 0 24px;
-      }
-      .admin-summary-card {
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        background: white;
-        padding: 18px;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-      }
-      .admin-summary-card span,
-      .admin-summary-card small {
-        font-size: 12px;
-        color: var(--muted);
-      }
-      .admin-summary-card strong {
-        font-size: 34px;
-        line-height: 1;
-        color: var(--ink);
-      }
-      .admin-summary-card.available { border-top: 3px solid #88c09a; }
-      .admin-summary-card.held { border-top: 3px solid #c6a563; }
-      .admin-summary-card.stored { border-top: 3px solid #537e66; }
-      .admin-summary-card.claimed { border-top: 3px solid var(--green); }
-      .admin-monitoring {
-        padding: 0;
-        overflow: hidden;
-      }
-      .admin-monitoring-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 24px;
-        align-items: end;
-        padding: 24px;
-        border-bottom: 1px solid var(--line);
-      }
-      .admin-monitoring-head h2 {
-        font-size: 22px;
-        letter-spacing: -0.03em;
-        margin: 5px 0;
-      }
-      .admin-monitoring-head p {
-        font-size: 13px;
-        color: var(--muted);
-        margin: 0;
-      }
-      .admin-updated { white-space: nowrap; }
-      .admin-locker-list { display: grid; }
-      .admin-locker-row {
-        display: grid;
-        grid-template-columns: 150px 1fr;
-        gap: 20px;
-        align-items: start;
-        padding: 18px 24px;
-        border-bottom: 1px solid var(--line);
-      }
-      .admin-locker-row:last-child { border-bottom: 0; }
-      .admin-locker-code {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .admin-locker-code > strong {
-        font-size: 22px;
-        letter-spacing: -0.04em;
-      }
-      .admin-status {
-        display: inline-flex;
-        align-items: center;
-        border-radius: 20px;
-        padding: 4px 8px;
-        font-size: 10px;
-        font-weight: 760;
-        letter-spacing: 0.05em;
-        background: #edf4ef;
-        color: var(--green);
-      }
-      .admin-status.held { background: #fbf5e8; color: #9b7540; }
-      .admin-status.stored { background: #e9efec; color: #315b48; }
-      .admin-status.claimed { background: #e7f2ed; color: var(--green-dark); }
-      .admin-locker-detail {
-        display: grid;
-        gap: 3px;
-        font-size: 13px;
-        color: #596b5f;
-      }
-      .admin-locker-detail > strong {
-        font-size: 15px;
-        color: var(--ink);
-      }
-      .admin-empty {
-        font-size: 13px;
-        color: var(--muted);
-        margin: 3px 0;
-      }
-      @media (max-width: 900px) {
-        .admin-summary { grid-template-columns: repeat(2, 1fr); }
-      }
-      @media (max-width: 670px) {
-        .admin-layout { padding: 27px 17px 44px; }
-        .admin-titlebar { padding: 2px 0 22px; }
-        .admin-titlebar h1 { font-size: 31px; }
-        .admin-summary { gap: 9px; margin-bottom: 16px; }
-        .admin-summary-card { padding: 14px; }
-        .admin-summary-card strong { font-size: 29px; }
-        .admin-monitoring-head { display: block; padding: 18px; }
-        .admin-updated { margin-top: 12px !important; }
-        .admin-locker-row { grid-template-columns: 1fr; gap: 9px; padding: 16px 18px; }
-        .admin-locker-code { justify-content: space-between; }
-        .admin-locker-detail { font-size: 12px; }
-      }
-    </style>
-    <script defer>
-      /* Balikin: prototype interaktif, tanpa backend, autentikasi, atau analisis AI sungguhan. */
-      (() => {
-        "use strict";
-        const $ = (id) => document.getElementById(id);
-        const icons = (name) =>
-          `<svg aria-hidden="true"><use href="#i-${name}"></use></svg>`;
-        const safe = (input) =>
-          String(input ?? "").replace(
-            /[&<>"']/g,
-            (c) =>
-              ({
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;",
-              })[c],
-          );
-        const locations = [
-          "A1",
-          "A2",
-          "A3",
-          "B1",
-          "B2",
-          "B3",
-          "C1",
-          "C2",
-          "C3",
-        ];
-        const ADMIN_USERNAME = "admin";
-        const ADMIN_PASSWORD = "admin123";
-        // Aplikasi tetap bisa dicoba secara lokal saat penyimpanan browser diblokir.
-        const storage = (() => {
-          try {
-            const s = window.sessionStorage;
-            s.setItem("__balikin_test", "1");
-            s.removeItem("__balikin_test");
-            return s;
-          } catch {
-            const memory = new Map();
-            return {
-              getItem: (k) => memory.get(k) ?? null,
-              setItem: (k, v) => memory.set(k, String(v)),
-              removeItem: (k) => memory.delete(k),
-            };
-          }
-        })();
-        const KEY_ITEMS = "balikin-items-standalone-v1";
-        const KEY_USER = "balikin-user-standalone-v1";
-        let user = null,
-          foundPhoto = "",
-          items = [],
-          currentModal = "",
-          progressTimer = null,
-          videoTimer = null;
-        const samplePhoto =
-          "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22500%22%20height%3D%22680%22%20viewBox%3D%220%200%20500%20680%22%3E%3Crect%20width%3D%22500%22%20height%3D%22680%22%20fill%3D%22%23edf3ef%22%2F%3E%3Crect%20x%3D%22170%22%20y%3D%2291%22%20width%3D%22160%22%20height%3D%2270%22%20rx%3D%2222%22%20fill%3D%22%2356906d%22%2F%3E%3Cpath%20d%3D%22M185%20160%20C170%20202%20150%20225%20155%20297%20L158%20520%20C160%20577%20177%20612%20250%20612%20C323%20612%20340%20577%20342%20520%20L345%20297%20C350%20225%20330%20202%20315%20160%20Z%22%20fill%3D%22%238ccc59%22%20fill-opacity%3D%22.84%22%20stroke%3D%22%234b8d52%22%20stroke-width%3D%228%22%2F%3E%3Cpath%20d%3D%22M217%20185%20Q190%20365%20214%20583%20M283%20185%20Q310%20365%20286%20583%22%20fill%3D%22none%22%20stroke%3D%22%23dcf69c%22%20stroke-width%3D%2210%22%20opacity%3D%22.6%22%2F%3E%3Cpath%20d%3D%22M161%20336%20Q250%20358%20339%20336%22%20fill%3D%22none%22%20stroke%3D%22%234b8d52%22%20stroke-width%3D%226%22%20opacity%3D%22.7%22%2F%3E%3C%2Fsvg%3E";
-        const stages = [
-          [
-            "Barang ditemukan",
-            "Seorang mahasiswa menemukan botol minum yang tertinggal di ruang kelas.",
-          ],
-          [
-            "Buka Balikin",
-            "Mahasiswa membuka aplikasi dan memilih menu Titip Barang.",
-          ],
-          [
-            "Foto barang",
-            "Penemu memotret botol melalui kamera atau memilih foto dari galeri.",
-          ],
-          [
-            "Bantu isi formulir",
-            "Informasi seperti nama, kategori, dan warna terisi melalui simulasi pemrosesan foto.",
-          ],
-          [
-            "Konfirmasi data",
-            "Penemu memeriksa informasi serta menambahkan lokasi temuan dan ciri khusus.",
-          ],
-          [
-            "Loker dialokasikan",
-            "Sistem menyediakan salah satu dari sembilan kompartemen loker.",
-          ],
-          ["Masukkan PIN", "Penemu memasukkan kode untuk membuka loker."],
-          [
-            "Barang disimpan",
-            "Loker ditutup dan barang dicatat sebagai tersedia di katalog.",
-          ],
-          [
-            "Pemilik mencari",
-            "Pemilik menelusuri daftar dan melihat barang yang sesuai.",
-          ],
-          [
-            "Foto pembanding",
-            "Pemilik mengunggah foto barang miliknya untuk pemindaian.",
-          ],
-          [
-            "Pemeriksaan foto",
-            "Simulasi AI membandingkan kedua foto dan menampilkan hasil cocok.",
-          ],
-          [
-            "Kode pengambilan",
-            "Kode akses diberikan pada alur klaim melalui foto.",
-          ],
-          [
-            "Barang kembali",
-            "Pemilik mengambil barang, lalu loker menjadi kosong.",
-          ],
-        ];
+</style>
+  <script>
+(() => {
+  'use strict';
 
-        function loadItems() {
-          try {
-            const stored = JSON.parse(storage.getItem(KEY_ITEMS) || "[]");
-            return Array.isArray(stored) ? stored : [];
-          } catch {
-            return [];
-          }
-        }
-        function persistItems() {
-          try {
-            storage.setItem(KEY_ITEMS, JSON.stringify(items));
-          } catch {
-            toast(
-              "Data foto terlalu besar untuk disimpan di sesi ini. Data tetap tersedia sampai halaman ditutup.",
-            );
-          }
-        }
-        function restoreUser() {
-          try {
-            return JSON.parse(storage.getItem(KEY_USER) || "null");
-          } catch {
-            return null;
-          }
-        }
-        function showAuthTab(which) {
-          const reg = which === "register";
-          $("loginForm").hidden = reg;
-          $("registerForm").hidden = !reg;
-          $("loginTab").classList.toggle("active", !reg);
-          $("registerTab").classList.toggle("active", reg);
-          $("loginTab").setAttribute("aria-selected", String(!reg));
-          $("registerTab").setAttribute("aria-selected", String(reg));
-          $("authTitle").textContent = reg
-            ? "Buat akun Balikin"
-            : "Masuk ke Balikin";
-          $("authHelp").textContent = reg
-            ? "Daftar menggunakan NIM untuk melanjutkan."
-            : "Gunakan NIM untuk melanjutkan.";
-        }
-        function setUser(data) {
-          user = data;
-          storage.setItem(KEY_USER, JSON.stringify(data));
-          const admin = data.role === "admin";
-          $("authView").hidden = true;
-          $("appView").hidden = admin;
-          $("adminView").hidden = !admin;
-          $("userTools").hidden = false;
-          $("mobileNav").hidden = admin;
-          $("nimDisplay").textContent = admin
-            ? "Administrator"
-            : data.nim
-              ? `NIM ${data.nim}`
-              : data.name || "Mahasiswa";
-          if (admin) {
-            renderAdminDashboard();
-            window.scrollTo(0, 0);
-            return;
-          }
-          showTab("titip");
-          window.scrollTo(0, 0);
-        }
-        function logout() {
-          user = null;
-          storage.removeItem(KEY_USER);
-          closeModal();
-          $("authView").hidden = false;
-          $("appView").hidden = true;
-          $("adminView").hidden = true;
-          $("userTools").hidden = true;
-          $("mobileNav").hidden = true;
-          showAuthTab("login");
-          window.scrollTo(0, 0);
-        }
-        function showTab(tab) {
-          ["titip", "cari", "loker"].forEach((t) => {
-            $("tab-" + t).hidden = t !== tab;
-          });
-          document.querySelectorAll("[data-tab]").forEach((b) => {
-            const active = b.dataset.tab === tab;
-            b.classList.toggle("active", active);
-            b.setAttribute("aria-selected", String(active));
-          });
-          if (tab === "cari") renderItems();
-          if (tab === "loker") renderLockers();
-          window.scrollTo({ top: 0, behavior: "instant" });
-        }
-        function toast(message) {
-          const t = document.createElement("div");
-          t.className = "toast";
-          t.setAttribute("role", "status");
-          t.textContent = message;
-          $("toastZone").appendChild(t);
-          setTimeout(() => t.remove(), 4200);
-        }
-        function showModal(body, heading = "Informasi") {
-          clearInterval(videoTimer);
-          videoTimer = null;
-          $("modalLayer").hidden = false;
-          $("modalContent").innerHTML =
-            `<button class="modal-close" type="button" aria-label="Tutup" id="modalClose">${icons("x")}</button><h2 id="modalHeading">${safe(heading)}</h2>${body}`;
-          $("modalClose").addEventListener("click", closeModal);
-          $("modalClose").focus();
-        }
-        function closeModal() {
-          if (progressTimer) {
-            clearInterval(progressTimer);
-            progressTimer = null;
-          }
-          if (videoTimer) {
-            clearInterval(videoTimer);
-            videoTimer = null;
-          }
-          $("modalLayer").hidden = true;
-          $("modalContent").innerHTML = "";
-          currentModal = "";
-        }
-        function actionRow(buttons) {
-          return `<div class="modal-actions">${buttons.map((b) => `<button type="button" class="button ${b.type === "primary" ? "button-main" : "button-outline"}" data-action="${safe(b.action)}">${safe(b.label)}</button>`).join("")}</div>`;
-        }
-        const photoCheck = (file) =>
-          file &&
-          file.type.startsWith("image/") &&
-          file.size <= 5 * 1024 * 1024;
-        function imageData(file) {
-          return new Promise((resolve, reject) => {
-            const fr = new FileReader();
-            fr.onerror = () => reject(Error("Gagal membaca foto."));
-            fr.onload = () => {
-              const img = new Image();
-              img.onerror = () =>
-                reject(Error("Format foto tidak dapat dibuka."));
-              img.onload = () => {
-                const ratio = Math.min(
-                  1,
-                  960 / Math.max(img.naturalWidth, img.naturalHeight),
-                );
-                const canvas = document.createElement("canvas");
-                canvas.width = Math.round(img.naturalWidth * ratio);
-                canvas.height = Math.round(img.naturalHeight * ratio);
-                canvas
-                  .getContext("2d")
-                  .drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL("image/jpeg", 0.76));
-              };
-              img.src = fr.result;
-            };
-            fr.readAsDataURL(file);
-          });
-        }
-        function animatePercent(container, bar, pct, milliseconds, done) {
-          container.hidden = false;
-          bar.style.width = "0%";
-          pct.textContent = "0%";
-          let start = performance.now();
-          clearInterval(progressTimer);
-          progressTimer = setInterval(() => {
-            const x = Math.min(1, (performance.now() - start) / milliseconds);
-            const n = Math.min(100, Math.round(x * 100));
-            bar.style.width = n + "%";
-            pct.textContent = n + "%";
-            if (x >= 1) {
-              clearInterval(progressTimer);
-              progressTimer = null;
-              done?.();
-            }
-          }, 70);
-        }
-        async function foundUpload(file) {
-          if (!file) return;
-          if (!photoCheck(file)) {
-            toast(
-              "Pilih foto JPG, PNG, atau format gambar lain dengan ukuran maksimal 5 MB.",
-            );
-            return;
-          }
-          try {
-            foundPhoto = await imageData(file);
-            $("foundPreview").innerHTML =
-              `<img src="${foundPhoto}" alt="Foto barang temuan"/>`;
-            animatePercent(
-              $("foundProcessing"),
-              $("foundProgressBar"),
-              $("foundProcessPct"),
-              2700,
-              () => {
-                $("foundProcessingText").textContent =
-                  "Formulir siap diperiksa";
-                $("itemName").value = "Botol minum";
-                $("itemCategory").value = "Botol / Tumbler";
-                $("itemColor").value = "Hijau";
-                $("itemGeneral").value =
-                  "Botol plastik transparan warna hijau, tutup hijau, badan dengan lekukan vertikal.";
-                toast("Data barang terisi. Periksa dan lengkapi lokasinya.");
-              },
-            );
-            $("foundProcessingText").textContent = "Memproses foto...";
-          } catch {
-            toast("Foto tidak dapat diproses. Coba foto lain.");
-          }
-        }
-        const availableLocker = () =>
-          locations.find(
-            (l) =>
-              !items.some(
-                (i) =>
-                  i.locker === l &&
-                  (i.status === "held" ||
-                    i.status === "stored" ||
-                    i.status === "claimed"),
-              ),
-          );
-        function newPin() {
-          return String(Math.floor(100000 + Math.random() * 900000));
-        }
-        function submitDeposit(e) {
-          e.preventDefault();
-          const name = $("itemName").value.trim(),
-            location = $("itemLocation").value.trim(),
-            category = $("itemCategory").value,
-            color = $("itemColor").value.trim(),
-            general = $("itemGeneral").value.trim(),
-            secret = $("itemSecret").value.trim();
-          if (!foundPhoto) {
-            toast("Tambahkan foto barang terlebih dahulu.");
-            return;
-          }
-          if (!name || !location || !category) {
-            toast("Lengkapi nama, kategori, dan lokasi barang.");
-            return;
-          }
-          const locker = availableLocker();
-          if (!locker) {
-            toast("Seluruh loker sedang digunakan.");
-            showTab("loker");
-            return;
-          }
-          const item = {
-            id: Date.now().toString(36),
-            name,
-            category,
-            color,
-            location,
-            general,
-            secret,
-            photo: foundPhoto,
-            locker,
-            depositPin: newPin(),
-            claimPin: "482916",
-            finder: user?.nim || "",
-            date: new Date().toLocaleDateString("id-ID"),
-            status: "held",
-          };
-          items.unshift(item);
-          persistItems();
-          renderLockers();
-          showModal(
-            `<p>Loker telah dipesan untuk barang temuanmu.</p><div class="pin-display"><small>LOKER ${safe(locker)} · PIN PENITIPAN</small><strong>${item.depositPin}</strong></div><p>Masukkan PIN pada loker, lalu taruh barang dan tutup pintunya.</p>${actionRow(
-              [
-                { label: "Batalkan", action: "cancel-deposit" },
-                {
-                  label: "Pintu terbuka",
-                  action: "open-deposit",
-                  type: "primary",
-                },
-              ],
-            )}`,
-            "Kode penitipan",
-          );
-          currentModal = item.id;
-        }
-        function finishDeposit(item) {
-          item.status = "stored";
-          persistItems();
-          renderLockers();
-          renderItems();
-          $("depositForm").reset();
-          foundPhoto = "";
-          $("foundPreview").innerHTML =
-            `${icons("camera")}<span>Belum ada foto</span>`;
-          $("foundProcessing").hidden = true;
-          showModal(
-            `<p>Barang telah tersimpan di loker <strong>${safe(item.locker)}</strong> dan sekarang muncul dalam katalog pencarian.</p>${actionRow(
-              [
-                { label: "Lihat barang", action: "go-cari", type: "primary" },
-                { label: "Tutup", action: "close" },
-              ],
-            )}`,
-            "Penitipan selesai",
-          );
-        }
-        function renderItems() {
-          const query = $("searchInput").value.trim().toLocaleLowerCase("id");
-          const visible = items.filter(
-            (i) =>
-              i.status === "stored" &&
-              [i.name, i.category, i.color, i.location, i.general].some((v) =>
-                String(v || "")
-                  .toLocaleLowerCase("id")
-                  .includes(query),
-              ),
-          );
-          $("resultCount").textContent = `${visible.length} barang ditemukan`;
-          if (!visible.length) {
-            $("itemsList").innerHTML =
-              `<div class="empty-state">${query ? "Tidak ada barang yang sesuai. Coba kata kunci lain." : "Belum ada barang temuan yang tersedia. Titip barang untuk memulai."}</div>`;
-            return;
-          }
-          $("itemsList").innerHTML = visible
-            .map(
-              (i) =>
-                `<article class="item-card"><div class="item-image"><img src="${i.photo}" alt="${safe(i.name)}"></div><div class="item-info"><span class="chip">${safe(i.category)}</span><h3>${safe(i.name)}</h3><div class="item-subtitle">${safe(i.color)} · ${safe(i.location)}</div><p class="item-desc">${safe(i.general)}</p><button class="button button-main" type="button" data-claim="${i.id}">Ini barang saya ${icons("arrow-right")}</button></div></article>`,
-            )
-            .join("");
-          $("itemsList")
-            .querySelectorAll("[data-claim]")
-            .forEach((button) =>
-              button.addEventListener("click", () =>
-                openClaim(button.dataset.claim),
-              ),
-            );
-        }
-        function renderLockers() {
-          $("lockersGrid").innerHTML = locations
-            .map((l) => {
-              const item = items.find(
-                (i) =>
-                  i.locker === l &&
-                  ["held", "stored", "claimed"].includes(i.status),
-              );
-              const state = item
-                ? item.status === "held"
-                  ? "held"
-                  : "filled"
-                : "available";
-              const label =
-                state === "available"
-                  ? "KOSONG"
-                  : state === "held"
-                    ? "DIPESAN"
-                    : "TERISI";
-              return `<div class="locker-cell ${state}" aria-label="Loker ${l}: ${label}">${l}<small>${label}</small></div>`;
-            })
-            .join("");
-        }
-        function renderAdminDashboard() {
-          const lockers = locations.map((locker) => {
-            const item = items.find(
-              (i) =>
-                i.locker === locker &&
-                ["held", "stored", "claimed"].includes(i.status),
-            );
-            const status = item?.status || "available";
-            const labels = {
-              available: "KOSONG",
-              held: "DIPESAN",
-              stored: "TERSIMPAN",
-              claimed: "SIAP DIAMBIL",
-            };
-            return { locker, item, status, label: labels[status] };
-          });
-          const counts = { available: 0, held: 0, stored: 0, claimed: 0 };
-          lockers.forEach(({ status }) => counts[status]++);
-          $("adminSummary").innerHTML = [
-            ["Kosong", counts.available, "available"],
-            ["Dipesan", counts.held, "held"],
-            ["Tersimpan", counts.stored, "stored"],
-            ["Siap diambil", counts.claimed, "claimed"],
-          ]
-            .map(
-              ([label, total, tone]) =>
-                `<article class="admin-summary-card ${tone}"><span>${label}</span><strong>${total}</strong><small>dari ${locations.length} loker</small></article>`,
-            )
-            .join("");
-          $("adminLockerList").innerHTML = lockers
-            .map(
-              ({ locker, item, status, label }) =>
-                `<article class="admin-locker-row ${status}">
-      <div class="admin-locker-code"><strong>${locker}</strong><span class="admin-status ${status}">${label}</span></div>
-      ${item ? `<div class="admin-locker-detail"><strong>${safe(item.name)}</strong><span>${safe(item.category)} · ${safe(item.color || "Warna tidak dicatat")}</span><span>${safe(item.location)}</span><span>Penitip: ${safe(item.finder || "Tidak tercatat")} · ${safe(item.date || "Tanpa tanggal")}</span><span>Ciri khusus: ${safe(item.secret || "Tidak dicatat")}</span><span>PIN titip ${safe(item.depositPin || "—")} · PIN ambil ${safe(item.claimPin || "—")}</span></div>` : `<p class="admin-empty">Tidak ada barang aktif di loker ini.</p>`}
-    </article>`,
-            )
-            .join("");
-          $("adminUpdated").textContent = `Diperbarui dari sesi ini · ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}`;
-        }
-        let claimPhoto = "";
-        function openClaim(id) {
-          const item = items.find((i) => i.id === id && i.status === "stored");
-          if (!item) return toast("Barang sudah tidak tersedia.");
-          currentModal = id;
-          claimPhoto = "";
-          showModal(
-            `<p>Pilih salah satu cara pengajuan klaim. Foto bersifat opsional.</p>
-      <div class="claim-path"><div class="claim-heading">${icons("camera")} Verifikasi dengan foto</div><p>Ambil foto barang milikmu atau pilih dari galeri. Ciri khusus tidak diperlukan jika menggunakan foto.</p>
-        <div class="two-actions"><button class="button button-outline" type="button" id="claimCameraBtn">${icons("camera")} Ambil foto</button><button class="button button-outline" type="button" id="claimGalleryBtn">${icons("image")} Pilih galeri</button></div>
-        <input type="file" id="claimCamera" accept="image/*" capture="environment" hidden><input type="file" id="claimGallery" accept="image/*" hidden>
-        <div class="claim-photo-preview" id="claimPhotoPreview" hidden></div><button class="button button-main full" type="button" id="scanClaimBtn" hidden>${icons("search")} Bandingkan dua foto</button></div>
-      <div class="claim-separator">atau</div>
-      <div class="claim-path"><div class="claim-heading">${icons("shield")} Klaim tanpa foto</div><p>Masukkan ciri khusus barang. Pengajuan akan ditinjau pengelola.</p>
-      <textarea class="claim-secret" id="claimSecret" rows="2" placeholder="Ciri khusus yang tidak terlihat pada foto publik"></textarea>
-      <button class="button button-outline full" type="button" id="claimTextSubmit">Ajukan klaim tanpa foto</button></div>`,
-            "Ajukan klaim",
-          );
-          currentModal = id;
-          ["Camera", "Gallery"].forEach((type) => {
-            $(`claim${type}Btn`).addEventListener("click", () =>
-              $(`claim${type}`).click(),
-            );
-            $(`claim${type}`).addEventListener("change", async (e) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              if (!photoCheck(file)) {
-                toast("Foto maksimal 5 MB dan harus berupa gambar.");
-                return;
-              }
-              try {
-                claimPhoto = await imageData(file);
-                $("claimPhotoPreview").hidden = false;
-                $("claimPhotoPreview").innerHTML =
-                  `<img src="${claimPhoto}" alt="Foto bukti pemilik"/><p>Foto berhasil ditambahkan.</p>`;
-                $("scanClaimBtn").hidden = false;
-              } catch {
-                toast("Foto gagal dibaca. Coba unggah kembali.");
-              }
-            });
-          });
-          $("scanClaimBtn").addEventListener("click", () => scanClaim(id));
-          $("claimTextSubmit").addEventListener("click", () => {
-            if (!$("claimSecret").value.trim()) {
-              toast("Masukkan ciri khusus atau unggah foto untuk melanjutkan.");
-              return;
-            }
-            showModal(
-              `<p>Pengajuan klaim telah dicatat dan akan diperiksa oleh pengelola.</p>${actionRow([{ label: "Selesai", action: "close", type: "primary" }])}`,
-              "Klaim terkirim",
-            );
-          });
-        }
-        function scanClaim(id) {
-          const item = items.find((i) => i.id === id && i.status === "stored");
-          if (!item || !claimPhoto) {
-            toast("Pilih foto terlebih dahulu.");
-            return;
-          }
-          showModal(
-            `<p>Sistem sedang membandingkan dua foto barang.</p>
-       <div class="modal-two-photos"><div><div class="comparison-frame"><img src="${item.photo}" alt="Foto barang temuan"><div class="scanline"></div></div><div class="photo-caption">Foto barang temuan</div></div><div><div class="comparison-frame"><img src="${claimPhoto}" alt="Foto milik pengklaim"><div class="scanline"></div></div><div class="photo-caption">Foto pemilik</div></div></div>
-       <div class="processing" id="claimProcessing"><div class="processing-label">${icons("search")}<span id="claimScanLabel">Membaca detail foto...</span><span id="claimPercent">0%</span></div><div class="progress-track"><div class="progress-bar" id="claimProgressBar"></div></div></div>`,
-            "Pemeriksaan foto",
-          );
-          currentModal = id;
-          const labels = [
-            "Membaca detail foto...",
-            "Memeriksa warna dan bentuk...",
-            "Mencocokkan ciri visual...",
-            "Menyelesaikan pemeriksaan...",
-          ];
-          const start = performance.now();
-          animatePercent(
-            $("claimProcessing"),
-            $("claimProgressBar"),
-            $("claimPercent"),
-            6400,
-            () => {
-              if (!items.includes(item)) return;
-              item.status = "claimed";
-              persistItems();
-              renderLockers();
-              showModal(
-                `<div class="result-check">${icons("check")} <span>Foto sesuai</span></div><p>Foto barang telah dinyatakan cocok. Kode akses dapat digunakan untuk mengambil barang di loker ${safe(item.locker)}.</p>
-      <div class="pin-display"><small>LOKER ${safe(item.locker)} · PIN PENGAMBILAN</small><strong>${safe(item.claimPin)}</strong></div>
-      ${actionRow([{ label: "Selesaikan pengambilan", action: "pickup", type: "primary" }])}`,
-                "Verifikasi selesai",
-              );
-              currentModal = id;
-            },
-          );
-          const ticker = setInterval(() => {
-            if (!$("claimScanLabel") || $("modalLayer").hidden) {
-              clearInterval(ticker);
-              return;
-            }
-            const step = Math.min(
-              3,
-              Math.floor((performance.now() - start) / 1600),
-            );
-            $("claimScanLabel").textContent = labels[step];
-            if (step >= 3) clearInterval(ticker);
-          }, 240);
-        }
-        function finishPickup(id) {
-          const item = items.find((i) => i.id === id);
-          if (!item) return closeModal();
-          item.status = "picked";
-          persistItems();
-          renderLockers();
-          renderItems();
-          showModal(
-            `<p>Barang telah diambil dan loker <strong>${safe(item.locker)}</strong> kembali kosong.</p>${actionRow([{ label: "Lihat status loker", action: "go-loker", type: "primary" }])}`,
-            "Pengambilan selesai",
-          );
-        }
-        let videoIndex = 0;
-        function renderVideoSlide() {
-          if (!$("videoHeading")) return;
-          $("videoHeading").textContent = stages[videoIndex][0];
-          $("videoDescription").textContent = stages[videoIndex][1];
-          $("videoCount").textContent = `${videoIndex + 1} / ${stages.length}`;
-          $("videoProgress").style.width =
-            ((videoIndex + 1) / stages.length) * 100 + "%";
-        }
-        function showVideo() {
-          videoIndex = 0;
-          showModal(
-            `<p>Alur penitipan dan pengambilan barang melalui Balikin.</p>
-      <div class="video-stage">${icons("play")}<h3 id="videoHeading"></h3><p id="videoDescription"></p></div>
-      <div class="video-controls"><button type="button" class="video-control-button" id="videoPrev" aria-label="Adegan sebelumnya">${icons("arrow-left")}</button><div class="video-timeline"><div id="videoProgress"></div></div><span class="video-count" id="videoCount"></span><button type="button" class="video-control-button" id="videoNext" aria-label="Adegan berikutnya">${icons("arrow-right")}</button></div>
-      ${actionRow([{ label: "Putar otomatis", action: "autoplay", type: "primary" }])}`,
-            "Video alur Balikin",
-          );
-          $("videoPrev").addEventListener("click", () => {
-            videoIndex = Math.max(0, videoIndex - 1);
-            renderVideoSlide();
-          });
-          $("videoNext").addEventListener("click", () => {
-            videoIndex = Math.min(stages.length - 1, videoIndex + 1);
-            renderVideoSlide();
-          });
-          $("modalContent")
-            .querySelector('[data-action="autoplay"]')
-            .addEventListener("click", (e) => {
-              if (videoTimer) {
-                clearInterval(videoTimer);
-                videoTimer = null;
-                e.target.textContent = "Putar otomatis";
-                return;
-              }
-              e.target.textContent = "Jeda";
-              videoTimer = setInterval(() => {
-                if (videoIndex >= stages.length - 1) {
-                  clearInterval(videoTimer);
-                  videoTimer = null;
-                  e.target.textContent = "Putar ulang";
-                  return;
-                }
-                videoIndex++;
-                renderVideoSlide();
-              }, 1800);
-            });
-          renderVideoSlide();
-        }
-        function modalClick(event) {
-          if (event.target?.dataset.close === "true") {
-            closeModal();
-            return;
-          }
-          const a = event.target.closest("[data-action]");
-          if (!a) return;
-          const item = items.find((i) => i.id === currentModal);
-          switch (a.dataset.action) {
-            case "cancel-deposit":
-              if (item) {
-                items = items.filter((i) => i.id !== item.id);
-                persistItems();
-                renderLockers();
-              }
-              closeModal();
-              break;
-            case "open-deposit":
-              if (item) {
-                showModal(
-                  `<p>Loker ${safe(item.locker)} terbuka. Letakkan barang dan tutup pintunya.</p>${actionRow([{ label: "Konfirmasi barang tersimpan", action: "finish-deposit", type: "primary" }])}`,
-                  "Loker terbuka",
-                );
-                currentModal = item.id;
-              }
-              break;
-            case "finish-deposit":
-              if (item) finishDeposit(item);
-              break;
-            case "go-cari":
-              closeModal();
-              showTab("cari");
-              break;
-            case "go-loker":
-              closeModal();
-              showTab("loker");
-              break;
-            case "pickup":
-              if (item) finishPickup(item.id);
-              break;
-            case "close":
-              closeModal();
-              break;
-          }
-        }
-        function install() {
-          items = loadItems();
-          renderLockers();
-          renderItems();
-          $("loginTab").addEventListener("click", () => showAuthTab("login"));
-          $("registerTab").addEventListener("click", () =>
-            showAuthTab("register"),
-          );
-          $("loginForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const username = $("loginNim").value.trim();
-            const password = $("loginPassword").value;
-            if (username === ADMIN_USERNAME) {
-              if (password === ADMIN_PASSWORD) {
-                setUser({ name: "Administrator", role: "admin" });
-              } else {
-                toast("Kredensial admin tidak sesuai.");
-              }
-              return;
-            }
-            setUser({ nim: username, name: "" });
-          });
-          $("registerForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            setUser({
-              nim: $("registerNim").value.trim(),
-              name: $("registerName").value.trim(),
-            });
-          });
-          document.querySelectorAll(".eye-button").forEach((button) =>
-            button.addEventListener("click", () => {
-              const input = $(button.dataset.target);
-              input.type = input.type === "password" ? "text" : "password";
-              button.setAttribute(
-                "aria-label",
-                input.type === "password"
-                  ? "Tampilkan password"
-                  : "Sembunyikan password",
-              );
-              button
-                .querySelector("use")
-                .setAttribute(
-                  "href",
-                  input.type === "password" ? "#i-eye" : "#i-eye-off",
-                );
-            }),
-          );
-          $("logoutBtn").addEventListener("click", logout);
-          $("brandLink").addEventListener("click", (e) => {
-            e.preventDefault();
-            if (user) showTab("titip");
-            else window.scrollTo(0, 0);
-          });
-          $("videoBtn").addEventListener("click", showVideo);
-          document
-            .querySelectorAll("[data-tab]")
-            .forEach((button) =>
-              button.addEventListener("click", () =>
-                showTab(button.dataset.tab),
-              ),
-            );
-          $("modalLayer").addEventListener("click", modalClick);
-          document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" && !$("modalLayer").hidden) closeModal();
-          });
-          $("foundCameraBtn").addEventListener("click", () =>
-            $("foundCamera").click(),
-          );
-          $("foundGalleryBtn").addEventListener("click", () =>
-            $("foundGallery").click(),
-          );
-          $("foundCamera").addEventListener("change", (e) =>
-            foundUpload(e.target.files?.[0]),
-          );
-          $("foundGallery").addEventListener("change", (e) =>
-            foundUpload(e.target.files?.[0]),
-          );
-          $("depositForm").addEventListener("submit", submitDeposit);
-          $("searchInput").addEventListener("input", renderItems);
-          const saved = restoreUser();
-          if (saved) {
-            setUser(saved);
-          } else {
-            showAuthTab("login");
-          }
-        }
-        document.addEventListener("DOMContentLoaded", install);
-      })();
-    </script>
-  </head>
-  <body>
-    <svg
-      aria-hidden="true"
-      class="svg-sprite"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <symbol id="i-package" viewBox="0 0 24 24">
-        <path d="m12 2 9 5-9 5-9-5 9-5Z" />
-        <path d="M3 7v10l9 5 9-5V7M12 12v10" />
-      </symbol>
-      <symbol id="i-camera" viewBox="0 0 24 24">
-        <path
-          d="M14 4h-4L8 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z"
-        />
-        <circle cx="12" cy="13" r="3" />
-      </symbol>
-      <symbol id="i-image" viewBox="0 0 24 24">
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <circle cx="8.5" cy="8.5" r="1.5" />
-        <path d="m21 15-5-5L5 21" />
-      </symbol>
-      <symbol id="i-search" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-4-4" />
-      </symbol>
-      <symbol id="i-lock" viewBox="0 0 24 24">
-        <rect x="5" y="10" width="14" height="11" rx="2" />
-        <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-      </symbol>
-      <symbol id="i-video" viewBox="0 0 24 24">
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="m10 9 5 3-5 3V9Z" />
-      </symbol>
-      <symbol id="i-log-out" viewBox="0 0 24 24">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9" />
-      </symbol>
-      <symbol id="i-arrow-right" viewBox="0 0 24 24">
-        <path d="M5 12h14m-6-6 6 6-6 6" />
-      </symbol>
-      <symbol id="i-user" viewBox="0 0 24 24">
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21a8 8 0 0 1 16 0" />
-      </symbol>
-      <symbol id="i-eye" viewBox="0 0 24 24">
-        <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z" />
-        <circle cx="12" cy="12" r="3" />
-      </symbol>
-      <symbol id="i-eye-off" viewBox="0 0 24 24">
-        <path
-          d="M3 3 21 21M10.5 5.2A11.5 11.5 0 0 1 12 5c6 0 10 7 10 7a15 15 0 0 1-3 3.7M6.2 6.2A15 15 0 0 0 2 12s4 7 10 7c1.6 0 3-.5 4.3-1.3"
-        />
-      </symbol>
-      <symbol id="i-check" viewBox="0 0 24 24">
-        <path d="m5 12 4 4L19 6" />
-      </symbol>
-      <symbol id="i-x" viewBox="0 0 24 24">
-        <path d="m18 6-12 12M6 6l12 12" />
-      </symbol>
-      <symbol id="i-arrow-left" viewBox="0 0 24 24">
-        <path d="m12 19-7-7 7-7M5 12h14" />
-      </symbol>
-      <symbol id="i-sparkles" viewBox="0 0 24 24">
-        <path
-          d="m12 3 1.6 6.4L20 11l-6.4 1.6L12 19l-1.6-6.4L4 11l6.4-1.6L12 3ZM19 18l.6 1.4L21 20l-1.4.6L19 22l-.6-1.4L17 20l1.4-.6L19 18Z"
-        />
-      </symbol>
-      <symbol id="i-pin" viewBox="0 0 24 24">
-        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
-        <circle cx="12" cy="10" r="2.5" />
-      </symbol>
-      <symbol id="i-menu" viewBox="0 0 24 24">
-        <path d="M4 6h16M4 12h16M4 18h16" />
-      </symbol>
-      <symbol id="i-play" viewBox="0 0 24 24">
-        <path d="m8 5 11 7-11 7V5Z" />
-      </symbol>
-      <symbol id="i-pause" viewBox="0 0 24 24">
-        <path d="M8 5v14m8-14v14" />
-      </symbol>
-      <symbol id="i-shield" viewBox="0 0 24 24">
-        <path d="m12 2 9 4v6c0 5.5-3.5 8.5-9 10-5.5-1.5-9-4.5-9-10V6l9-4Z" />
-        <path d="m9 12 2 2 4-4" />
-      </symbol>
-    </svg>
+  const $ = (id) => document.getElementById(id);
+  const icons = (name) => `<svg aria-hidden="true"><use href="#i-${name}"></use></svg>`;
+  const safe = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = 'admin123';
+  const USER_KEY = 'balikin-visual-user-v2';
+  const locations = [
+    { id: 'fisip', name: 'FISIP', place: 'Gedung A · Lantai 1', distance: 'Terdekat dari kelas sosial', capacity: 7, total: 12, sizes: ['S 3', 'M 3', 'L 1'], status: 'online' },
+    { id: 'fti', name: 'FTI', place: 'Lobi Utama', distance: '4 menit dari FISIP', capacity: 3, total: 12, sizes: ['S 1', 'M 1', 'L 1'], status: 'online' },
+    { id: 'masjid', name: 'Masjid Kampus', place: 'Sisi utara', distance: '6 menit dari FISIP', capacity: 0, total: 9, sizes: ['S 0', 'M 0', 'L 0'], status: 'offline' },
+  ];
+  const items = [
+    { id: 'bottle', name: 'Botol minum hijau', category: 'Botol / Tumbler', color: 'Hijau', location: 'FISIP · Gedung A', date: 'Hari ini', locker: 'A2', node: 'FISIP', status: 'stored', risk: 'normal', secret: 'Stiker nama di bagian bawah', finder: '20240001', depositPin: '184205', claimPin: '482916' },
+    { id: 'wallet', name: 'Dompet hitam', category: 'Dompet', color: 'Hitam', location: 'FTI · Lobi Utama', date: 'Kemarin', locker: 'B1', node: 'FTI', status: 'claimed', risk: 'high', secret: 'Ada foto keluarga di bagian dalam', finder: '20240045', depositPin: '—', claimPin: 'Diterbitkan setelah review' },
+    { id: 'card', name: 'Kartu Identitas', category: 'Kartu Identitas', color: 'Tertutup', location: 'Masjid Kampus', date: '2 hari lalu', locker: 'Pos', node: 'Masjid', status: 'review', risk: 'identity', secret: 'Data tidak pernah ditampilkan di katalog', finder: '20240120', depositPin: '—', claimPin: 'Verifikasi admin' },
+  ];
+  const lockerRows = [
+    ['A1', 'FISIP', 'available'], ['A2', 'FISIP', 'stored', items[0]], ['A3', 'FISIP', 'held'],
+    ['B1', 'FTI', 'claimed', items[1]], ['B2', 'FTI', 'available'], ['B3', 'FTI', 'available'],
+    ['C1', 'Masjid', 'offline'], ['C2', 'Masjid', 'offline'], ['C3', 'Masjid', 'offline'],
+  ];
+  const exceptions = [
+    ['Foto tidak valid', 'Mahasiswa unggah ulang. Jika AI gagal, formulir tetap dapat diisi manual.', 'camera', 'Mahasiswa memperbaiki data'],
+    ['Kartu identitas / ATM', 'Foto disembunyikan dari katalog, diberi label aman, lalu masuk antrean Himatif.', 'shield', 'Admin memeriksa dan menghubungi pemilik'],
+    ['Loker penuh', 'Sistem menawarkan titik lain beserta jarak. Jika seluruh titik penuh, arahkan ke pos.', 'pin', 'Status: Dititip di Pos'],
+    ['Klaim ditolak', 'Pemilik dapat mencoba maksimal tiga kali sebelum eskalasi ke peninjauan manusia.', 'alert', 'Himatif menilai bukti tambahan'],
+    ['PIN salah atau kedaluwarsa', 'Tiga percobaan gagal mengunci sementara; reservasi atau klaim kembali ke antrean.', 'lock', 'Admin menangani eskalasi'],
+    ['Listrik atau Wi-Fi mati', 'Titik ditandai offline/tertunda. Aktivitas lokal harus disinkronkan saat pulih.', 'clock', 'Jangan janji akses otomatis'],
+  ];
+  let user = null;
+  let identityMode = false;
 
-    <header class="site-header">
-      <div class="header-inner">
-        <a href="#" id="brandLink" class="brand" aria-label="Balikin beranda"
-          ><span class="brand-icon"
-            ><svg><use href="#i-package"></use></svg></span
-          ><span>balikin<span class="brand-period">.</span></span></a
-        >
-        <nav class="topnav" aria-label="Navigasi utama">
-          <button type="button" id="videoBtn" class="nav-button">
-            <svg><use href="#i-video"></use></svg><span>Video</span>
-          </button>
-          <div class="user-tools" id="userTools" hidden>
-            <span class="nim-chip" id="nimDisplay"></span
-            ><button
-              type="button"
-              id="logoutBtn"
-              class="nav-button"
-              aria-label="Keluar"
-            >
-              <svg><use href="#i-log-out"></use></svg><span>Keluar</span>
-            </button>
-          </div>
-        </nav>
-      </div>
-    </header>
+  const storage = (() => {
+    try {
+      const session = window.sessionStorage;
+      session.setItem('__balikin_test', '1');
+      session.removeItem('__balikin_test');
+      return session;
+    } catch {
+      const memory = new Map();
+      return { getItem: (key) => memory.get(key) || null, setItem: (key, value) => memory.set(key, String(value)), removeItem: (key) => memory.delete(key) };
+    }
+  })();
 
-    <main id="authView" class="auth-layout">
-      <section class="auth-visual">
-        <div class="section-kicker">LOST & FOUND KAMPUS</div>
-        <h1>Barang tertinggal?<br /><em>Balikin aja.</em></h1>
-        <p>
-          Cari dan titipkan barang temuan lewat satu tempat. Prosesnya lebih
-          jelas, tanpa harus bertanya ke banyak orang.
-        </p>
-        <div class="auth-visual-footer">
-          <div class="auth-minifeature">
-            <svg><use href="#i-package"></use></svg> Titip barang
-          </div>
-          <div class="auth-minifeature">
-            <svg><use href="#i-search"></use></svg> Cari barang
-          </div>
-          <div class="auth-minifeature">
-            <svg><use href="#i-lock"></use></svg> Loker mandiri
-          </div>
-        </div>
-      </section>
-      <section class="auth-card" aria-label="Masuk atau daftar">
-        <span class="eyebrow">AKUN MAHASISWA</span>
-        <h2 id="authTitle">Masuk ke Balikin</h2>
-        <p class="muted" id="authHelp">Gunakan NIM untuk melanjutkan.</p>
-        <div class="auth-tabs" role="tablist" aria-label="Pilih akses">
-          <button
-            id="loginTab"
-            class="active"
-            type="button"
-            role="tab"
-            aria-selected="true"
-          >
-            Masuk</button
-          ><button
-            id="registerTab"
-            type="button"
-            role="tab"
-            aria-selected="false"
-          >
-            Daftar
-          </button>
-        </div>
-        <form id="loginForm" autocomplete="off" novalidate>
-          <label class="field"
-            ><span>NIM atau username</span
-            ><input id="loginNim" placeholder="Masukkan NIM atau username" /></label>
-          <label class="field"
-            ><span>Password</span
-            ><span class="passfield"
-              ><input
-                id="loginPassword"
-                type="password"
-                placeholder="Password" /><button
-                class="eye-button"
-                data-target="loginPassword"
-                type="button"
-                aria-label="Tampilkan password"
-              >
-                <svg><use href="#i-eye"></use></svg></button></span
-          ></label>
-          <button class="button button-main full" type="submit">
-            Masuk <svg><use href="#i-arrow-right"></use></svg>
-          </button>
-        </form>
-        <form id="registerForm" autocomplete="off" novalidate hidden>
-          <label class="field"
-            ><span>NIM</span
-            ><input
-              id="registerNim"
-              inputmode="numeric"
-              placeholder="Masukkan NIM"
-          /></label>
-          <label class="field"
-            ><span>Nama lengkap</span
-            ><input id="registerName" placeholder="Nama mahasiswa"
-          /></label>
-          <label class="field"
-            ><span>Password</span
-            ><span class="passfield"
-              ><input
-                id="registerPassword"
-                type="password"
-                placeholder="Buat password" /><button
-                class="eye-button"
-                data-target="registerPassword"
-                type="button"
-                aria-label="Tampilkan password"
-              >
-                <svg><use href="#i-eye"></use></svg></button></span
-          ></label>
-          <button class="button button-main full" type="submit">
-            Daftar dan lanjut <svg><use href="#i-arrow-right"></use></svg>
-          </button>
-        </form>
-        <p class="auth-footnote">
-          Prototipe penelitian. Akun dan password mahasiswa tidak diverifikasi; akses admin hanya untuk demo.
-        </p>
-      </section>
-    </main>
+  function toast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.setAttribute('role', 'status');
+    toast.textContent = message;
+    $('toastZone').appendChild(toast);
+    setTimeout(() => toast.remove(), 4200);
+  }
 
-    <main id="appView" class="app-layout" hidden>
-      <div class="app-titlebar">
-        <div>
-          <div class="section-kicker">BALIKIN / KAMPUS</div>
-          <h1>Barang hilang bisa ketemu lagi.</h1>
-          <p>Laporkan temuan, cari barang, atau lihat ketersediaan loker.</p>
-        </div>
-      </div>
-      <div class="desktop-tabs" role="tablist" aria-label="Menu Balikin">
-        <button
-          class="tab-button active"
-          data-tab="titip"
-          type="button"
-          role="tab"
-          aria-selected="true"
-        >
-          <svg><use href="#i-package"></use></svg> Titip Barang</button
-        ><button
-          class="tab-button"
-          data-tab="cari"
-          type="button"
-          role="tab"
-          aria-selected="false"
-        >
-          <svg><use href="#i-search"></use></svg> Cari Barang</button
-        ><button
-          class="tab-button"
-          data-tab="loker"
-          type="button"
-          role="tab"
-          aria-selected="false"
-        >
-          <svg><use href="#i-lock"></use></svg> Status Loker
-        </button>
-      </div>
+  function renderLocations() {
+    $('locationGrid').innerHTML = locations.map((location) => {
+      const used = location.total - location.capacity;
+      const percent = Math.round((used / location.total) * 100);
+      return `<article class="location-card ${location.status === 'offline' ? 'offline' : ''}">
+        <div class="location-card-head"><div><span class="eyebrow">TITIK LOKER</span><h3>${safe(location.name)}</h3><p>${safe(location.place)}</p></div><span class="location-status">${location.status === 'offline' ? 'OFFLINE' : 'ONLINE'}</span></div>
+        <p>${safe(location.distance)}</p>
+        <div class="capacity-line"><span>${location.status === 'offline' ? 'Tidak tersedia' : `${location.capacity} loker tersedia`}</span><span>${used}/${location.total}</span></div>
+        <div class="capacity-bar"><span style="width:${percent}%"></span></div>
+        <div class="size-row">${location.sizes.map((size) => `<span>${safe(size)}</span>`).join('')}</div>
+        <button class="button button-outline" type="button" data-node="${location.id}" ${location.status === 'offline' ? 'disabled' : ''}>${location.status === 'offline' ? 'Titik sedang offline' : 'Lihat rute penitipan'}</button>
+      </article>`;
+    }).join('');
+    $('locationGrid').querySelectorAll('[data-node]').forEach((button) => button.addEventListener('click', () => toast(`Visual rute ke ${button.closest('.location-card').querySelector('h3').textContent} ditampilkan pada peta kampus nanti.`)));
+  }
 
-      <section
-        class="content-section active"
-        id="tab-titip"
-        aria-labelledby="titipTitle"
-      >
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">01 / PENITIPAN</span>
-            <h2 id="titipTitle">Lapor barang temuan</h2>
-            <p>
-              Unggah foto untuk membantu pengisian data, lalu simpan barang pada
-              loker.
-            </p>
-          </div>
-        </div>
-        <div class="form-layout">
-          <div class="panel photo-panel">
-            <h3>Foto barang <span class="required">*</span></h3>
-            <p class="muted small">
-              Foto bagian luar barang saja. Maksimal 5 MB.
-            </p>
-            <div class="photo-preview" id="foundPreview">
-              <svg><use href="#i-camera"></use></svg><span>Belum ada foto</span>
-            </div>
-            <div class="two-actions">
-              <button
-                class="button button-outline"
-                id="foundCameraBtn"
-                type="button"
-              >
-                <svg><use href="#i-camera"></use></svg> Ambil foto</button
-              ><button
-                class="button button-outline"
-                id="foundGalleryBtn"
-                type="button"
-              >
-                <svg><use href="#i-image"></use></svg> Pilih galeri
-              </button>
-            </div>
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              id="foundCamera"
-              hidden
-            /><input type="file" accept="image/*" id="foundGallery" hidden />
-            <div
-              class="processing"
-              id="foundProcessing"
-              aria-live="polite"
-              hidden
-            >
-              <div class="processing-label">
-                <svg><use href="#i-sparkles"></use></svg
-                ><span id="foundProcessingText">Memproses foto...</span
-                ><span id="foundProcessPct">0%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-bar" id="foundProgressBar"></div>
-              </div>
-            </div>
-          </div>
-          <form class="panel item-form" id="depositForm" novalidate>
-            <div class="item-form-head">
-              <h3>Detail barang</h3>
-              <span class="private-tag">Periksa sebelum lanjut</span>
-            </div>
-            <div class="fieldgrid">
-              <label class="field"
-                ><span>Nama barang</span
-                ><input
-                  id="itemName"
-                  placeholder="Contoh: Botol minum" /></label
-              ><label class="field"
-                ><span>Kategori</span
-                ><select id="itemCategory">
-                  <option value="">Pilih kategori</option>
-                  <option>Botol / Tumbler</option>
-                  <option>Dompet</option>
-                  <option>Elektronik</option>
-                  <option>Kunci</option>
-                  <option>Dokumen</option>
-                  <option>Aksesori</option>
-                  <option>Lainnya</option>
-                </select></label
-              ><label class="field"
-                ><span>Warna dominan</span
-                ><input id="itemColor" placeholder="Contoh: Hijau" /></label
-              ><label class="field"
-                ><span>Lokasi ditemukan</span
-                ><input
-                  id="itemLocation"
-                  placeholder="Contoh: Ruang kelas A201"
-              /></label>
-            </div>
-            <label class="field"
-              ><span>Ciri umum</span
-              ><textarea
-                id="itemGeneral"
-                rows="2"
-                placeholder="Ciri yang boleh diketahui publik"
-              ></textarea></label
-            ><label class="field"
-              ><span>Ciri khusus (tidak dipublikasikan)</span
-              ><textarea
-                id="itemSecret"
-                rows="2"
-                placeholder="Contoh: terdapat goresan kecil di sisi bawah"
-              ></textarea
-              ><small
-                >Hanya untuk membantu memeriksa klaim. Jangan membuka isi
-                pribadi barang.</small
-              ></label
-            ><button class="button button-main" type="submit">
-              Lanjut ke penitipan <svg><use href="#i-arrow-right"></use></svg>
-            </button>
-          </form>
-        </div>
-      </section>
+  function renderExceptions() {
+    $('exceptionGrid').innerHTML = exceptions.map(([title, detail, icon, action]) => `<article class="exception-card">${icons(icon)}<h3>${safe(title)}</h3><p>${safe(detail)}</p><strong>${safe(action)}</strong></article>`).join('');
+  }
 
-      <section
-        class="content-section"
-        id="tab-cari"
-        aria-labelledby="cariTitle"
-        hidden
-      >
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">02 / PENCARIAN</span>
-            <h2 id="cariTitle">Cari barang yang hilang</h2>
-            <p>
-              Lihat daftar barang yang sudah dititipkan. Ajukan klaim jika
-              menemukan milikmu.
-            </p>
-          </div>
-        </div>
-        <div class="search-field">
-          <svg><use href="#i-search"></use></svg
-          ><input
-            id="searchInput"
-            placeholder="Cari nama, warna, kategori, lokasi..."
-            aria-label="Cari barang"
-          />
-        </div>
-        <div id="resultCount" class="result-count"></div>
-        <div id="itemsList" class="item-grid"></div>
-      </section>
+  function renderItems() {
+    const query = $('searchInput').value.trim().toLocaleLowerCase('id');
+    const location = $('searchLocation').value.toLocaleLowerCase('id');
+    const visible = items.filter((item) => [item.name, item.category, item.location].join(' ').toLocaleLowerCase('id').includes(query) && (!location || item.location.toLocaleLowerCase('id').includes(location)));
+    $('resultCount').textContent = `${visible.length} barang ditemukan · detail rahasia tidak pernah ditampilkan di katalog.`;
+    $('itemsList').innerHTML = visible.map((item) => `<article class="item-card"><div class="item-cover">${icons(item.category === 'Kartu Identitas' ? 'shield' : 'package')}</div><div class="item-info"><div class="item-meta"><span class="chip">${safe(item.category)}</span>${item.risk !== 'normal' ? '<span class="chip risk-chip">Review manusia</span>' : ''}</div><h3>${safe(item.name)}</h3><small>${safe(item.color)} · ${safe(item.location)} · ${safe(item.date)}</small><p>${item.category === 'Kartu Identitas' ? 'Data pribadi disembunyikan dari katalog publik.' : 'Pilih klaim dan jawab ciri khusus tanpa petunjuk.'}</p><button class="button button-main" type="button" data-claim="${item.id}">Ini barang saya ${icons('arrow-right')}</button></div></article>`).join('') || '<p class="empty-state">Tidak ada barang yang cocok. Coba kata kunci lain atau laporkan kehilangan.</p>';
+    $('itemsList').querySelectorAll('[data-claim]').forEach((button) => button.addEventListener('click', () => openClaim(button.dataset.claim)));
+  }
 
-      <section
-        class="content-section"
-        id="tab-loker"
-        aria-labelledby="lokerTitle"
-        hidden
-      >
-        <div class="section-heading">
-          <div>
-            <span class="eyebrow">03 / LOKER</span>
-            <h2 id="lokerTitle">Ketersediaan loker</h2>
-            <p>9 kompartemen disusun dalam tiga baris.</p>
-          </div>
-        </div>
-        <div class="locker-layout">
-          <div class="panel lockers-panel">
-            <div
-              id="lockersGrid"
-              class="lockers-grid"
-              aria-label="Status sembilan loker"
-            ></div>
-          </div>
-          <div class="panel locker-help">
-            <h3>Status loker</h3>
-            <div class="legend">
-              <span><i class="dot dot-available"></i>Kosong</span
-              ><span><i class="dot dot-held"></i>Dipesan</span
-              ><span><i class="dot dot-filled"></i>Terisi</span>
-            </div>
-            <p class="muted">
-              Pintu dan kode akses pada prototipe ini disimulasikan melalui
-              layar.
-            </p>
-          </div>
-        </div>
-      </section>
-    </main>
+  function renderLockerRecommendation(foundLocation) {
+    const preferred = locations.find((location) => location.id === foundLocation && location.status === 'online' && location.capacity > 0);
+    const alternative = locations.find((location) => location.status === 'online' && location.capacity > 0);
+    const location = preferred || alternative;
+    const fallback = !location;
+    $('lockerRecommendation').hidden = false;
+    $('lockerRecommendation').innerHTML = fallback
+      ? `<div class="recommendation-grid"><div><span class="eyebrow">KAPASITAS PENUH</span><h3>Alihkan ke pos Himatif atau satpam.</h3><p>Barang dicatat sebagai <strong>Dititip di Pos</strong>; admin kemudian memasukkannya ke antrean layanan.</p></div><button class="button button-main" type="button" id="handoffBtn">Catat handoff</button></div>`
+      : `<div class="recommendation-grid"><div><span class="eyebrow">REKOMENDASI LOKER</span><h3>${safe(location.name)} · Loker M-03</h3><p>${safe(location.distance)} · ukuran sesuai untuk botol. PIN penitipan berlaku 15 menit, lalu sensor pintu mengonfirmasi penutupan.</p><div class="pin-display"><span>PIN penitipan</span><strong>184205</strong><span>15:00</span></div></div><button class="button button-main" type="button" id="reserveLockerBtn">Simulasikan buka loker</button></div>`;
+    const action = $('reserveLockerBtn') || $('handoffBtn');
+    action.addEventListener('click', () => {
+      action.textContent = fallback ? 'Handoff tercatat' : 'Pintu terkonfirmasi tertutup';
+      action.disabled = true;
+      toast(fallback ? 'Status visual berubah menjadi Dititip di Pos.' : 'Barang masuk katalog publik tanpa ciri khusus.');
+    });
+    $('lockerRecommendation').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 
-    <main id="adminView" class="admin-layout" hidden>
-      <div class="admin-titlebar">
-        <div>
-          <span class="section-kicker">ADMIN / MONITORING</span>
-          <h1>Semua loker, satu layar.</h1>
-          <p>Pantau status loker dan detail barang dari sesi browser ini.</p>
-        </div>
-      </div>
-      <div id="adminSummary" class="admin-summary" aria-label="Ringkasan status loker"></div>
-      <section class="panel admin-monitoring" aria-labelledby="adminLockerTitle">
-        <div class="admin-monitoring-head">
-          <div>
-            <span class="eyebrow">STATUS TERKINI</span>
-            <h2 id="adminLockerTitle">Detail setiap loker</h2>
-            <p>Informasi item termasuk ciri khusus dan PIN ditampilkan untuk kebutuhan monitoring prototipe.</p>
-          </div>
-          <p id="adminUpdated" class="admin-updated" aria-live="polite"></p>
-        </div>
-        <div id="adminLockerList" class="admin-locker-list" aria-live="polite"></div>
-      </section>
-    </main>
+  function openClaim(id) {
+    const item = items.find((entry) => entry.id === id);
+    if (!item) return;
+    const requiresReview = item.risk !== 'normal';
+    openModal(`
+      <button class="modal-close" type="button" aria-label="Tutup" id="modalClose">×</button>
+      <span class="eyebrow">AJUKAN KLAIM</span><h2>${safe(item.name)}</h2>
+      <p>${requiresReview ? 'Barang bernilai atau sensitif: skor tinggi tetap masuk antrean verifikasi Himatif.' : 'Barang biasa: jawaban yang meyakinkan dapat diteruskan ke penerbitan PIN pengambilan.'}</p>
+      <form id="claimForm" class="claim-form"><label class="field"><span>Ciri khusus tanpa petunjuk</span><textarea required rows="3" placeholder="Jelaskan bagian yang tidak terlihat di katalog publik"></textarea></label><label class="field"><span>Bukti kepemilikan tambahan</span><input placeholder="Opsional untuk barang biasa" /></label><button class="button button-main" type="submit">Kirim untuk verifikasi</button></form><div id="claimResult"></div>`, 'Klaim barang');
+    $('claimForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      $('claimResult').innerHTML = `<div class="claim-result">${icons('check')} ${requiresReview ? 'Klaim tercatat. Himatif memeriksa bukti sebelum PIN diterbitkan.' : 'Skor visual cukup tinggi. PIN pengambilan diterbitkan setelah konfirmasi akhir.'}</div>`;
+    });
+  }
 
-    <nav
-      class="mobile-bottom-nav"
-      id="mobileNav"
-      aria-label="Navigasi mobile"
-      hidden
-    >
-      <button
-        type="button"
-        class="mobile-nav-item active"
-        data-tab="titip"
-        aria-label="Titip"
-      >
-        <svg><use href="#i-package"></use></svg><span>Titip</span></button
-      ><button
-        type="button"
-        class="mobile-nav-item"
-        data-tab="cari"
-        aria-label="Cari"
-      >
-        <svg><use href="#i-search"></use></svg><span>Cari</span></button
-      ><button
-        type="button"
-        class="mobile-nav-item"
-        data-tab="loker"
-        aria-label="Loker"
-      >
-        <svg><use href="#i-lock"></use></svg><span>Loker</span>
-      </button>
+  function openLostReport() {
+    $('lostReportPanel').hidden = !$('lostReportPanel').hidden;
+    if (!$('lostReportPanel').hidden) $('lostReportPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function openModal(body, heading) {
+    $('modalLayer').hidden = false;
+    $('modalContent').innerHTML = body;
+    $('modalContent').setAttribute('aria-label', heading);
+    const close = $('modalClose');
+    if (close) close.addEventListener('click', closeModal);
+  }
+
+  function closeModal() {
+    $('modalLayer').hidden = true;
+    $('modalContent').innerHTML = '';
+  }
+
+  function renderAdminDashboard() {
+    const summary = [
+      ['Loker tersedia', 10, 'available'], ['Klaim perlu review', 2, 'waiting'], ['Barang > 30 hari', 1, 'alert'], ['Titik offline', 1, 'alert'],
+    ];
+    $('adminSummary').innerHTML = summary.map(([label, count, tone]) => `<article class="admin-summary-card ${tone}"><span>${label}</span><strong>${count}</strong><small>butuh keputusan operasional</small></article>`).join('');
+    const queue = [
+      ['alert', 'Kartu Identitas dari Masjid', 'Hubungi pemilik bila NIM terbaca; jangan tampilkan data di katalog.', 'Buka prosedur', 'shield'],
+      ['waiting', 'Klaim Dompet hitam', 'Bukti kepemilikan perlu dicocokkan sebelum PIN pengambilan diterbitkan.', 'Tinjau klaim', 'search'],
+      ['alert', 'Loker C1–C3 offline', 'Heartbeat titik Masjid berhenti. Jangan arahkan penitipan baru ke titik ini.', 'Tandai ditangani', 'alert'],
+      ['waiting', 'Botol minum > 30 hari', 'Siapkan pengumuman terbuka sebelum keputusan donasi atau handoff.', 'Buka audit', 'clock'],
+    ];
+    $('adminQueue').innerHTML = queue.map(([tone, title, detail, action, icon]) => `<article class="queue-item ${tone}"><div class="queue-icon">${icons(icon)}</div><div><h3>${safe(title)}</h3><p>${safe(detail)}</p></div><button class="button button-outline" type="button">${safe(action)}</button></article>`).join('');
+    $('adminQueue').querySelectorAll('button').forEach((button) => button.addEventListener('click', () => { button.textContent = 'Dicatat'; button.disabled = true; toast('Tindakan dicatat dalam audit trail visual.'); }));
+    $('adminLocations').innerHTML = locations.map((location) => `<div class="admin-location"><span><strong>${safe(location.name)}</strong><br><small>${safe(location.place)}</small></span><span class="location-status">${location.status === 'offline' ? 'OFFLINE' : `${location.capacity} TERSEDIA`}</span></div>`).join('');
+    const audit = ['09:42 · Klaim dompet masuk antrean verifikasi', '09:18 · Sensor FISIP A2 mengonfirmasi pintu tertutup', 'Kemarin · Alert botol minum diaktifkan', '2 hari lalu · Kartu identitas diberi perlindungan privasi'];
+    $('auditLog').innerHTML = audit.map((entry) => `<div class="audit-item"><span>${safe(entry)}</span><small>tercatat</small></div>`).join('');
+    const labels = { available: 'KOSONG', held: 'DIPESAN', stored: 'TERSIMPAN', claimed: 'SIAP DIAMBIL', offline: 'OFFLINE' };
+    $('adminLockerList').innerHTML = lockerRows.map(([locker, node, status, item]) => `<article class="admin-locker-row ${status}"><div class="admin-locker-code"><strong>${safe(locker)}</strong><span class="admin-status ${status}">${labels[status]}</span></div>${item ? `<div class="admin-locker-detail"><strong>${safe(item.name)}</strong><span>${safe(node)} · ${safe(item.category)} · ${safe(item.color)}</span><span>Penemu: ${safe(item.finder)} · ${safe(item.location)}</span><span>Ciri khusus: ${safe(item.secret)}</span><span>PIN penitipan ${safe(item.depositPin)} · PIN ambil ${safe(item.claimPin)}</span></div>` : `<p class="admin-empty">${status === 'offline' ? 'Titik sedang offline; status pintu perlu sinkronisasi.' : 'Tidak ada barang aktif di loker ini.'}</p>`}</article>`).join('');
+    $('adminUpdated').textContent = `Visual data · ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
+  }
+
+  function showTab(tab) {
+    ['temukan', 'cari', 'lokasi', 'bantuan'].forEach((name) => { $(`tab-${name}`).hidden = name !== tab; });
+    document.querySelectorAll('[data-tab]').forEach((button) => button.classList.toggle('active', button.dataset.tab === tab));
+    if (tab === 'cari') renderItems();
+    if (tab === 'lokasi') renderLocations();
+    if (tab === 'bantuan') renderExceptions();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function setUser(data) {
+    user = data;
+    storage.setItem(USER_KEY, JSON.stringify(data));
+    const admin = data.role === 'admin';
+    $('authView').hidden = true;
+    $('appView').hidden = admin;
+    $('adminView').hidden = !admin;
+    $('userTools').hidden = false;
+    $('nimDisplay').textContent = admin ? 'Himatif admin' : `NIM ${data.nim || 'Mahasiswa'}`;
+    if (admin) {
+      renderAdminDashboard();
+    } else {
+      $('welcomeTitle').textContent = 'Apa yang ingin kamu lakukan?';
+      showTab('temukan');
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function logout() {
+    user = null;
+    storage.removeItem(USER_KEY);
+    closeModal();
+    $('authView').hidden = false;
+    $('appView').hidden = true;
+    $('adminView').hidden = true;
+    $('userTools').hidden = true;
+    $('loginPassword').value = '';
+    window.scrollTo(0, 0);
+  }
+
+  function install() {
+    renderLocations();
+    renderExceptions();
+    $('loginForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const username = $('loginNim').value.trim();
+      const password = $('loginPassword').value;
+      if (username === ADMIN_USERNAME) {
+        if (password === ADMIN_PASSWORD) setUser({ role: 'admin', name: 'Himatif admin' });
+        else toast('Kredensial admin tidak sesuai.');
+        return;
+      }
+      setUser({ nim: username || 'Mahasiswa' });
+    });
+    document.querySelectorAll('.eye-button').forEach((button) => button.addEventListener('click', () => {
+      const input = $(button.dataset.target);
+      input.type = input.type === 'password' ? 'text' : 'password';
+      button.setAttribute('aria-label', input.type === 'password' ? 'Tampilkan password' : 'Sembunyikan password');
+      button.querySelector('use').setAttribute('href', input.type === 'password' ? '#i-eye' : '#i-eye-off');
+    }));
+    document.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => showTab(button.dataset.tab)));
+    $('depositForm').addEventListener('submit', (event) => { event.preventDefault(); renderLockerRecommendation($('foundLocation').value); });
+    $('toggleIdentityBtn').addEventListener('click', () => {
+      identityMode = !identityMode;
+      $('identityNotice').hidden = !identityMode;
+      $('toggleIdentityBtn').textContent = identityMode ? 'Kembali ke alur barang biasa' : 'Simulasikan deteksi kartu identitas';
+      if (identityMode) $('itemCategory').value = 'Kartu Identitas';
+    });
+    $('searchInput').addEventListener('input', renderItems);
+    $('searchLocation').addEventListener('change', renderItems);
+    $('showLostReport').addEventListener('click', openLostReport);
+    $('activateAlertBtn').addEventListener('click', (event) => { event.target.textContent = 'Alert kategori aktif'; event.target.disabled = true; toast('Visual alert diaktifkan untuk kategori dan ciri yang dipilih.'); });
+    $('logoutBtn').addEventListener('click', logout);
+    $('brandLink').addEventListener('click', (event) => { event.preventDefault(); if (user?.role === 'admin') renderAdminDashboard(); else if (user) showTab('temukan'); else window.scrollTo(0, 0); });
+    $('modalLayer').addEventListener('click', (event) => { if (event.target.dataset.close === 'true') closeModal(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !$('modalLayer').hidden) closeModal(); });
+    const saved = (() => { try { return JSON.parse(storage.getItem(USER_KEY) || 'null'); } catch { return null; } })();
+    if (saved) setUser(saved);
+  }
+
+  document.addEventListener('DOMContentLoaded', install);
+})();
+
+</script>
+</head>
+<body>
+  <svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-package" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="M3 7v10l9 5 9-5V7M12 12v10"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14 4h-4L8 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4l-2-3Z"/><circle cx="12" cy="13" r="3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 22h4"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 2 9 4v6c0 5.5-3.5 8.5-9 10-5.5-1.5-9-4.5-9-10V6l9-4Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m10.3 3.7-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3.3l-8-14a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3 21 21M10.5 5.2A11.5 11.5 0 0 1 12 5c6 0 10 7 10 7a15 15 0 0 1-3 3.7M6.2 6.2A15 15 0 0 0 2 12s4 7 10 7c1.6 0 3-.5 4.3-1.3"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#" id="brandLink" class="brand" aria-label="Balikin beranda"><span class="brand-icon"><svg><use href="#i-package"></use></svg></span><span>balikin<span class="brand-period">.</span></span></a>
+      <div class="header-context"><span class="campus-status"><i></i> Prototipe kampus</span><div class="user-tools" id="userTools" hidden><span class="nim-chip" id="nimDisplay"></span><button type="button" id="logoutBtn" class="nav-button"><svg><use href="#i-log-out"></use></svg><span>Keluar</span></button></div></div>
+    </div>
+  </header>
+
+  <main id="authView" class="auth-layout">
+    <section class="auth-visual">
+      <span class="section-kicker">LOST &amp; FOUND KAMPUS</span>
+      <h1>Barang hilang bukan harus <em>menunggu diumumkan.</em></h1>
+      <p>Satu alur untuk menitipkan, menemukan, mengklaim, dan mengelola barang kampus—dirancang untuk FISIP, FTI, dan Masjid.</p>
+      <div class="auth-flow-preview" aria-label="Ringkasan alur Balikin"><span>Temukan</span><b></b><span>Catat</span><b></b><span>Amankan</span><b></b><span>Kembalikan</span></div>
+    </section>
+    <section class="auth-card" aria-label="Masuk Balikin">
+      <span class="eyebrow">AKSES MAHASISWA</span>
+      <h2>Mulai dari kebutuhanmu.</h2>
+      <p class="muted">Gunakan NIM untuk melihat visual alur layanan.</p>
+      <form id="loginForm" autocomplete="off">
+        <label class="field"><span>NIM atau username</span><input id="loginNim" placeholder="Contoh: 20240001" /></label>
+        <label class="field"><span>Password</span><span class="passfield"><input id="loginPassword" type="password" placeholder="Password"/><button class="eye-button" data-target="loginPassword" type="button" aria-label="Tampilkan password"><svg><use href="#i-eye"></use></svg></button></span></label>
+        <button class="button button-main full" type="submit">Masuk ke alur layanan <svg><use href="#i-arrow-right"></use></svg></button>
+      </form>
+      <p class="auth-footnote">Demo visual: NIM apa pun bisa masuk. Admin: <code>admin</code> / <code>admin123</code>.</p>
+    </section>
+  </main>
+
+  <main id="appView" class="app-layout" hidden>
+    <div class="app-titlebar"><div><span class="section-kicker">BALIKIN / LAYANAN KAMPUS</span><h1 id="welcomeTitle">Apa yang ingin kamu lakukan?</h1><p>Pilih alur, lihat statusnya, lalu pahami titik handoff ke loker atau Himatif.</p></div><div class="service-chip"><svg><use href="#i-clock"></use></svg> Visual alur layanan</div></div>
+    <nav class="workspace-tabs" aria-label="Alur Balikin">
+      <button class="tab-button active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg> Saya menemukan</button>
+      <button class="tab-button" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg> Saya kehilangan</button>
+      <button class="tab-button" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg> Titik loker</button>
+      <button class="tab-button" data-tab="bantuan" type="button"><svg><use href="#i-shield"></use></svg> Kondisi khusus</button>
     </nav>
 
-    <div class="toast-zone" id="toastZone" aria-live="polite"></div>
-    <div class="modal-layer" id="modalLayer" hidden>
-      <div class="modal-backdrop" data-close="true"></div>
-      <section
-        class="modal-panel"
-        id="modalContent"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modalHeading"
-      ></section>
-    </div>
-    <footer class="site-footer">
-      Balikin — Prototipe konsep Lost &amp; Found kampus. Belum terhubung ke
-      loker fisik atau layanan AI.
-    </footer>
-  </body>
+    <section class="content-section" id="tab-temukan">
+      <div class="flow-heading"><div><span class="eyebrow">01 / PENEMU BARANG</span><h2>Amankan barang tanpa menunggu pengumuman.</h2><p>Visual alur dari foto sampai loker terkunci dan katalog publik diperbarui.</p></div><span class="flow-tag">Estimasi 3–5 menit</span></div>
+      <ol class="flow-steps" aria-label="Langkah penitipan"><li class="active"><b>1</b> Foto &amp; validasi</li><li><b>2</b> Detail rahasia</li><li><b>3</b> Pilih loker</li><li><b>4</b> Konfirmasi pintu</li></ol>
+      <div class="finder-layout">
+        <section class="panel photo-panel"><div class="panel-title"><div><h3>Foto barang</h3><p>Foto luar barang saja. Kartu identitas akan diperlakukan berbeda.</p></div><span class="status-pill ready">Valid</span></div><div class="photo-preview finder-photo"><svg><use href="#i-camera"></use></svg><strong>Botol minum terdeteksi</strong><span>AI hanya memberi saran, pengguna tetap memeriksa.</span></div><button id="toggleIdentityBtn" class="button button-outline full" type="button">Simulasikan deteksi kartu identitas</button><div id="identityNotice" class="identity-notice" hidden><svg><use href="#i-shield"></use></svg><div><strong>Jalur privasi aktif</strong><p>Foto diblur dari katalog. Barang diberi label Kartu Identitas dan masuk antrean admin.</p></div></div></section>
+        <form class="panel item-form" id="depositForm"><div class="panel-title"><div><h3>Data yang akan dicatat</h3><p>Kolom bertanda privat tidak tampil di katalog publik.</p></div><span class="ai-note">Saran AI</span></div><div class="fieldgrid"><label class="field"><span>Nama barang</span><input id="itemName" value="Botol minum"/></label><label class="field"><span>Kategori</span><select id="itemCategory"><option>Botol / Tumbler</option><option>Payung</option><option>Dompet</option><option>Elektronik</option><option>Kartu Identitas</option></select></label><label class="field"><span>Warna</span><input id="itemColor" value="Hijau"/></label><label class="field"><span>Lokasi ditemukan</span><select id="foundLocation"><option value="fisip">FISIP · Gedung A</option><option value="fti">FTI · Lobi Utama</option><option value="masjid">Masjid Kampus</option></select></label></div><label class="field"><span>Ciri umum</span><textarea id="itemGeneral" rows="2">Botol plastik transparan dengan tutup hijau.</textarea></label><label class="field"><span>Ciri khusus <em>privat</em></span><textarea id="itemSecret" rows="2" placeholder="Contoh: ada stiker nama di bagian bawah"></textarea></label><button class="button button-main" type="submit">Cari loker yang sesuai <svg><use href="#i-arrow-right"></use></svg></button></form>
+      </div>
+      <section id="lockerRecommendation" class="recommendation" hidden aria-live="polite"></section>
+    </section>
+
+    <section class="content-section" id="tab-cari" hidden>
+      <div class="flow-heading"><div><span class="eyebrow">02 / PEMILIK BARANG</span><h2>Cari dulu. Klaim dengan bukti, bukan tebakan.</h2><p>Barang biasa dapat diverifikasi cepat; barang bernilai masuk antrean peninjauan Himatif.</p></div><button id="showLostReport" type="button" class="button button-outline"><svg><use href="#i-bell"></use></svg> Laporkan kehilangan</button></div>
+      <div class="search-controls"><label class="search-field"><svg><use href="#i-search"></use></svg><input id="searchInput" placeholder="Cari nama, kategori, atau lokasi..." /></label><select id="searchLocation"><option value="">Semua titik</option><option>FISIP</option><option>FTI</option><option>Masjid</option></select><select id="searchDate"><option>7 hari terakhir</option><option>30 hari terakhir</option></select></div>
+      <p id="resultCount" class="result-count"></p>
+      <div id="itemsList" class="item-grid"></div>
+      <section id="lostReportPanel" class="panel lost-report" hidden><div><span class="eyebrow">BELUM MENEMUKAN BARANG?</span><h3>Aktifkan laporan kehilangan.</h3><p>Ketika barang baru memiliki kategori atau ciri yang serupa, pemilik menerima notifikasi.</p></div><div class="lost-report-actions"><button class="button button-main" type="button" id="activateAlertBtn">Aktifkan alert kategori</button><small>Visualisasi notifikasi—belum terkirim ke perangkat nyata.</small></div></section>
+    </section>
+
+    <section class="content-section" id="tab-lokasi" hidden>
+      <div class="flow-heading"><div><span class="eyebrow">03 / JARINGAN LOKER</span><h2>Tiga titik, satu status layanan.</h2><p>Jika lokasi awal penuh atau offline, pengguna melihat alternatif sebelum berjalan ke titik tersebut.</p></div><span class="flow-tag">Ukuran S · M · L</span></div>
+      <div id="locationGrid" class="location-grid"></div>
+      <section class="panel route-note"><svg><use href="#i-alert"></use></svg><div><h3>Aturan saat kapasitas habis</h3><p>Jika semua loker penuh, alur mengarah ke pos Himatif/satpam untuk titip manual dengan status <strong>Dititip di Pos</strong>.</p></div></section>
+    </section>
+
+    <section class="content-section" id="tab-bantuan" hidden>
+      <div class="flow-heading"><div><span class="eyebrow">04 / KONDISI KHUSUS</span><h2>Alur tetap jelas ketika sesuatu gagal.</h2><p>Setiap kondisi memperlihatkan siapa yang bertindak: mahasiswa, sistem loker, atau Himatif.</p></div></div>
+      <div id="exceptionGrid" class="exception-grid"></div>
+    </section>
+  </main>
+
+  <main id="adminView" class="admin-layout" hidden>
+    <div class="admin-titlebar"><div><span class="section-kicker">HIMATIF / OPERASIONAL</span><h1>Jangan pantau semuanya. Kerjakan antreannya.</h1><p>Dashboard visual untuk deposit, klaim, kapasitas, barang lama, dan gangguan titik loker.</p></div><span class="service-chip"><svg><use href="#i-shield"></use></svg> Operator Himatif</span></div>
+    <div id="adminSummary" class="admin-summary" aria-label="Ringkasan status loker"></div>
+    <section class="admin-queue-section"><div class="section-row"><div><span class="eyebrow">ANTREAN TINDAKAN</span><h2>Yang perlu ditangani sekarang</h2></div><span class="queue-count">4 prioritas</span></div><div id="adminQueue" class="admin-queue"></div></section>
+    <section class="admin-columns"><section class="panel"><span class="eyebrow">JARINGAN TITIK</span><h2>FISIP, FTI, Masjid</h2><div id="adminLocations" class="admin-locations"></div></section><section class="panel"><span class="eyebrow">AUDIT TRAIL</span><h2>Jejak tindakan</h2><div id="auditLog" class="audit-log"></div></section></section>
+    <section class="panel admin-monitoring" aria-labelledby="adminLockerTitle"><div class="admin-monitoring-head"><div><span class="eyebrow">SEMUA LOKER</span><h2 id="adminLockerTitle">Status dan detail barang aktif</h2><p>Visualisasi data yang kelak harus tersimpan di server dan tak dapat diubah.</p></div><p id="adminUpdated" class="admin-updated" aria-live="polite"></p></div><div id="adminLockerList" class="admin-locker-list" aria-live="polite"></div></section>
+  </main>
+
+  <div id="modalLayer" class="modal-layer" hidden><div class="modal-backdrop" data-close="true"></div><section id="modalContent" class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalHeading"></section></div>
+  <div id="toastZone" class="toast-zone" aria-live="polite"></div>
+  <footer class="site-footer">Balikin — visualisasi layanan barang hilang kampus. Belum terhubung ke akun kampus, notifikasi, sensor, atau loker fisik.</footer>
+</body>
 </html>
