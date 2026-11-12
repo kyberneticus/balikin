@@ -15,6 +15,15 @@ test('student prototype visualizes each primary service flow', () => {
   assert.match(html, /Kondisi khusus/);
 });
 
+test('finder flow uses a real camera input and manual location detail', () => {
+  const html = read('src/index.html');
+  const script = read('src/script.js');
+  assert.match(html, /id="foundCamera"[^>]*accept="image\/\*"[^>]*capture="environment"/);
+  assert.match(html, /id="detailLocation"/);
+  assert.doesNotMatch(html, /Simulasikan deteksi kartu identitas/);
+  assert.match(script, /function previewFoundPhoto\(/);
+});
+
 test('student prototype restores the fixed mobile flow menu', () => {
   const html = read('src/index.html');
   assert.match(html, /id="mobileNav"/);

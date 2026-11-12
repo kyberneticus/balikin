@@ -31,7 +31,7 @@
     ['Listrik atau Wi-Fi mati', 'Titik ditandai offline/tertunda. Aktivitas lokal harus disinkronkan saat pulih.', 'clock', 'Jangan janji akses otomatis'],
   ];
   let user = null;
-  let identityMode = false;
+  let foundPhoto = '';
 
   const storage = (() => {
     try {
@@ -83,7 +83,22 @@
     $('itemsList').querySelectorAll('[data-claim]').forEach((button) => button.addEventListener('click', () => openClaim(button.dataset.claim)));
   }
 
-  function renderLockerRecommendation(foundLocation) {
+  function previewFoundPhoto(file) {
+    if (!file) return;
+    if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
+      toast('Pilih foto gambar dengan ukuran maksimal 5 MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => toast('Foto tidak dapat dibaca. Coba lagi.');
+    reader.onload = () => {
+      foundPhoto = reader.result;
+      $('foundPreview').innerHTML = `<img src="${foundPhoto}" alt="Foto barang yang akan dititipkan">`;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderLockerRecommendation(foundLocation, detailLocation) {
     const preferred = locations.find((location) => location.id === foundLocation && location.status === 'online' && location.capacity > 0);
     const alternative = locations.find((location) => location.status === 'online' && location.capacity > 0);
     const location = preferred || alternative;
@@ -91,7 +106,7 @@
     $('lockerRecommendation').hidden = false;
     $('lockerRecommendation').innerHTML = fallback
       ? `<div class="recommendation-grid"><div><span class="eyebrow">KAPASITAS PENUH</span><h3>Alihkan ke pos Himatif atau satpam.</h3><p>Barang dicatat sebagai <strong>Dititip di Pos</strong>; admin kemudian memasukkannya ke antrean layanan.</p></div><button class="button button-main" type="button" id="handoffBtn">Catat handoff</button></div>`
-      : `<div class="recommendation-grid"><div><span class="eyebrow">REKOMENDASI LOKER</span><h3>${safe(location.name)} · Loker M-03</h3><p>${safe(location.distance)} · ukuran sesuai untuk botol. PIN penitipan berlaku 15 menit, lalu sensor pintu mengonfirmasi penutupan.</p><div class="pin-display"><span>PIN penitipan</span><strong>184205</strong><span>15:00</span></div></div><button class="button button-main" type="button" id="reserveLockerBtn">Simulasikan buka loker</button></div>`;
+      : `<div class="recommendation-grid"><div><span class="eyebrow">REKOMENDASI LOKER</span><h3>${safe(location.name)} · Loker M-03</h3><p>Ditemukan di ${safe(detailLocation)} · ${safe(location.distance)}. PIN penitipan berlaku 15 menit, lalu sensor pintu mengonfirmasi penutupan.</p><div class="pin-display"><span>PIN penitipan</span><strong>184205</strong><span>15:00</span></div></div><button class="button button-main" type="button" id="reserveLockerBtn">Simulasikan buka loker</button></div>`;
     const action = $('reserveLockerBtn') || $('handoffBtn');
     action.addEventListener('click', () => {
       action.textContent = fallback ? 'Handoff tercatat' : 'Pintu terkonfirmasi tertutup';
@@ -217,12 +232,16 @@
       button.querySelector('use').setAttribute('href', input.type === 'password' ? '#i-eye' : '#i-eye-off');
     }));
     document.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => showTab(button.dataset.tab)));
-    $('depositForm').addEventListener('submit', (event) => { event.preventDefault(); renderLockerRecommendation($('foundLocation').value); });
-    $('toggleIdentityBtn').addEventListener('click', () => {
-      identityMode = !identityMode;
-      $('identityNotice').hidden = !identityMode;
-      $('toggleIdentityBtn').textContent = identityMode ? 'Kembali ke alur barang biasa' : 'Simulasikan deteksi kartu identitas';
-      if (identityMode) $('itemCategory').value = 'Kartu Identitas';
+    $('foundCameraBtn').addEventListener('click', () => $('foundCamera').click());
+    $('foundCamera').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
+    $('depositForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = $('itemName').value.trim();
+      const category = $('itemCategory').value;
+      const detailLocation = $('detailLocation').value.trim();
+      if (!foundPhoto) return toast('Ambil foto barang terlebih dahulu.');
+      if (!name || !category || !detailLocation) return toast('Lengkapi nama, kategori, dan detail lokasi barang.');
+      renderLockerRecommendation($('foundLocation').value, detailLocation);
     });
     $('searchInput').addEventListener('input', renderItems);
     $('searchLocation').addEventListener('change', renderItems);
