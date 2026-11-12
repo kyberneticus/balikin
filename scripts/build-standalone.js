@@ -13,3 +13,5 @@ const output = html
   .replaceAll('assets/', 'src/assets/');
 
 fs.writeFileSync(path.join(root, 'index.html'), output);
+fs.mkdirSync(path.join(root, 'public'), { recursive: true });
+fs.writeFileSync(path.join(root, 'public', 'index.html'), output);
