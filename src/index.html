@@ -55,7 +55,7 @@
       <h2 id="authTitle">Masuk ke Balikin</h2><p class="muted" id="authHelp">Gunakan NIM untuk melanjutkan.</p>
       <div class="auth-tabs" role="tablist" aria-label="Pilih akses"><button id="loginTab" class="active" type="button" role="tab" aria-selected="true">Masuk</button><button id="registerTab" type="button" role="tab" aria-selected="false">Daftar</button></div>
       <form id="loginForm" autocomplete="off" novalidate>
-        <label class="field"><span>NIM</span><input id="loginNim" inputmode="numeric" placeholder="Masukkan NIM" /></label>
+        <label class="field"><span>NIM atau username</span><input id="loginNim" placeholder="Masukkan NIM atau username" /></label>
         <label class="field"><span>Password</span><span class="passfield"><input id="loginPassword" type="password" placeholder="Password"/><button class="eye-button" data-target="loginPassword" type="button" aria-label="Tampilkan password"><svg><use href="#i-eye"></use></svg></button></span></label>
         <button class="button button-main full" type="submit">Masuk <svg><use href="#i-arrow-right"></use></svg></button>
       </form>
@@ -65,7 +65,7 @@
         <label class="field"><span>Password</span><span class="passfield"><input id="registerPassword" type="password" placeholder="Buat password"/><button class="eye-button" data-target="registerPassword" type="button" aria-label="Tampilkan password"><svg><use href="#i-eye"></use></svg></button></span></label>
         <button class="button button-main full" type="submit">Daftar dan lanjut <svg><use href="#i-arrow-right"></use></svg></button>
       </form>
-      <p class="auth-footnote">Prototipe penelitian. Akun dan password tidak diverifikasi.</p>
+      <p class="auth-footnote">Prototipe penelitian. Akun dan password mahasiswa tidak diverifikasi; akses admin hanya untuk demo.</p>
     </section>
   </main>
 
@@ -84,6 +84,15 @@
     <section class="content-section" id="tab-cari" aria-labelledby="cariTitle" hidden><div class="section-heading"><div><span class="eyebrow">02 / PENCARIAN</span><h2 id="cariTitle">Cari barang yang hilang</h2><p>Lihat daftar barang yang sudah dititipkan. Ajukan klaim jika menemukan milikmu.</p></div></div><div class="search-field"><svg><use href="#i-search"></use></svg><input id="searchInput" placeholder="Cari nama, warna, kategori, lokasi..." aria-label="Cari barang" /></div><div id="resultCount" class="result-count"></div><div id="itemsList" class="item-grid"></div></section>
 
     <section class="content-section" id="tab-loker" aria-labelledby="lokerTitle" hidden><div class="section-heading"><div><span class="eyebrow">03 / LOKER</span><h2 id="lokerTitle">Ketersediaan loker</h2><p>9 kompartemen disusun dalam tiga baris.</p></div></div><div class="locker-layout"><div class="panel lockers-panel"><div id="lockersGrid" class="lockers-grid" aria-label="Status sembilan loker"></div></div><div class="panel locker-help"><h3>Status loker</h3><div class="legend"><span><i class="dot dot-available"></i>Kosong</span><span><i class="dot dot-held"></i>Dipesan</span><span><i class="dot dot-filled"></i>Terisi</span></div><p class="muted">Pintu dan kode akses pada prototipe ini disimulasikan melalui layar.</p></div></div></section>
+  </main>
+
+  <main id="adminView" class="admin-layout" hidden>
+    <div class="admin-titlebar"><div><span class="section-kicker">ADMIN / MONITORING</span><h1>Semua loker, satu layar.</h1><p>Pantau status loker dan detail barang dari sesi browser ini.</p></div></div>
+    <div id="adminSummary" class="admin-summary" aria-label="Ringkasan status loker"></div>
+    <section class="panel admin-monitoring" aria-labelledby="adminLockerTitle">
+      <div class="admin-monitoring-head"><div><span class="eyebrow">STATUS TERKINI</span><h2 id="adminLockerTitle">Detail setiap loker</h2><p>Informasi item termasuk ciri khusus dan PIN ditampilkan untuk kebutuhan monitoring prototipe.</p></div><p id="adminUpdated" class="admin-updated" aria-live="polite"></p></div>
+      <div id="adminLockerList" class="admin-locker-list" aria-live="polite"></div>
+    </section>
   </main>
 
   <nav class="mobile-bottom-nav" id="mobileNav" aria-label="Navigasi mobile" hidden><button type="button" class="mobile-nav-item active" data-tab="titip" aria-label="Titip"><svg><use href="#i-package"></use></svg><span>Titip</span></button><button type="button" class="mobile-nav-item" data-tab="cari" aria-label="Cari"><svg><use href="#i-search"></use></svg><span>Cari</span></button><button type="button" class="mobile-nav-item" data-tab="loker" aria-label="Loker"><svg><use href="#i-lock"></use></svg><span>Loker</span></button></nav>

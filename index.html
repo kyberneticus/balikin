@@ -1271,6 +1271,139 @@
           display: inline;
         }
       }
+      .admin-layout {
+        max-width: 1190px;
+        margin: 0 auto;
+        padding: 42px 28px 68px;
+      }
+      .admin-titlebar {
+        padding: 12px 0 28px;
+      }
+      .admin-titlebar h1 {
+        font-size: clamp(30px, 4vw, 48px);
+        letter-spacing: -0.05em;
+        margin: 8px 0;
+      }
+      .admin-titlebar p {
+        color: var(--muted);
+        margin: 0;
+      }
+      .admin-summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin: 0 0 24px;
+      }
+      .admin-summary-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: white;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+      .admin-summary-card span,
+      .admin-summary-card small {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .admin-summary-card strong {
+        font-size: 34px;
+        line-height: 1;
+        color: var(--ink);
+      }
+      .admin-summary-card.available { border-top: 3px solid #88c09a; }
+      .admin-summary-card.held { border-top: 3px solid #c6a563; }
+      .admin-summary-card.stored { border-top: 3px solid #537e66; }
+      .admin-summary-card.claimed { border-top: 3px solid var(--green); }
+      .admin-monitoring {
+        padding: 0;
+        overflow: hidden;
+      }
+      .admin-monitoring-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: end;
+        padding: 24px;
+        border-bottom: 1px solid var(--line);
+      }
+      .admin-monitoring-head h2 {
+        font-size: 22px;
+        letter-spacing: -0.03em;
+        margin: 5px 0;
+      }
+      .admin-monitoring-head p {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .admin-updated { white-space: nowrap; }
+      .admin-locker-list { display: grid; }
+      .admin-locker-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 20px;
+        align-items: start;
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--line);
+      }
+      .admin-locker-row:last-child { border-bottom: 0; }
+      .admin-locker-code {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .admin-locker-code > strong {
+        font-size: 22px;
+        letter-spacing: -0.04em;
+      }
+      .admin-status {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 20px;
+        padding: 4px 8px;
+        font-size: 10px;
+        font-weight: 760;
+        letter-spacing: 0.05em;
+        background: #edf4ef;
+        color: var(--green);
+      }
+      .admin-status.held { background: #fbf5e8; color: #9b7540; }
+      .admin-status.stored { background: #e9efec; color: #315b48; }
+      .admin-status.claimed { background: #e7f2ed; color: var(--green-dark); }
+      .admin-locker-detail {
+        display: grid;
+        gap: 3px;
+        font-size: 13px;
+        color: #596b5f;
+      }
+      .admin-locker-detail > strong {
+        font-size: 15px;
+        color: var(--ink);
+      }
+      .admin-empty {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 3px 0;
+      }
+      @media (max-width: 900px) {
+        .admin-summary { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 670px) {
+        .admin-layout { padding: 27px 17px 44px; }
+        .admin-titlebar { padding: 2px 0 22px; }
+        .admin-titlebar h1 { font-size: 31px; }
+        .admin-summary { gap: 9px; margin-bottom: 16px; }
+        .admin-summary-card { padding: 14px; }
+        .admin-summary-card strong { font-size: 29px; }
+        .admin-monitoring-head { display: block; padding: 18px; }
+        .admin-updated { margin-top: 12px !important; }
+        .admin-locker-row { grid-template-columns: 1fr; gap: 9px; padding: 16px 18px; }
+        .admin-locker-code { justify-content: space-between; }
+        .admin-locker-detail { font-size: 12px; }
+      }
     </style>
     <script defer>
       /* Balikin: prototype interaktif, tanpa backend, autentikasi, atau analisis AI sungguhan. */
@@ -1302,6 +1435,8 @@
           "C2",
           "C3",
         ];
+        const ADMIN_USERNAME = "admin";
+        const ADMIN_PASSWORD = "admin123";
         // Aplikasi tetap bisa dicoba secara lokal saat penyimpanan browser diblokir.
         const storage = (() => {
           try {
@@ -1422,13 +1557,22 @@
         function setUser(data) {
           user = data;
           storage.setItem(KEY_USER, JSON.stringify(data));
+          const admin = data.role === "admin";
           $("authView").hidden = true;
-          $("appView").hidden = false;
+          $("appView").hidden = admin;
+          $("adminView").hidden = !admin;
           $("userTools").hidden = false;
-          $("mobileNav").hidden = false;
-          $("nimDisplay").textContent = data.nim
-            ? `NIM ${data.nim}`
-            : data.name || "Mahasiswa";
+          $("mobileNav").hidden = admin;
+          $("nimDisplay").textContent = admin
+            ? "Administrator"
+            : data.nim
+              ? `NIM ${data.nim}`
+              : data.name || "Mahasiswa";
+          if (admin) {
+            renderAdminDashboard();
+            window.scrollTo(0, 0);
+            return;
+          }
           showTab("titip");
           window.scrollTo(0, 0);
         }
@@ -1438,6 +1582,7 @@
           closeModal();
           $("authView").hidden = false;
           $("appView").hidden = true;
+          $("adminView").hidden = true;
           $("userTools").hidden = true;
           $("mobileNav").hidden = true;
           showAuthTab("login");
@@ -1714,6 +1859,46 @@
             })
             .join("");
         }
+        function renderAdminDashboard() {
+          const lockers = locations.map((locker) => {
+            const item = items.find(
+              (i) =>
+                i.locker === locker &&
+                ["held", "stored", "claimed"].includes(i.status),
+            );
+            const status = item?.status || "available";
+            const labels = {
+              available: "KOSONG",
+              held: "DIPESAN",
+              stored: "TERSIMPAN",
+              claimed: "SIAP DIAMBIL",
+            };
+            return { locker, item, status, label: labels[status] };
+          });
+          const counts = { available: 0, held: 0, stored: 0, claimed: 0 };
+          lockers.forEach(({ status }) => counts[status]++);
+          $("adminSummary").innerHTML = [
+            ["Kosong", counts.available, "available"],
+            ["Dipesan", counts.held, "held"],
+            ["Tersimpan", counts.stored, "stored"],
+            ["Siap diambil", counts.claimed, "claimed"],
+          ]
+            .map(
+              ([label, total, tone]) =>
+                `<article class="admin-summary-card ${tone}"><span>${label}</span><strong>${total}</strong><small>dari ${locations.length} loker</small></article>`,
+            )
+            .join("");
+          $("adminLockerList").innerHTML = lockers
+            .map(
+              ({ locker, item, status, label }) =>
+                `<article class="admin-locker-row ${status}">
+      <div class="admin-locker-code"><strong>${locker}</strong><span class="admin-status ${status}">${label}</span></div>
+      ${item ? `<div class="admin-locker-detail"><strong>${safe(item.name)}</strong><span>${safe(item.category)} · ${safe(item.color || "Warna tidak dicatat")}</span><span>${safe(item.location)}</span><span>Penitip: ${safe(item.finder || "Tidak tercatat")} · ${safe(item.date || "Tanpa tanggal")}</span><span>Ciri khusus: ${safe(item.secret || "Tidak dicatat")}</span><span>PIN titip ${safe(item.depositPin || "—")} · PIN ambil ${safe(item.claimPin || "—")}</span></div>` : `<p class="admin-empty">Tidak ada barang aktif di loker ini.</p>`}
+    </article>`,
+            )
+            .join("");
+          $("adminUpdated").textContent = `Diperbarui dari sesi ini · ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}`;
+        }
         let claimPhoto = "";
         function openClaim(id) {
           const item = items.find((i) => i.id === id && i.status === "stored");
@@ -1935,7 +2120,17 @@
           );
           $("loginForm").addEventListener("submit", (e) => {
             e.preventDefault();
-            setUser({ nim: $("loginNim").value.trim(), name: "" });
+            const username = $("loginNim").value.trim();
+            const password = $("loginPassword").value;
+            if (username === ADMIN_USERNAME) {
+              if (password === ADMIN_PASSWORD) {
+                setUser({ name: "Administrator", role: "admin" });
+              } else {
+                toast("Kredensial admin tidak sesuai.");
+              }
+              return;
+            }
+            setUser({ nim: username, name: "" });
           });
           $("registerForm").addEventListener("submit", (e) => {
             e.preventDefault();
@@ -2160,12 +2355,8 @@
         </div>
         <form id="loginForm" autocomplete="off" novalidate>
           <label class="field"
-            ><span>NIM</span
-            ><input
-              id="loginNim"
-              inputmode="numeric"
-              placeholder="Masukkan NIM"
-          /></label>
+            ><span>NIM atau username</span
+            ><input id="loginNim" placeholder="Masukkan NIM atau username" /></label>
           <label class="field"
             ><span>Password</span
             ><span class="passfield"
@@ -2215,7 +2406,7 @@
           </button>
         </form>
         <p class="auth-footnote">
-          Prototipe penelitian. Akun dan password tidak diverifikasi.
+          Prototipe penelitian. Akun dan password mahasiswa tidak diverifikasi; akses admin hanya untuk demo.
         </p>
       </section>
     </main>
@@ -2438,6 +2629,28 @@
             </p>
           </div>
         </div>
+      </section>
+    </main>
+
+    <main id="adminView" class="admin-layout" hidden>
+      <div class="admin-titlebar">
+        <div>
+          <span class="section-kicker">ADMIN / MONITORING</span>
+          <h1>Semua loker, satu layar.</h1>
+          <p>Pantau status loker dan detail barang dari sesi browser ini.</p>
+        </div>
+      </div>
+      <div id="adminSummary" class="admin-summary" aria-label="Ringkasan status loker"></div>
+      <section class="panel admin-monitoring" aria-labelledby="adminLockerTitle">
+        <div class="admin-monitoring-head">
+          <div>
+            <span class="eyebrow">STATUS TERKINI</span>
+            <h2 id="adminLockerTitle">Detail setiap loker</h2>
+            <p>Informasi item termasuk ciri khusus dan PIN ditampilkan untuk kebutuhan monitoring prototipe.</p>
+          </div>
+          <p id="adminUpdated" class="admin-updated" aria-live="polite"></p>
+        </div>
+        <div id="adminLockerList" class="admin-locker-list" aria-live="polite"></div>
       </section>
     </main>
 

@@ -16,7 +16,7 @@ Website statis HTML, CSS, JavaScript tanpa backend (siap dipasang di Vercel seba
 6. Menu navigasi bawah tersedia di ponsel.
 
 ## Batasan penting
-- Akun, NIM, PIN, data barang, dan foto hanya tersimpan sementara di sesi browser. Tidak ada server atau admin sungguhan.
+- Akun, NIM, PIN, data barang, dan foto hanya tersimpan sementara di sesi browser. Dashboard demo dapat dibuka dengan username `admin` dan password `admin123`, tetapi kredensial ini publik dan bukan keamanan sungguhan.
 - Bantuan pengisian dan pencocokan foto adalah simulasi yang menggunakan hasil tetap, **bukan analisis AI sebenarnya**. Untuk keperluan video, unggahan gambar yang valid akan dianggap cocok pada alur klaim foto.
 - PIN bukan pengamanan perangkat fisik; loker adalah simulasi. Jangan menggunakan versi ini untuk penitipan barang sungguhan.
 - `Video` membuka storyboard teks 13 langkah (bukan rekaman atau animasi 3D asli dari situs terdahulu).

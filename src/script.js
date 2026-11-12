@@ -5,6 +5,8 @@
   const icons = (name) => `<svg aria-hidden="true"><use href="#i-${name}"></use></svg>`;
   const safe = (input) => String(input ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const locations = ['A1','A2','A3','B1','B2','B3','C1','C2','C3'];
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = 'admin123';
   // Aplikasi tetap bisa dicoba secara lokal saat penyimpanan browser diblokir.
   const storage = (() => {
     try { const s = window.sessionStorage; s.setItem('__balikin_test', '1'); s.removeItem('__balikin_test'); return s; }
@@ -50,14 +52,16 @@
   function setUser(data) {
     user = data;
     storage.setItem(KEY_USER, JSON.stringify(data));
-    $('authView').hidden = true; $('appView').hidden = false;
-    $('userTools').hidden = false; $('mobileNav').hidden = false;
-    $('nimDisplay').textContent = data.nim ? `NIM ${data.nim}` : (data.name || 'Mahasiswa');
+    const admin = data.role === 'admin';
+    $('authView').hidden = true; $('appView').hidden = admin; $('adminView').hidden = !admin;
+    $('userTools').hidden = false; $('mobileNav').hidden = admin;
+    $('nimDisplay').textContent = admin ? 'Administrator' : (data.nim ? `NIM ${data.nim}` : (data.name || 'Mahasiswa'));
+    if(admin){renderAdminDashboard();window.scrollTo(0,0);return;}
     showTab('titip'); window.scrollTo(0,0);
   }
   function logout(){
     user = null; storage.removeItem(KEY_USER);
-    closeModal(); $('authView').hidden = false; $('appView').hidden = true;
+    closeModal(); $('authView').hidden = false; $('appView').hidden = true; $('adminView').hidden = true;
     $('userTools').hidden = true; $('mobileNav').hidden = true;
     showAuthTab('login'); window.scrollTo(0,0);
   }
@@ -170,6 +174,24 @@
       return `<div class="locker-cell ${state}" aria-label="Loker ${l}: ${label}">${l}<small>${label}</small></div>`;
     }).join('');
   }
+  function renderAdminDashboard(){
+    const lockers=locations.map(locker=>{
+      const item=items.find(i=>i.locker===locker&&['held','stored','claimed'].includes(i.status));
+      const status=item?.status||'available';
+      const labels={available:'KOSONG',held:'DIPESAN',stored:'TERSIMPAN',claimed:'SIAP DIAMBIL'};
+      return {locker,item,status,label:labels[status]};
+    });
+    const counts={available:0,held:0,stored:0,claimed:0};
+    lockers.forEach(({status})=>counts[status]++);
+    $('adminSummary').innerHTML=[
+      ['Kosong',counts.available,'available'],['Dipesan',counts.held,'held'],['Tersimpan',counts.stored,'stored'],['Siap diambil',counts.claimed,'claimed']
+    ].map(([label,total,tone])=>`<article class="admin-summary-card ${tone}"><span>${label}</span><strong>${total}</strong><small>dari ${locations.length} loker</small></article>`).join('');
+    $('adminLockerList').innerHTML=lockers.map(({locker,item,status,label})=>`<article class="admin-locker-row ${status}">
+      <div class="admin-locker-code"><strong>${locker}</strong><span class="admin-status ${status}">${label}</span></div>
+      ${item?`<div class="admin-locker-detail"><strong>${safe(item.name)}</strong><span>${safe(item.category)} · ${safe(item.color||'Warna tidak dicatat')}</span><span>${safe(item.location)}</span><span>Penitip: ${safe(item.finder||'Tidak tercatat')} · ${safe(item.date||'Tanpa tanggal')}</span><span>Ciri khusus: ${safe(item.secret||'Tidak dicatat')}</span><span>PIN titip ${safe(item.depositPin||'—')} · PIN ambil ${safe(item.claimPin||'—')}</span></div>`:`<p class="admin-empty">Tidak ada barang aktif di loker ini.</p>`}
+    </article>`).join('');
+    $('adminUpdated').textContent=`Diperbarui dari sesi ini · ${new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
+  }
   let claimPhoto='';
   function openClaim(id){
     const item=items.find(i=>i.id===id&&i.status==='stored');if(!item)return toast('Barang sudah tidak tersedia.');
@@ -269,7 +291,16 @@
     items=loadItems();renderLockers();renderItems();
     $('loginTab').addEventListener('click',()=>showAuthTab('login'));
     $('registerTab').addEventListener('click',()=>showAuthTab('register'));
-    $('loginForm').addEventListener('submit',e=>{e.preventDefault();setUser({nim:$('loginNim').value.trim(),name:''});});
+    $('loginForm').addEventListener('submit',e=>{
+      e.preventDefault();
+      const username=$('loginNim').value.trim(),password=$('loginPassword').value;
+      if(username===ADMIN_USERNAME){
+        if(password===ADMIN_PASSWORD)setUser({name:'Administrator',role:'admin'});
+        else toast('Kredensial admin tidak sesuai.');
+        return;
+      }
+      setUser({nim:username,name:''});
+    });
     $('registerForm').addEventListener('submit',e=>{e.preventDefault();setUser({nim:$('registerNim').value.trim(),name:$('registerName').value.trim()});});
     document.querySelectorAll('.eye-button').forEach(button=>button.addEventListener('click',()=>{
       const input=$(button.dataset.target);input.type=input.type==='password'?'text':'password';

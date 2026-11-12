@@ -16,4 +16,8 @@ npx live-server --host=0.0.0.0 --port=8080
 
 Use `http://<your-local-IP>:8080` from a phone on the same Wi-Fi network.
 
-> This is a prototype. Login, locker, photo processing, and matching are simulated in the browser only.
+## Admin demo
+
+Log in with username `admin` and password `admin123` to view the locker monitoring dashboard.
+
+> This is a prototype. Login, locker, photo processing, and matching are simulated in the browser only. The admin credentials are public in the client code, and the dashboard only monitors data from that browser session.
