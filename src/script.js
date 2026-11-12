@@ -233,7 +233,9 @@
     }));
     document.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => showTab(button.dataset.tab)));
     $('foundCameraBtn').addEventListener('click', () => $('foundCamera').click());
+    $('foundGalleryBtn').addEventListener('click', () => $('foundGallery').click());
     $('foundCamera').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
+    $('foundGallery').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
     $('depositForm').addEventListener('submit', (event) => {
       event.preventDefault();
       const name = $('itemName').value.trim();
