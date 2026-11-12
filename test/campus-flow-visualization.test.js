@@ -15,6 +15,14 @@ test('student prototype visualizes each primary service flow', () => {
   assert.match(html, /Kondisi khusus/);
 });
 
+test('student prototype restores the fixed mobile flow menu', () => {
+  const html = read('src/index.html');
+  assert.match(html, /id="mobileNav"/);
+  for (const tab of ['temukan', 'cari', 'lokasi', 'bantuan']) {
+    assert.match(html, new RegExp(`mobile-nav-item[^>]*data-tab="${tab}"`));
+  }
+});
+
 test('visualization models campus locations, exceptions, and admin queues', () => {
   const script = read('src/script.js');
   for (const marker of ['renderLocations', 'renderExceptions', 'renderLockerRecommendation', 'renderAdminDashboard']) {

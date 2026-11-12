@@ -172,6 +172,7 @@
     $('appView').hidden = admin;
     $('adminView').hidden = !admin;
     $('userTools').hidden = false;
+    $('mobileNav').hidden = admin;
     $('nimDisplay').textContent = admin ? 'Himatif admin' : `NIM ${data.nim || 'Mahasiswa'}`;
     if (admin) {
       renderAdminDashboard();
@@ -190,6 +191,7 @@
     $('appView').hidden = true;
     $('adminView').hidden = true;
     $('userTools').hidden = true;
+    $('mobileNav').hidden = true;
     $('loginPassword').value = '';
     window.scrollTo(0, 0);
   }
