@@ -10,7 +10,10 @@
     claimCheck: 900,
     claimGauge: 600,
     claimHold: 1200,
-    toast: 4200,
+    toast: 4000,
+    pinTtl: 15 * 60 * 1000,
+    lockerSignal: 3500,
+    doorClose: 2500,
   });
   const ADMIN_USERNAME = 'admin';
   const ADMIN_PASSWORD = 'admin123';
@@ -460,26 +463,6 @@
     }
   }
 
-  async function useDemoPhoto() {
-    const button = $('foundDemoBtn');
-    setButtonLoading(button, true, 'Memuat foto');
-    try {
-      const source = $('demoPhotoSource');
-      if (!source.complete || !source.naturalWidth) await source.decode();
-      const canvas = document.createElement('canvas');
-      canvas.width = source.naturalWidth;
-      canvas.height = source.naturalHeight;
-      canvas.getContext('2d').drawImage(source, 0, 0);
-      const blob = await canvasBlob(canvas, IMAGE_LIMITS.quality);
-      if (!blob) throw new Error('Foto demo tidak tersedia.');
-      await previewFoundPhoto(new File([blob], 'botol-hijau.jpg', { type: 'image/jpeg' }));
-    } catch (error) {
-      setTextStatus('depositStatus', error.message || 'Foto demo tidak dapat digunakan.', 'error');
-    } finally {
-      setButtonLoading(button, false);
-    }
-  }
-
   function validateFoundForm() {
     const values = {
       name: $('itemName').value.trim(),
@@ -501,38 +484,130 @@
     return valid ? values : null;
   }
 
+  let lockerTimer = null;
+  let lockerEnd = 0;
+  let lockerRun = 0;
+  const lockerAnnounced = new Set();
+
+  function formatPinCountdown(ms) {
+    const total = Math.max(0, Math.ceil(ms / 1000));
+    const minutes = String(Math.floor(total / 60)).padStart(2, '0');
+    const seconds = String(total % 60).padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  function stopLockerCountdown() {
+    if (lockerTimer) window.clearInterval(lockerTimer);
+    lockerTimer = null;
+  }
+
+  function lockerCountdownMarkup() {
+    return `<div class="locker-count"><strong id="lockerCountdown" class="locker-time">15:00</strong><div class="locker-bar" aria-hidden="true"><span id="lockerBar"></span></div></div><p id="lockerLive" class="sr-only" aria-live="polite"></p>`;
+  }
+
+  function updateLockerCountdown(locationLabel) {
+    const remain = lockerEnd - Date.now();
+    const label = formatPinCountdown(remain);
+    const time = $('lockerCountdown');
+    if (time) time.textContent = label;
+    const bar = $('lockerBar');
+    if (bar) bar.style.transform = `scaleX(${Math.max(0, Math.min(1, remain / DEMO_TIMING.pinTtl))})`;
+    const live = $('lockerLive');
+    for (const mark of ['05:00', '01:00']) {
+      if (label === mark && !lockerAnnounced.has(mark)) {
+        lockerAnnounced.add(mark);
+        if (live) live.textContent = `PIN tersisa ${mark === '05:00' ? '5 menit' : '1 menit'}.`;
+      }
+    }
+    if (remain <= 0) {
+      if ($('newPinBtn')) return;
+      stopLockerCountdown();
+      lockerRun += 1;
+      if (live) live.textContent = 'PIN kedaluwarsa.';
+      modalShell(locationLabel, `<section class="locker-sheet"><p class="locker-expired">PIN kedaluwarsa. Reservasi loker dilepas.</p><button id="newPinBtn" class="button button-main full" type="button">Buat PIN baru</button></section>`);
+      const close = $('modalClose');
+      if (close) close.hidden = true;
+      $('newPinBtn').addEventListener('click', () => {
+        document.body.classList.remove('locker-open');
+        closeModal(true);
+      });
+    }
+  }
+
+  function startLockerCountdown(locationLabel) {
+    stopLockerCountdown();
+    lockerAnnounced.clear();
+    lockerEnd = Date.now() + DEMO_TIMING.pinTtl;
+    updateLockerCountdown(locationLabel);
+    lockerTimer = window.setInterval(() => updateLockerCountdown(locationLabel), 250);
+  }
+
   function renderLockerRecommendation(payload) {
     state.pendingFound = payload;
     const preferred = locations.find((location) => location.id === payload.locationId && location.status === 'online' && location.capacity > 0);
     const location = preferred || locations.find((entry) => entry.status === 'online' && entry.capacity > 0);
     if (!location) {
-      $('lockerRecommendation').hidden = false;
-      $('lockerRecommendation').innerHTML = '<h3>Loker sedang tidak tersedia</h3><p>Coba lagi saat ada loker kosong.</p>';
+      setTextStatus('depositStatus', 'Loker sedang tidak tersedia. Coba lagi saat ada loker kosong.', 'error');
       return;
     }
-    $('lockerRecommendation').hidden = false;
-    $('lockerRecommendation').innerHTML = `<div class="recommendation-grid"><div><h3>${safe(location.name)} · Loker M-03</h3><p>Ditemukan di ${safe(payload.detailLocation)}. PIN penitipan berlaku 15 menit.</p><div class="pin-display"><span>PIN penitipan</span><strong>184205</strong><span>15 menit</span></div></div><button id="reserveLockerBtn" class="button button-main" type="button">Simulasikan buka loker</button></div>`;
-    $('reserveLockerBtn').addEventListener('click', () => submitFoundItem().catch((error) => setTextStatus('depositStatus', error.message || 'Barang tidak dapat disimpan.', 'error')));
+    const title = `${location.name} · Loker M-03`;
     setFinderStep(2);
-    $('lockerRecommendation').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    openModal(title, `<section class="locker-sheet"><p class="locker-found">Ditemukan di ${safe(payload.detailLocation)}.</p><p class="locker-valid">PIN penitipan berlaku 15 menit.</p><div class="locker-pin"><span>PIN penitipan</span><strong>184205</strong></div>${lockerCountdownMarkup()}<button id="openLockerBtn" class="button button-main full" type="button">Buka loker</button><button id="cancelLockerBtn" class="link-button" type="button">Batalkan</button></section>`, $('depositSubmit'), { persistent: true });
+    const close = $('modalClose');
+    if (close) close.hidden = true;
+    document.body.classList.add('locker-open');
+    startLockerCountdown(title);
+    $('cancelLockerBtn').addEventListener('click', () => {
+      stopLockerCountdown();
+      lockerRun += 1;
+      document.body.classList.remove('locker-open');
+      closeModal(true);
+    });
+    $('openLockerBtn').addEventListener('click', () => openLockerSignal(title).catch((error) => setTextStatus('depositStatus', error.message || 'Loker tidak dapat dibuka.', 'error')));
   }
 
-  async function submitFoundItem() {
-    const button = $('reserveLockerBtn');
-    if (!state.pendingFound || !button) return;
-    setButtonLoading(button, true, 'Menyimpan barang');
-    try {
-      const item = await api.submitFound(state.pendingFound);
-      state.pendingFound = null;
-      setFinderStep(3);
-      $('lockerRecommendation').innerHTML = `<div class="recommendation-grid"><div><h3>Barang sudah dititipkan</h3><p>${safe(item.name)} sekarang tampil di katalog tanpa ciri khusus.</p></div><button id="viewCatalogBtn" class="button button-main" type="button">Lihat di katalog</button></div>`;
-      $('viewCatalogBtn').addEventListener('click', () => showTab('cari'));
-      setTextStatus('depositStatus', 'Barang berhasil disimpan.', 'success');
-      toast('Barang masuk ke katalog.');
-    } catch (error) {
-      setButtonLoading(button, false);
-      throw error;
+  async function openLockerSignal(title) {
+    const run = ++lockerRun;
+    const steps = ['Perintah terkirim', 'Menunggu respons loker', 'Pintu terbuka'];
+    modalShell('Menghubungi loker', `<section class="locker-sheet is-busy">${lockerCountdownMarkup()}<div class="indeterminate" aria-hidden="true"><span></span></div><ol class="locker-steps">${steps.map((label, index) => `<li id="lockerStep${index}"><span></span>${safe(label)}</li>`).join('')}</ol></section>`);
+    const closeA = $('modalClose');
+    if (closeA) closeA.hidden = true;
+    const stepWait = DEMO_TIMING.lockerSignal / (steps.length + 1);
+    for (let index = 0; index < steps.length; index += 1) {
+      await wait(stepWait);
+      if (run !== lockerRun) return;
+      const row = $(`lockerStep${index}`);
+      if (row) row.classList.add('complete');
     }
+    await wait(stepWait);
+    if (run !== lockerRun) return;
+    stopLockerCountdown();
+    modalShell('Loker terbuka', `<section class="locker-sheet"><p>Masukkan barang, lalu tutup pintu.</p><p class="locker-wait"><span class="spinner" aria-hidden="true"></span>Menunggu pintu tertutup</p></section>`);
+    const closeB = $('modalClose');
+    if (closeB) closeB.hidden = true;
+    await wait(DEMO_TIMING.doorClose);
+    if (run !== lockerRun) return;
+    let item = null;
+    try {
+      item = await api.submitFound(state.pendingFound);
+    } catch (error) {
+      setTextStatus('depositStatus', error.message || 'Barang tidak dapat disimpan.', 'error');
+      document.body.classList.remove('locker-open');
+      closeModal(true);
+      return;
+    }
+    if (run !== lockerRun) return;
+    state.pendingFound = null;
+    setFinderStep(3);
+    setTextStatus('depositStatus', 'Barang berhasil disimpan.', 'success');
+    modalShell('Barang tercatat', `<section class="locker-sheet"><p>${safe(item.name)} sudah masuk katalog.</p><button id="viewCatalogBtn" class="button button-main full" type="button">Lihat di katalog</button></section>`);
+    const closeC = $('modalClose');
+    if (closeC) closeC.hidden = true;
+    $('viewCatalogBtn').addEventListener('click', () => {
+      document.body.classList.remove('locker-open');
+      closeModal(true);
+      showTab('cari');
+    });
   }
 
   // Catalog and claim flow
@@ -556,19 +631,24 @@
     $('modalClose').addEventListener('click', closeModal);
   }
 
-  function openModal(title, body, trigger) {
+  function openModal(title, body, trigger, options = {}) {
     state.modalTrigger = trigger || document.activeElement;
+    state.modalPersistent = Boolean(options.persistent);
     $('modalLayer').hidden = false;
+    document.body.style.overflow = 'hidden';
     modalShell(title, body);
     window.requestAnimationFrame(() => ($('modalContent').querySelector('[data-autofocus]') || $('modalClose')).focus());
   }
 
-  function closeModal() {
+  function closeModal(force = false) {
     if ($('modalLayer').hidden) return;
+    if (state.modalPersistent && !force) return;
     $('modalLayer').hidden = true;
     $('modalContent').innerHTML = '';
+    document.body.style.overflow = '';
     const trigger = state.modalTrigger;
     state.modalTrigger = null;
+    state.modalPersistent = false;
     if (trigger && document.contains(trigger)) trigger.focus();
   }
 
@@ -945,11 +1025,9 @@
     document.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => showTab(button.dataset.tab)));
     $('foundCameraBtn').addEventListener('click', () => $('foundCamera').click());
     $('foundGalleryBtn').addEventListener('click', () => $('foundGallery').click());
-    $('foundDemoBtn').addEventListener('click', () => useDemoPhoto());
     $('foundChangeBtn').addEventListener('click', () => setFoundPhotoControls(false));
     $('foundCamera').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
     $('foundGallery').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
-    $('secretExampleBtn').addEventListener('click', () => { $('itemSecret').value = 'Stiker nama di bagian bawah'; setFieldError('itemSecretError'); $('itemSecret').focus(); });
     $('depositForm').addEventListener('input', (event) => {
       if (event.target.value?.trim()) setFinderFormHasContent();
     });

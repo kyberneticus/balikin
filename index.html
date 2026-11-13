@@ -31,7 +31,8 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); font-size: 16px; line-height: 1.5; }
+body { margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); font-size: 16px; line-height: 1.5; overflow-x: clip; }
+img { max-width: 100%; }
 body.support-tab-active { padding-bottom: 0; }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
@@ -72,6 +73,13 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .field > span { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--ink); font-size: 13px; font-weight: 750; }
 .field input, .field select, .field textarea, .search-controls select, .support-composer textarea, .admin-reply-form textarea { width: 100%; min-height: 48px; border: 1px solid #bfd0c2; border-radius: 12px; padding: 12px; background: var(--white); color: var(--ink); font-size: 16px; line-height: 1.5; }
 .field textarea, .support-composer textarea, .admin-reply-form textarea { resize: vertical; }
+.field input, .field select { height: 48px; }
+.field textarea { min-height: 88px; }
+.item-form { display: grid; gap: 16px; align-content: start; }
+.item-form .panel-heading { margin-bottom: 8px; }
+.item-form .field-error { margin: 0; }
+.item-form label.field + .field-error, .fieldgrid .field-error { margin-top: 4px; }
+.item-form .form-status, .item-form .finder-submit { margin: 0; }
 .field input::placeholder, .field textarea::placeholder, .support-composer textarea::placeholder { color: #718078; }
 .field-error { min-height: 18px; margin: 4px 0 8px; color: var(--red); font-size: 12px; }
 .field-error:empty { display: none; }
@@ -135,9 +143,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 @keyframes scan-sweep { from { transform: translateY(0); } to { transform: translateY(calc(100% - 1px)); } }
 @keyframes detection-enter { to { opacity: 1; transform: translateY(0); } }
 .photo-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.photo-actions .button { min-width: 0; padding: 8px; font-size: 13px; }
-.photo-actions .button:first-child { grid-column: 1 / -1; }
-.photo-actions.has-photo { display: none; }
+.photo-actions .button { min-width: 0; min-height: 48px; padding: 8px; font-size: 13px; }
 .photo-change { display: inline-flex; align-items: center; gap: 8px; padding: 0; }
 .photo-change svg { width: 20px; height: 20px; }
 .ai-progress { border-top: 1px solid var(--line); padding-top: 16px; margin-bottom: 16px; }
@@ -155,11 +161,9 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .ai-progress-steps li.active > span, .ai-progress-steps li.complete > span { border-color: var(--green); background: var(--green); color: var(--white); }
 .ai-progress p { margin: 16px 0 0; color: var(--muted); font-size: 12px; }
 
-.fieldgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.fieldgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .ai-fill-tag { color: var(--green); font-size: 12px; font-weight: 700; }
-.field-tools { display: flex; align-items: start; justify-content: space-between; gap: 16px; min-height: 44px; }
-.field-tools .field-error { flex: 1; text-align: right; }
-.finder-submit { margin-top: 8px; }
+.photo-actions.has-photo { display: none; }
 .recommendation { margin-top: 24px; border: 1px solid #b9d7c0; border-radius: 16px; padding: 24px; background: #f0f7f1; }
 .recommendation-grid { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 24px; }
 .recommendation h3 { margin: 0; font-size: 20px; letter-spacing: -.03em; }
@@ -169,6 +173,30 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .pin-display strong { color: var(--green-dark); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 24px; letter-spacing: .12em; }
 
 .search-controls { display: flex; align-items: center; gap: 12px; }
+.locker-sheet { display: grid; gap: 16px; align-content: start; justify-items: center; min-height: 432px; margin-top: 24px; text-align: center; animation: locker-enter 180ms ease; }
+.locker-sheet > p { margin: 0; font-size: 14px; }
+.locker-sheet .locker-valid { color: var(--muted); font-size: 13px; }
+.locker-pin { display: grid; gap: 8px; justify-items: center; }
+.locker-pin span { color: var(--muted); font-size: 12px; }
+.locker-pin strong { color: var(--green-dark); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 40px; letter-spacing: .12em; line-height: 1; }
+.locker-count { display: grid; gap: 8px; justify-items: center; width: 100%; }
+.locker-time { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 28px; font-variant-numeric: tabular-nums; }
+.locker-bar { width: 100%; height: 4px; overflow: hidden; border-radius: 2px; background: #e3ebe4; }
+.locker-bar span { display: block; height: 100%; background: var(--green); transform-origin: left center; }
+.locker-sheet .button.full { width: 100%; }
+.locker-steps { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.locker-steps li { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-size: 14px; opacity: .55; transition: opacity 180ms ease; }
+.locker-steps li > span { width: 20px; height: 20px; border: 1px solid var(--line); border-radius: 50%; }
+.locker-steps li.complete { color: var(--green-dark); opacity: 1; }
+.locker-steps li.complete > span { border-color: var(--green); background: var(--green); }
+.locker-wait { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); }
+.locker-expired { font-size: 14px; }
+.indeterminate { width: 100%; height: 4px; overflow: hidden; border-radius: 2px; background: #e3ebe4; }
+.indeterminate span { display: block; width: 40%; height: 100%; background: var(--green); animation: locker-slide 1.2s ease-in-out infinite; }
+.spinner { width: 16px; height: 16px; border: 2px solid var(--line); border-top-color: var(--green); border-radius: 50%; animation: locker-spin .8s linear infinite; }
+@keyframes locker-slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+@keyframes locker-spin { to { transform: rotate(360deg); } }
+@keyframes locker-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .search-field { display: flex; min-height: 48px; flex: 1; align-items: center; gap: 8px; border: 1px solid #bfd0c2; border-radius: 12px; padding: 0 12px; background: var(--white); }
 .search-field input { width: 100%; min-width: 0; min-height: 44px; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 16px; }
 .search-controls select { width: 176px; }
@@ -316,13 +344,16 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .link-button { min-height: 44px; border: 0; padding: 0; background: transparent; color: var(--green); font-size: 13px; font-weight: 750; text-decoration: underline; text-underline-offset: 4px; }
 .pickup-success { display: grid; justify-items: center; gap: 16px; text-align: center; }
 
-.toast-zone { position: fixed; z-index: 50; right: 16px; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 12px); display: grid; gap: 8px; width: min(360px, calc(100vw - 32px)); }
+.toast-zone { position: fixed; z-index: 80; right: 24px; bottom: 24px; display: grid; gap: 8px; width: 360px; max-width: calc(100vw - 48px); }
+.toast-zone:empty { display: none; }
+body.locker-open .toast-zone { top: calc(env(safe-area-inset-top, 0px) + 12px); bottom: auto; }
 .toast { border-radius: 12px; padding: 12px 16px; background: var(--ink); color: var(--white); box-shadow: var(--shadow); font-size: 13px; }
 
 .mobile-bottom-nav { display: none; }
 
 @media (max-width: 900px) {
   .auth-layout, .finder-layout { grid-template-columns: 1fr; }
+  .finder-layout { gap: 16px; }
   .auth-layout { gap: 32px; }
   .auth-intro { max-width: 720px; }
   .location-grid { grid-template-columns: 1fr; }
@@ -334,7 +365,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 @media (max-width: 670px) {
   :root { --nav-height: 72px; }
   .site-header { position: sticky; }
-  .header-inner { min-height: 64px; gap: 8px; padding: 0 16px; }
+  .header-inner { min-height: 64px; gap: 8px; padding: 0 calc(16px + env(safe-area-inset-right)) 0 calc(16px + env(safe-area-inset-left)); }
   .brand { flex: none; font-size: 22px; }
   .brand-icon { width: 32px; height: 32px; }
   .header-tools { flex: none; gap: 0; }
@@ -346,7 +377,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   .auth-intro h1 { font-size: 40px; }
   .auth-intro > p:last-child { margin-top: 16px; font-size: 14px; }
   .auth-card { padding: 24px 16px; }
-  .app-layout, .admin-layout { padding: 24px 16px calc(96px + env(safe-area-inset-bottom)); }
+  .app-layout, .admin-layout { padding: 24px calc(16px + env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left)); }
   .app-titlebar { display: none; }
   .admin-titlebar { padding: 0 0 16px; }
   .admin-titlebar h1 { font-size: 30px; }
@@ -358,7 +389,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   .flow-steps li:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
   .panel { padding: 16px; }
   .fieldgrid { grid-template-columns: 1fr; }
-  .photo-preview { aspect-ratio: 4 / 3; max-height: 36svh; }
+  .photo-preview { aspect-ratio: 4 / 3; max-height: 40svh; }
   .photo-actions .button { justify-content: center; }
   .ai-progress-steps { grid-template-columns: repeat(3, 1fr); gap: 4px; }
   .ai-progress-steps li { min-width: 0; gap: 4px; font-size: 12px; white-space: nowrap; }
@@ -387,7 +418,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   .admin-thread { max-height: 34svh; }
   .admin-reply-form { position: sticky; bottom: env(safe-area-inset-bottom); padding: 12px 0 env(safe-area-inset-bottom); background: var(--white); }
   .modal-layer { align-items: end; padding: 0; }
-  .modal-panel { width: 100%; max-height: 90svh; border-radius: 16px 16px 0 0; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .modal-panel { width: 100%; max-height: 90svh; border-radius: 16px 16px 0 0; padding: 12px calc(16px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left)); }
   .sheet-handle { display: block; width: 40px; height: 4px; border-radius: 12px; margin: 0 auto 12px; background: #b8c5ba; }
   .modal-panel h2 { font-size: 24px; }
   .claim-state { min-height: 432px; }
@@ -396,6 +427,8 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   .mobile-nav-item { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 12px; padding: 4px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 750; }
   .mobile-nav-item svg { width: 20px; height: 20px; }
   .mobile-nav-item.active { background: var(--green-pale); color: var(--green-dark); }
+  .toast-zone { right: 16px; left: 16px; width: auto; max-width: calc(100vw - 32px); justify-items: center; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 12px); }
+  body:not(.locker-open):has(.item-form.has-content) .toast-zone { bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 96px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -417,7 +450,10 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     claimCheck: 900,
     claimGauge: 600,
     claimHold: 1200,
-    toast: 4200,
+    toast: 4000,
+    pinTtl: 15 * 60 * 1000,
+    lockerSignal: 3500,
+    doorClose: 2500,
   });
   const ADMIN_USERNAME = 'admin';
   const ADMIN_PASSWORD = 'admin123';
@@ -867,26 +903,6 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     }
   }
 
-  async function useDemoPhoto() {
-    const button = $('foundDemoBtn');
-    setButtonLoading(button, true, 'Memuat foto');
-    try {
-      const source = $('demoPhotoSource');
-      if (!source.complete || !source.naturalWidth) await source.decode();
-      const canvas = document.createElement('canvas');
-      canvas.width = source.naturalWidth;
-      canvas.height = source.naturalHeight;
-      canvas.getContext('2d').drawImage(source, 0, 0);
-      const blob = await canvasBlob(canvas, IMAGE_LIMITS.quality);
-      if (!blob) throw new Error('Foto demo tidak tersedia.');
-      await previewFoundPhoto(new File([blob], 'botol-hijau.jpg', { type: 'image/jpeg' }));
-    } catch (error) {
-      setTextStatus('depositStatus', error.message || 'Foto demo tidak dapat digunakan.', 'error');
-    } finally {
-      setButtonLoading(button, false);
-    }
-  }
-
   function validateFoundForm() {
     const values = {
       name: $('itemName').value.trim(),
@@ -908,38 +924,130 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     return valid ? values : null;
   }
 
+  let lockerTimer = null;
+  let lockerEnd = 0;
+  let lockerRun = 0;
+  const lockerAnnounced = new Set();
+
+  function formatPinCountdown(ms) {
+    const total = Math.max(0, Math.ceil(ms / 1000));
+    const minutes = String(Math.floor(total / 60)).padStart(2, '0');
+    const seconds = String(total % 60).padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  function stopLockerCountdown() {
+    if (lockerTimer) window.clearInterval(lockerTimer);
+    lockerTimer = null;
+  }
+
+  function lockerCountdownMarkup() {
+    return `<div class="locker-count"><strong id="lockerCountdown" class="locker-time">15:00</strong><div class="locker-bar" aria-hidden="true"><span id="lockerBar"></span></div></div><p id="lockerLive" class="sr-only" aria-live="polite"></p>`;
+  }
+
+  function updateLockerCountdown(locationLabel) {
+    const remain = lockerEnd - Date.now();
+    const label = formatPinCountdown(remain);
+    const time = $('lockerCountdown');
+    if (time) time.textContent = label;
+    const bar = $('lockerBar');
+    if (bar) bar.style.transform = `scaleX(${Math.max(0, Math.min(1, remain / DEMO_TIMING.pinTtl))})`;
+    const live = $('lockerLive');
+    for (const mark of ['05:00', '01:00']) {
+      if (label === mark && !lockerAnnounced.has(mark)) {
+        lockerAnnounced.add(mark);
+        if (live) live.textContent = `PIN tersisa ${mark === '05:00' ? '5 menit' : '1 menit'}.`;
+      }
+    }
+    if (remain <= 0) {
+      if ($('newPinBtn')) return;
+      stopLockerCountdown();
+      lockerRun += 1;
+      if (live) live.textContent = 'PIN kedaluwarsa.';
+      modalShell(locationLabel, `<section class="locker-sheet"><p class="locker-expired">PIN kedaluwarsa. Reservasi loker dilepas.</p><button id="newPinBtn" class="button button-main full" type="button">Buat PIN baru</button></section>`);
+      const close = $('modalClose');
+      if (close) close.hidden = true;
+      $('newPinBtn').addEventListener('click', () => {
+        document.body.classList.remove('locker-open');
+        closeModal(true);
+      });
+    }
+  }
+
+  function startLockerCountdown(locationLabel) {
+    stopLockerCountdown();
+    lockerAnnounced.clear();
+    lockerEnd = Date.now() + DEMO_TIMING.pinTtl;
+    updateLockerCountdown(locationLabel);
+    lockerTimer = window.setInterval(() => updateLockerCountdown(locationLabel), 250);
+  }
+
   function renderLockerRecommendation(payload) {
     state.pendingFound = payload;
     const preferred = locations.find((location) => location.id === payload.locationId && location.status === 'online' && location.capacity > 0);
     const location = preferred || locations.find((entry) => entry.status === 'online' && entry.capacity > 0);
     if (!location) {
-      $('lockerRecommendation').hidden = false;
-      $('lockerRecommendation').innerHTML = '<h3>Loker sedang tidak tersedia</h3><p>Coba lagi saat ada loker kosong.</p>';
+      setTextStatus('depositStatus', 'Loker sedang tidak tersedia. Coba lagi saat ada loker kosong.', 'error');
       return;
     }
-    $('lockerRecommendation').hidden = false;
-    $('lockerRecommendation').innerHTML = `<div class="recommendation-grid"><div><h3>${safe(location.name)} · Loker M-03</h3><p>Ditemukan di ${safe(payload.detailLocation)}. PIN penitipan berlaku 15 menit.</p><div class="pin-display"><span>PIN penitipan</span><strong>184205</strong><span>15 menit</span></div></div><button id="reserveLockerBtn" class="button button-main" type="button">Simulasikan buka loker</button></div>`;
-    $('reserveLockerBtn').addEventListener('click', () => submitFoundItem().catch((error) => setTextStatus('depositStatus', error.message || 'Barang tidak dapat disimpan.', 'error')));
+    const title = `${location.name} · Loker M-03`;
     setFinderStep(2);
-    $('lockerRecommendation').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    openModal(title, `<section class="locker-sheet"><p class="locker-found">Ditemukan di ${safe(payload.detailLocation)}.</p><p class="locker-valid">PIN penitipan berlaku 15 menit.</p><div class="locker-pin"><span>PIN penitipan</span><strong>184205</strong></div>${lockerCountdownMarkup()}<button id="openLockerBtn" class="button button-main full" type="button">Buka loker</button><button id="cancelLockerBtn" class="link-button" type="button">Batalkan</button></section>`, $('depositSubmit'), { persistent: true });
+    const close = $('modalClose');
+    if (close) close.hidden = true;
+    document.body.classList.add('locker-open');
+    startLockerCountdown(title);
+    $('cancelLockerBtn').addEventListener('click', () => {
+      stopLockerCountdown();
+      lockerRun += 1;
+      document.body.classList.remove('locker-open');
+      closeModal(true);
+    });
+    $('openLockerBtn').addEventListener('click', () => openLockerSignal(title).catch((error) => setTextStatus('depositStatus', error.message || 'Loker tidak dapat dibuka.', 'error')));
   }
 
-  async function submitFoundItem() {
-    const button = $('reserveLockerBtn');
-    if (!state.pendingFound || !button) return;
-    setButtonLoading(button, true, 'Menyimpan barang');
-    try {
-      const item = await api.submitFound(state.pendingFound);
-      state.pendingFound = null;
-      setFinderStep(3);
-      $('lockerRecommendation').innerHTML = `<div class="recommendation-grid"><div><h3>Barang sudah dititipkan</h3><p>${safe(item.name)} sekarang tampil di katalog tanpa ciri khusus.</p></div><button id="viewCatalogBtn" class="button button-main" type="button">Lihat di katalog</button></div>`;
-      $('viewCatalogBtn').addEventListener('click', () => showTab('cari'));
-      setTextStatus('depositStatus', 'Barang berhasil disimpan.', 'success');
-      toast('Barang masuk ke katalog.');
-    } catch (error) {
-      setButtonLoading(button, false);
-      throw error;
+  async function openLockerSignal(title) {
+    const run = ++lockerRun;
+    const steps = ['Perintah terkirim', 'Menunggu respons loker', 'Pintu terbuka'];
+    modalShell('Menghubungi loker', `<section class="locker-sheet is-busy">${lockerCountdownMarkup()}<div class="indeterminate" aria-hidden="true"><span></span></div><ol class="locker-steps">${steps.map((label, index) => `<li id="lockerStep${index}"><span></span>${safe(label)}</li>`).join('')}</ol></section>`);
+    const closeA = $('modalClose');
+    if (closeA) closeA.hidden = true;
+    const stepWait = DEMO_TIMING.lockerSignal / (steps.length + 1);
+    for (let index = 0; index < steps.length; index += 1) {
+      await wait(stepWait);
+      if (run !== lockerRun) return;
+      const row = $(`lockerStep${index}`);
+      if (row) row.classList.add('complete');
     }
+    await wait(stepWait);
+    if (run !== lockerRun) return;
+    stopLockerCountdown();
+    modalShell('Loker terbuka', `<section class="locker-sheet"><p>Masukkan barang, lalu tutup pintu.</p><p class="locker-wait"><span class="spinner" aria-hidden="true"></span>Menunggu pintu tertutup</p></section>`);
+    const closeB = $('modalClose');
+    if (closeB) closeB.hidden = true;
+    await wait(DEMO_TIMING.doorClose);
+    if (run !== lockerRun) return;
+    let item = null;
+    try {
+      item = await api.submitFound(state.pendingFound);
+    } catch (error) {
+      setTextStatus('depositStatus', error.message || 'Barang tidak dapat disimpan.', 'error');
+      document.body.classList.remove('locker-open');
+      closeModal(true);
+      return;
+    }
+    if (run !== lockerRun) return;
+    state.pendingFound = null;
+    setFinderStep(3);
+    setTextStatus('depositStatus', 'Barang berhasil disimpan.', 'success');
+    modalShell('Barang tercatat', `<section class="locker-sheet"><p>${safe(item.name)} sudah masuk katalog.</p><button id="viewCatalogBtn" class="button button-main full" type="button">Lihat di katalog</button></section>`);
+    const closeC = $('modalClose');
+    if (closeC) closeC.hidden = true;
+    $('viewCatalogBtn').addEventListener('click', () => {
+      document.body.classList.remove('locker-open');
+      closeModal(true);
+      showTab('cari');
+    });
   }
 
   // Catalog and claim flow
@@ -963,19 +1071,24 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     $('modalClose').addEventListener('click', closeModal);
   }
 
-  function openModal(title, body, trigger) {
+  function openModal(title, body, trigger, options = {}) {
     state.modalTrigger = trigger || document.activeElement;
+    state.modalPersistent = Boolean(options.persistent);
     $('modalLayer').hidden = false;
+    document.body.style.overflow = 'hidden';
     modalShell(title, body);
     window.requestAnimationFrame(() => ($('modalContent').querySelector('[data-autofocus]') || $('modalClose')).focus());
   }
 
-  function closeModal() {
+  function closeModal(force = false) {
     if ($('modalLayer').hidden) return;
+    if (state.modalPersistent && !force) return;
     $('modalLayer').hidden = true;
     $('modalContent').innerHTML = '';
+    document.body.style.overflow = '';
     const trigger = state.modalTrigger;
     state.modalTrigger = null;
+    state.modalPersistent = false;
     if (trigger && document.contains(trigger)) trigger.focus();
   }
 
@@ -1352,11 +1465,9 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     document.querySelectorAll('[data-tab]').forEach((button) => button.addEventListener('click', () => showTab(button.dataset.tab)));
     $('foundCameraBtn').addEventListener('click', () => $('foundCamera').click());
     $('foundGalleryBtn').addEventListener('click', () => $('foundGallery').click());
-    $('foundDemoBtn').addEventListener('click', () => useDemoPhoto());
     $('foundChangeBtn').addEventListener('click', () => setFoundPhotoControls(false));
     $('foundCamera').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
     $('foundGallery').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
-    $('secretExampleBtn').addEventListener('click', () => { $('itemSecret').value = 'Stiker nama di bagian bawah'; setFieldError('itemSecretError'); $('itemSecret').focus(); });
     $('depositForm').addEventListener('input', (event) => {
       if (event.target.value?.trim()) setFinderFormHasContent();
     });
@@ -1461,7 +1572,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   <main id="authView" class="auth-layout">
     <section class="auth-intro">
       <p class="kicker">Lost &amp; Found Kampus</p>
-      <h1>Temukan jalan pulang untuk barang kampus.</h1>
+      <h1>Temuin jalan pulang untuk barang kampus.</h1>
       <p>Catat barang temuan, cari barang hilang, dan hubungi admin bila loker bermasalah.</p>
     </section>
     <section class="auth-card" aria-labelledby="loginTitle">
@@ -1484,7 +1595,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     </div>
 
     <nav class="workspace-tabs" aria-label="Layanan Balikin">
-      <button class="tab-button active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg>Temukan</button>
+      <button class="tab-button active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg>Temuin</button>
       <button class="tab-button" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg>Cari</button>
       <button class="tab-button" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg>Loker</button>
       <button class="tab-button" data-tab="bantuan" type="button"><svg><use href="#i-message"></use></svg>Bantuan</button>
@@ -1507,13 +1618,11 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
           </section>
           <div id="photoActions" class="photo-actions">
             <button id="foundCameraBtn" class="button button-main" type="button"><svg><use href="#i-camera"></use></svg>Ambil foto</button>
-            <button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Galeri</button>
-            <button id="foundDemoBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Foto demo</button>
+            <button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Pilih galeri</button>
           </div>
           <button id="foundChangeBtn" class="text-button photo-change" type="button" hidden><svg><use href="#i-image"></use></svg>Ganti foto</button>
           <input id="foundCamera" type="file" accept="image/*" capture="environment" hidden />
           <input id="foundGallery" type="file" accept="image/*" hidden />
-          <img id="demoPhotoSource" src="src/assets/botol-hijau.jpg" alt="" hidden />
         </section>
 
         <form class="panel item-form" id="depositForm" novalidate>
@@ -1527,12 +1636,11 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
           <label class="field" for="detailLocation"><span>Detail lokasi</span><input id="detailLocation" placeholder="Contoh: depan ruang A201" /></label><p id="detailLocationError" class="field-error" aria-live="polite"></p>
           <label class="field" for="itemGeneral"><span>Ciri umum <small id="itemGeneralTag" class="ai-fill-tag" hidden>Diisi AI</small></span><textarea id="itemGeneral" rows="2" placeholder="Ciri yang boleh terlihat di katalog"></textarea></label>
           <label class="field" for="itemSecret"><span>Ciri khusus (privat)</span><textarea id="itemSecret" rows="2" placeholder="Ciri yang hanya diketahui pemilik"></textarea></label>
-          <div class="field-tools"><button id="secretExampleBtn" class="text-button" type="button">Isi contoh</button><p id="itemSecretError" class="field-error" aria-live="polite"></p></div>
+          <p id="itemSecretError" class="field-error" aria-live="polite"></p>
           <p id="depositStatus" class="form-status" aria-live="polite"></p>
           <div class="finder-submit"><button id="depositSubmit" class="button button-main full" type="submit">Cari loker <svg><use href="#i-arrow-right"></use></svg></button></div>
         </form>
       </div>
-      <section id="lockerRecommendation" class="recommendation" aria-live="polite" hidden></section>
     </section>
 
     <section class="content-section" id="tab-cari" hidden>
@@ -1570,7 +1678,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   </main>
 
   <nav id="mobileNav" class="mobile-bottom-nav" aria-label="Menu layanan" hidden>
-    <button class="mobile-nav-item active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg><span>Temukan</span></button>
+    <button class="mobile-nav-item active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg><span>Temuin</span></button>
     <button class="mobile-nav-item" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg><span>Cari</span></button>
     <button class="mobile-nav-item" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg><span>Loker</span></button>
     <button class="mobile-nav-item" data-tab="bantuan" type="button"><svg><use href="#i-message"></use></svg><span>Bantuan</span></button>

@@ -44,7 +44,7 @@
   <main id="authView" class="auth-layout">
     <section class="auth-intro">
       <p class="kicker">Lost &amp; Found Kampus</p>
-      <h1>Temukan jalan pulang untuk barang kampus.</h1>
+      <h1>Temuin jalan pulang untuk barang kampus.</h1>
       <p>Catat barang temuan, cari barang hilang, dan hubungi admin bila loker bermasalah.</p>
     </section>
     <section class="auth-card" aria-labelledby="loginTitle">
@@ -67,7 +67,7 @@
     </div>
 
     <nav class="workspace-tabs" aria-label="Layanan Balikin">
-      <button class="tab-button active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg>Temukan</button>
+      <button class="tab-button active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg>Temuin</button>
       <button class="tab-button" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg>Cari</button>
       <button class="tab-button" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg>Loker</button>
       <button class="tab-button" data-tab="bantuan" type="button"><svg><use href="#i-message"></use></svg>Bantuan</button>
@@ -90,13 +90,11 @@
           </section>
           <div id="photoActions" class="photo-actions">
             <button id="foundCameraBtn" class="button button-main" type="button"><svg><use href="#i-camera"></use></svg>Ambil foto</button>
-            <button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Galeri</button>
-            <button id="foundDemoBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Foto demo</button>
+            <button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Pilih galeri</button>
           </div>
           <button id="foundChangeBtn" class="text-button photo-change" type="button" hidden><svg><use href="#i-image"></use></svg>Ganti foto</button>
           <input id="foundCamera" type="file" accept="image/*" capture="environment" hidden />
           <input id="foundGallery" type="file" accept="image/*" hidden />
-          <img id="demoPhotoSource" src="assets/botol-hijau.jpg" alt="" hidden />
         </section>
 
         <form class="panel item-form" id="depositForm" novalidate>
@@ -110,12 +108,11 @@
           <label class="field" for="detailLocation"><span>Detail lokasi</span><input id="detailLocation" placeholder="Contoh: depan ruang A201" /></label><p id="detailLocationError" class="field-error" aria-live="polite"></p>
           <label class="field" for="itemGeneral"><span>Ciri umum <small id="itemGeneralTag" class="ai-fill-tag" hidden>Diisi AI</small></span><textarea id="itemGeneral" rows="2" placeholder="Ciri yang boleh terlihat di katalog"></textarea></label>
           <label class="field" for="itemSecret"><span>Ciri khusus (privat)</span><textarea id="itemSecret" rows="2" placeholder="Ciri yang hanya diketahui pemilik"></textarea></label>
-          <div class="field-tools"><button id="secretExampleBtn" class="text-button" type="button">Isi contoh</button><p id="itemSecretError" class="field-error" aria-live="polite"></p></div>
+          <p id="itemSecretError" class="field-error" aria-live="polite"></p>
           <p id="depositStatus" class="form-status" aria-live="polite"></p>
           <div class="finder-submit"><button id="depositSubmit" class="button button-main full" type="submit">Cari loker <svg><use href="#i-arrow-right"></use></svg></button></div>
         </form>
       </div>
-      <section id="lockerRecommendation" class="recommendation" aria-live="polite" hidden></section>
     </section>
 
     <section class="content-section" id="tab-cari" hidden>
@@ -153,7 +150,7 @@
   </main>
 
   <nav id="mobileNav" class="mobile-bottom-nav" aria-label="Menu layanan" hidden>
-    <button class="mobile-nav-item active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg><span>Temukan</span></button>
+    <button class="mobile-nav-item active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg><span>Temuin</span></button>
     <button class="mobile-nav-item" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg><span>Cari</span></button>
     <button class="mobile-nav-item" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg><span>Loker</span></button>
     <button class="mobile-nav-item" data-tab="bantuan" type="button"><svg><use href="#i-message"></use></svg><span>Bantuan</span></button>

@@ -16,16 +16,51 @@ test('student prototype keeps four primary service tabs', () => {
   assert.doesNotMatch(html, /exceptionGrid/);
 });
 
-test('finder flow has camera, gallery, and a deterministic demo photo path', () => {
+test('finder flow uses camera and gallery without demo shortcuts', () => {
   const html = read('src/index.html');
   const script = read('src/script.js');
   assert.match(html, /id="foundCamera"[^>]*accept="image\/\*"[^>]*capture="environment"/);
   assert.match(html, /id="foundGallery"[^>]*accept="image\/\*"/);
-  assert.match(html, /id="foundDemoBtn"/);
-  assert.match(html, /assets\/botol-hijau\.jpg/);
+  assert.match(html, /Pilih galeri/);
+  assert.doesNotMatch(html, /id="foundDemoBtn"/);
+  assert.doesNotMatch(html, /id="demoPhotoSource"/);
+  assert.doesNotMatch(html, /id="secretExampleBtn"/);
+  assert.doesNotMatch(html, /id="lockerRecommendation"/);
   assert.match(html, /id="detailLocation"/);
   assert.match(script, /function previewFoundPhoto\(/);
-  assert.match(script, /function useDemoPhoto\(/);
+  assert.doesNotMatch(script, /function useDemoPhoto\(/);
+  assert.doesNotMatch(script, /foundDemoBtn/);
+  assert.doesNotMatch(script, /secretExampleBtn/);
+  assert.doesNotMatch(script, /lockerRecommendation/);
+  // Seeded catalog bottle still uses the photo, so the asset stays.
+  assert.match(script, /photo: 'assets\/botol-hijau\.jpg'/);
+});
+
+test('locker reservation opens a persistent sheet with countdown and open flow', () => {
+  const html = read('src/index.html');
+  const script = read('src/script.js');
+  const css = read('src/style.css');
+  assert.match(script, /pinTtl: 15 \* 60 \* 1000/);
+  assert.match(script, /lockerSignal: 3500/);
+  assert.match(script, /doorClose: 2500/);
+  assert.match(script, /toast: 4000/);
+  assert.match(script, /function renderLockerRecommendation\(payload\)/);
+  assert.match(script, /function openLockerSignal\(/);
+  assert.match(script, /PIN penitipan berlaku 15 menit/);
+  assert.match(script, /Buka loker/);
+  assert.match(script, /persistent: true/);
+  assert.match(script, /PIN kedaluwarsa\. Reservasi loker dilepas\./);
+  assert.match(script, /Buat PIN baru/);
+  assert.match(script, /Lihat di katalog/);
+  assert.match(script, /Date\.now\(\)/);
+  assert.doesNotMatch(script, /toast\('Barang masuk ke katalog\.'\)/);
+  assert.match(css, /\.locker-sheet/);
+  assert.match(css, /\.locker-time/);
+  assert.match(css, /tabular-nums/);
+  assert.match(css, /z-index: 80/);
+  assert.match(css, /\.photo-actions \.button \{ min-width: 0; min-height: 48px/);
+  assert.match(html, /Temuin/);
+  assert.doesNotMatch(html, />Temukan</);
 });
 
 test('finder exposes scan, simulated assistance, and private-detail helper', () => {

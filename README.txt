@@ -9,9 +9,9 @@ Jalankan:
 
 MODE DEMO
 Buka http://localhost:8080/?demo=1.
-- Sistem masuk sebagai NIM 20240001 dan membuka Temukan.
-- Klik Pakai foto demo untuk memulai alur botol hijau.
-- Isi ciri khusus, dapatkan PIN penitipan, lalu simulasikan buka loker.
+- Sistem masuk sebagai NIM 20240001 dan membuka Temuin.
+- Ambil foto atau pilih dari galeri untuk memulai alur botol hijau.
+- Isi ciri khusus, dapatkan PIN penitipan, lalu pilih Buka loker.
 - Cari botol di katalog, lihat warna barang, lalu ambil foto barang bila perlu sebelum memakai Isi jawaban demo.
 - Simulasikan buka loker untuk menghapus barang dari katalog.
 - Gunakan Bantuan untuk mengirim pesan ke admin.
