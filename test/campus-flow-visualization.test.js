@@ -36,6 +36,7 @@ test('finder exposes scan, simulated assistance, and private-detail helper', () 
   }
   assert.match(html, /BANTUAN AI · SIMULASI/);
   assert.match(script, /Stiker nama di bagian bawah/);
+  assert.match(script, /Tutup hijau/);
   assert.match(script, /const DEMO_TIMING/);
   assert.match(script, /function startFoundAiSimulation\(/);
   assert.match(script, /function applyFoundAiSuggestions\(/);
@@ -52,6 +53,11 @@ test('claim and simulated backend seam cover the demo lifecycle', () => {
   }
   assert.match(script, /PIN penitipan berlaku 15 menit/);
   assert.match(script, /Simulasi pencocokan/);
+  assert.match(script, /id="claimCameraBtn"/);
+  assert.match(script, /function previewClaimPhoto\(/);
+  assert.match(script, /window\.localStorage/);
+  assert.match(script, /balikin-(?:demo-)?items-v1/);
+  assert.match(script, /class="item-details"/);
   assert.match(script, /score: match \? 94 : 38/);
 });
 

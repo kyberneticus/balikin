@@ -18,11 +18,15 @@ Buka `http://localhost:8080/?demo=1` untuk alur rekaman yang tetap.
 
 1. Pilih **Pakai foto demo**. Foto botol dipindai, lalu isian publik muncul bertahap.
 2. Isi ciri privat, cari loker, lalu simulasikan pembukaan loker. Botol masuk ke katalog.
-3. Buka **Cari**, klaim botol, lalu pilih **Isi jawaban demo**. Skor tetap adalah 94%.
+3. Buka **Cari**, lihat warna barang dengan jelas, lalu klaim botol. Kamu juga dapat mengambil foto barang untuk dipindai sebelum memilih **Isi jawaban demo**. Skor tetap adalah 94%.
 4. Simulasikan pengambilan untuk menghapus barang dari katalog.
 5. Buka **Bantuan** untuk mengirim pesan ke admin. Masuk sebagai `admin` / `admin123` untuk membalasnya.
 
 Bantuan pengisian foto, pencocokan klaim, PIN, dan loker semuanya simulasi. Tidak ada AI, backend, perangkat loker, atau panggilan API nyata.
+
+## Penyimpanan lokal
+
+Katalog dan foto penitipan disimpan di `localStorage` pada browser ini. Mode demo memakai key terpisah dan **Reset demo** menghapusnya. Bukti foto klaim juga disimpan bersama data barang selama barang masih ada di katalog.
 
 ## Batasan chat
 

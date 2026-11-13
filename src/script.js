@@ -16,6 +16,8 @@
   const USER_KEY = 'balikin-visual-user-v2';
   const SUPPORT_KEY = 'balikin-support-v1';
   const DEMO_MODE = new URLSearchParams(window.location.search).get('demo') === '1';
+  const ITEMS_KEY = DEMO_MODE ? 'balikin-demo-items-v1' : 'balikin-items-v1';
+  const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
   const $ = (id) => document.getElementById(id);
   const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
   const safe = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
@@ -46,11 +48,37 @@
     }
   })();
 
+  const persistentStorage = (() => {
+    try {
+      const local = window.localStorage;
+      local.setItem('__balikin_test', '1');
+      local.removeItem('__balikin_test');
+      return local;
+    } catch {
+      const memory = new Map();
+      return { getItem: (key) => memory.get(key) || null, setItem: (key, value) => memory.set(key, String(value)), removeItem: (key) => memory.delete(key) };
+    }
+  })();
+
+  function loadItems() {
+    try {
+      const saved = JSON.parse(persistentStorage.getItem(ITEMS_KEY) || 'null');
+      return Array.isArray(saved) ? saved : seedItems();
+    } catch {
+      return seedItems();
+    }
+  }
+
+  function saveItems(items) {
+    persistentStorage.setItem(ITEMS_KEY, JSON.stringify(items));
+  }
+
   // State
   const state = {
     user: null,
-    items: seedItems(),
+    items: loadItems(),
     foundPhoto: '',
+    claimPhoto: '',
     pendingFound: null,
     activeTab: 'temukan',
     claimAttempts: {},
@@ -99,7 +127,9 @@
         depositPin: '184205',
         claimPin: '482916',
       };
-      state.items.unshift(item);
+      const nextItems = [item, ...state.items];
+      saveItems(nextItems);
+      state.items = nextItems;
       return item;
     },
 
@@ -113,8 +143,15 @@
       });
     },
 
-    async submitClaim({ itemId, answer }) {
+    async submitClaim({ itemId, answer, photo }) {
       await wait(DEMO_TIMING.api);
+      const item = state.items.find((entry) => entry.id === itemId);
+      if (!item) throw new Error('Barang sudah tidak ada di katalog.');
+      if (photo) {
+        const nextItems = state.items.map((entry) => entry.id === itemId ? { ...entry, claimPhoto: photo } : entry);
+        saveItems(nextItems);
+        state.items = nextItems;
+      }
       const attempt = (state.claimAttempts[itemId] || 0) + 1;
       state.claimAttempts[itemId] = attempt;
       const match = /(stiker|nama)/i.test(answer);
@@ -125,7 +162,9 @@
       await wait(DEMO_TIMING.api);
       const item = state.items.find((entry) => entry.id === itemId);
       if (!item) throw new Error('Barang sudah tidak ada di katalog.');
-      state.items = state.items.filter((entry) => entry.id !== itemId);
+      const nextItems = state.items.filter((entry) => entry.id !== itemId);
+      saveItems(nextItems);
+      state.items = nextItems;
       return item;
     },
 
@@ -227,7 +266,7 @@
   // Finder rendering and flow
   function renderFoundPreview() {
     if (!state.foundPhoto) return;
-    $('foundPreview').innerHTML = `<img src="${safe(state.foundPhoto)}" alt="Foto barang yang akan dititipkan"><div class="scanner-overlay" aria-hidden="true"><span class="scan-line"></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list"><span>Botol minum</span><span>Hijau</span><span>Tutup hitam</span></div></div>`;
+    $('foundPreview').innerHTML = `<img src="${safe(state.foundPhoto)}" alt="Foto barang yang akan dititipkan"><div class="scanner-overlay" aria-hidden="true"><span class="scan-line"></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list"><span>Botol minum</span><span>Hijau</span><span>Tutup hijau</span></div></div>`;
   }
 
   function updateFoundAiProgress(stage) {
@@ -287,8 +326,8 @@
 
   function previewFoundPhoto(file) {
     if (!file) return;
-    if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
-      setTextStatus('depositStatus', 'Pilih gambar dengan ukuran maksimal 5 MB.', 'error');
+    if (!file.type.startsWith('image/') || file.size > MAX_IMAGE_BYTES) {
+      setTextStatus('depositStatus', 'Pilih gambar dengan ukuran maksimal 2 MB.', 'error');
       return;
     }
     const reader = new FileReader();
@@ -385,7 +424,7 @@
     try {
       const visible = await api.searchItems({ query, location });
       $('resultCount').textContent = visible.length ? `${visible.length} barang ditemukan.` : 'Tidak ada barang yang cocok.';
-      $('itemsList').innerHTML = visible.map((item) => `<article class="item-card"><div class="item-cover">${item.photo ? `<img src="${safe(item.photo)}" alt="Foto ${safe(item.name)}">` : icons(item.category === 'Kartu Identitas' ? 'shield' : 'package')}</div><div class="item-info"><div class="item-meta">${safe(item.category)}</div><h3>${safe(item.name)}</h3><small>${safe(item.color)} · ${safe(item.location)} · ${safe(item.date)}</small><p>${item.category === 'Kartu Identitas' ? 'Data pribadi tidak ditampilkan di katalog.' : 'Jawab ciri khusus untuk mengajukan klaim.'}</p><button class="button button-main" type="button" data-claim="${safe(item.id)}">Ini barang saya ${icons('arrow-right')}</button></div></article>`).join('') || '<p class="empty-state">Tidak ada barang yang cocok. Coba kata kunci lain.</p>';
+      $('itemsList').innerHTML = visible.map((item) => `<article class="item-card"><div class="item-cover">${item.photo ? `<img src="${safe(item.photo)}" alt="Foto ${safe(item.name)}">` : icons(item.category === 'Kartu Identitas' ? 'shield' : 'package')}</div><div class="item-info"><div class="item-meta">${safe(item.category)}</div><h3>${safe(item.name)}</h3><dl class="item-details"><div><dt>Warna</dt><dd>${safe(item.color)}</dd></div><div><dt>Lokasi</dt><dd>${safe(item.location)}</dd></div><div><dt>Ditemukan</dt><dd>${safe(item.date)}</dd></div></dl><p>${item.category === 'Kartu Identitas' ? 'Data pribadi tidak ditampilkan di katalog.' : 'Jawab ciri khusus untuk mengajukan klaim.'}</p><button class="button button-main" type="button" data-claim="${safe(item.id)}">Ini barang saya ${icons('arrow-right')}</button></div></article>`).join('') || '<p class="empty-state">Tidak ada barang yang cocok. Coba kata kunci lain.</p>';
       $('itemsList').querySelectorAll('[data-claim]').forEach((button) => button.addEventListener('click', () => openClaim(button.dataset.claim, button)));
     } catch (error) {
       $('resultCount').textContent = 'Barang tidak dapat dimuat.';
@@ -415,11 +454,39 @@
   }
 
   function claimFormBody(item, attempt = 0, feedback = '') {
-    return `<p>Sebutkan ciri khusus yang tidak terlihat di katalog.</p><form id="claimForm" class="claim-form" novalidate><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang"></textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><div class="claim-tools"><button id="claimExampleBtn" class="text-button" type="button">Isi jawaban demo</button><span class="claim-attempt">Percobaan ${attempt} dari 3</span></div><p id="claimStatus" class="form-status ${feedback ? 'is-error' : ''}" aria-live="polite">${safe(feedback)}</p><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button></form><p class="simulation-note">Simulasi pencocokan</p>`;
+    return `<p>Sebutkan ciri khusus yang tidak terlihat di katalog.</p><form id="claimForm" class="claim-form" novalidate><section class="claim-photo-field" aria-labelledby="claimPhotoLabel"><span id="claimPhotoLabel">Foto barang <small>opsional</small></span><div id="claimPreview" class="claim-preview" aria-live="polite"></div><label class="sr-only" for="claimCamera">Ambil foto barang untuk klaim</label><button id="claimCameraBtn" class="button button-outline full" type="button">${icons('camera')}Ambil foto barang</button><input id="claimCamera" type="file" accept="image/*" capture="environment" hidden /><p id="claimPhotoError" class="field-error" aria-live="polite"></p></section><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang"></textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><div class="claim-tools"><button id="claimExampleBtn" class="text-button" type="button">Isi jawaban demo</button><span class="claim-attempt">Percobaan ${attempt} dari 3</span></div><p id="claimStatus" class="form-status ${feedback ? 'is-error' : ''}" aria-live="polite">${safe(feedback)}</p><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button></form><p class="simulation-note">Simulasi pencocokan</p>`;
+  }
+
+  function renderClaimPreview() {
+    const preview = $('claimPreview');
+    if (!state.claimPhoto) {
+      preview.innerHTML = `${icons('camera')}<strong>Foto belum ditambahkan</strong><span>Foto membantu admin memeriksa barang.</span>`;
+      return;
+    }
+    preview.innerHTML = `<img src="${safe(state.claimPhoto)}" alt="Foto barang untuk klaim"><div class="scanner-overlay" aria-hidden="true"><span class="scan-line"></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list"><span>Botol minum</span><span>Hijau</span><span>Tutup hijau</span></div></div>`;
+  }
+
+  function previewClaimPhoto(file) {
+    if (!file) return;
+    if (!file.type.startsWith('image/') || file.size > MAX_IMAGE_BYTES) {
+      setFieldError('claimPhotoError', 'Pilih gambar dengan ukuran maksimal 2 MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => setFieldError('claimPhotoError', 'Foto tidak dapat dibaca. Coba lagi.');
+    reader.onload = () => {
+      state.claimPhoto = String(reader.result);
+      setFieldError('claimPhotoError');
+      renderClaimPreview();
+    };
+    reader.readAsDataURL(file);
   }
 
   function wireClaimForm(item, attempt = 0, feedback = '') {
     modalShell(`Klaim ${item.name}`, claimFormBody(item, attempt, feedback));
+    renderClaimPreview();
+    $('claimCameraBtn').addEventListener('click', () => $('claimCamera').click());
+    $('claimCamera').addEventListener('change', (event) => previewClaimPhoto(event.target.files?.[0]));
     $('claimExampleBtn').addEventListener('click', () => { $('claimAnswer').value = 'Ada stiker nama di bagian bawah botol'; $('claimAnswer').focus(); });
     $('claimForm').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -430,7 +497,11 @@
   function openClaim(id, trigger) {
     const item = state.items.find((entry) => entry.id === id);
     if (!item) return toast('Barang sudah tidak ada di katalog.');
+    state.claimPhoto = '';
     openModal(`Klaim ${item.name}`, claimFormBody(item), trigger);
+    renderClaimPreview();
+    $('claimCameraBtn').addEventListener('click', () => $('claimCamera').click());
+    $('claimCamera').addEventListener('change', (event) => previewClaimPhoto(event.target.files?.[0]));
     $('claimExampleBtn').addEventListener('click', () => { $('claimAnswer').value = 'Ada stiker nama di bagian bawah botol'; $('claimAnswer').focus(); });
     $('claimForm').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -448,7 +519,7 @@
     }
     const button = $('claimSubmit');
     setButtonLoading(button, true, 'Memeriksa klaim');
-    const result = await api.submitClaim({ itemId: item.id, answer });
+    const result = await api.submitClaim({ itemId: item.id, answer, photo: state.claimPhoto });
     await runClaimVerification(result);
     if (result.match) {
       await wait(DEMO_TIMING.claimResult);
@@ -711,6 +782,7 @@
   function resetDemo() {
     storage.removeItem(USER_KEY);
     storage.removeItem(SUPPORT_KEY);
+    persistentStorage.removeItem(ITEMS_KEY);
     window.location.reload();
   }
 
