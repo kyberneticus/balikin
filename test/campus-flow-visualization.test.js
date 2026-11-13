@@ -1,10 +1,15 @@
 const assert = require('node:assert/strict');
+const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
 const root = path.join(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+
+test('src/script.js parses without syntax errors', () => {
+  execFileSync(process.execPath, ['--check', path.join(root, 'src', 'script.js')]);
+});
 
 test('student prototype keeps four primary service tabs', () => {
   const html = read('src/index.html');
@@ -42,6 +47,10 @@ test('locker reservation opens a persistent sheet with countdown and open flow',
   const css = read('src/style.css');
   assert.match(script, /pinTtl: 15 \* 60 \* 1000/);
   assert.match(script, /lockerSignal: 3500/);
+  assert.match(script, /lockerSearch: 1200/);
+  assert.match(script, /Mencari loker/);
+  assert.match(script, /Memeriksa titik/);
+  assert.match(script, /function resetDepositForm\(/);
   assert.match(script, /doorClose: 2500/);
   assert.match(script, /toast: 4000/);
   assert.match(script, /function renderLockerRecommendation\(payload\)/);

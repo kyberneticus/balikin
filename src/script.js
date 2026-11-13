@@ -12,6 +12,7 @@
     claimHold: 1200,
     toast: 4000,
     pinTtl: 15 * 60 * 1000,
+    lockerSearch: 1200,
     lockerSignal: 3500,
     doorClose: 2500,
   });
@@ -542,7 +543,25 @@
     lockerTimer = window.setInterval(() => updateLockerCountdown(locationLabel), 250);
   }
 
-  function renderLockerRecommendation(payload) {
+  function resetDepositForm() {
+    state.finderRun += 1;
+    state.foundPhoto = '';
+    $('depositForm').reset();
+    $('depositForm').classList.remove('has-content');
+    $('foundCamera').value = '';
+    $('foundGallery').value = '';
+    $('foundPreview').classList.add('is-empty');
+    $('foundPreview').innerHTML = '<svg><use href="#i-camera"></use></svg><span>Ambil foto atau pilih dari galeri.</span>';
+    setFoundPhotoControls(false);
+    $('foundAiProgress').hidden = true;
+    ['itemNameTag', 'itemCategoryTag', 'itemColorTag', 'itemGeneralTag'].forEach((id) => { $(id).hidden = true; });
+    clearFieldErrors(['itemNameError', 'itemCategoryError', 'itemColorError', 'detailLocationError', 'itemSecretError']);
+    setTextStatus('depositStatus');
+    setFinderStep(0);
+  }
+
+  async function renderLockerRecommendation(payload) {
+    const run = ++lockerRun;
     state.pendingFound = payload;
     const preferred = locations.find((location) => location.id === payload.locationId && location.status === 'online' && location.capacity > 0);
     const location = preferred || locations.find((entry) => entry.status === 'online' && entry.capacity > 0);
@@ -552,6 +571,12 @@
     }
     const title = `${location.name} · Loker M-03`;
     setFinderStep(2);
+    openModal('Mencari loker', `<section class="locker-sheet is-busy"><p>Memeriksa titik ${safe(location.name)}.</p><div class="indeterminate" aria-hidden="true"><span></span></div></section>`, $('depositSubmit'), { persistent: true });
+    const closeSearch = $('modalClose');
+    if (closeSearch) closeSearch.hidden = true;
+    document.body.classList.add('locker-open');
+    await wait(DEMO_TIMING.lockerSearch);
+    if (run !== lockerRun) return;
     openModal(title, `<section class="locker-sheet"><p class="locker-found">Ditemukan di ${safe(payload.detailLocation)}.</p><p class="locker-valid">PIN penitipan berlaku 15 menit.</p><div class="locker-pin"><span>PIN penitipan</span><strong>184205</strong></div>${lockerCountdownMarkup()}<button id="openLockerBtn" class="button button-main full" type="button">Buka loker</button><button id="cancelLockerBtn" class="link-button" type="button">Batalkan</button></section>`, $('depositSubmit'), { persistent: true });
     const close = $('modalClose');
     if (close) close.hidden = true;
@@ -606,6 +631,7 @@
     $('viewCatalogBtn').addEventListener('click', () => {
       document.body.classList.remove('locker-open');
       closeModal(true);
+      resetDepositForm();
       showTab('cari');
     });
   }
