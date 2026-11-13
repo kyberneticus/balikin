@@ -20,5 +20,5 @@ Admin demo: username admin, password admin123.
 
 BATASAN
 Foto, bantuan pengisian, pencocokan klaim, PIN, dan loker adalah simulasi. Tidak ada AI, backend, atau perangkat fisik.
-Katalog, foto penitipan, dan bukti foto klaim disimpan di localStorage browser ini. Reset demo menghapus data demo tersebut.
+Katalog, foto penitipan, dan bukti foto klaim disimpan di localStorage browser ini. Foto hingga 12 MB dikecilkan menjadi maksimal 2 MB sebelum disimpan. Reset demo menghapus data demo tersebut.
 Pesan Bantuan memakai sessionStorage dengan key balikin-support-v1. Pesan hanya hidup dalam tab browser yang sama selama sesi aktif. Chat lintas perangkat memerlukan backend.

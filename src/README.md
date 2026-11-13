@@ -19,6 +19,6 @@ Gunakan `assets/botol-hijau.jpg` untuk foto demo. Build menggantinya dengan jalu
 
 Tambahkan `?demo=1` pada URL untuk masuk sebagai NIM `20240001`, membuka Temukan, dan menampilkan Reset demo. Alurnya: pakai foto demo, titipkan botol, cari dengan detail warna yang jelas, lalu klaim botol dengan foto opsional dan jawaban demo sebelum mengambil barang.
 
-Semua bantuan pengisian, pencocokan, PIN, dan loker disimulasikan di `script.js`. Objek `api` adalah seam untuk mengganti simulasi dengan backend di masa depan. Data katalog dan foto disimpan melalui `localStorage`; key demo terpisah dihapus oleh Reset demo.
+Semua bantuan pengisian, pencocokan, PIN, dan loker disimulasikan di `script.js`. Objek `api` adalah seam untuk mengganti simulasi dengan backend di masa depan. Data katalog dan foto disimpan melalui `localStorage`; foto kamera hingga 12 MB dikecilkan menjadi maksimal 2 MB dan key demo terpisah dihapus oleh Reset demo.
 
 Chat Bantuan disimpan di `sessionStorage` sebagai `balikin-support-v1`; chat hanya dapat dipakai dalam satu tab browser selama sesi aktif. Chat lintas perangkat memerlukan backend.

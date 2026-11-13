@@ -17,7 +17,15 @@
   const SUPPORT_KEY = 'balikin-support-v1';
   const DEMO_MODE = new URLSearchParams(window.location.search).get('demo') === '1';
   const ITEMS_KEY = DEMO_MODE ? 'balikin-demo-items-v1' : 'balikin-items-v1';
-  const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+  const IMAGE_LIMITS = Object.freeze({
+    uploadBytes: 12 * 1024 * 1024,
+    storageBytes: 2 * 1024 * 1024,
+    maxDimension: 1600,
+    quality: .82,
+    qualityStep: .12,
+    resizeFactor: .75,
+    attempts: 5,
+  });
   const $ = (id) => document.getElementById(id);
   const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
   const safe = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
@@ -324,21 +332,65 @@
     setFinderStep(1);
   }
 
-  function previewFoundPhoto(file) {
-    if (!file) return;
-    if (!file.type.startsWith('image/') || file.size > MAX_IMAGE_BYTES) {
-      setTextStatus('depositStatus', 'Pilih gambar dengan ukuran maksimal 2 MB.', 'error');
-      return;
+  function readAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Foto tidak dapat dibaca. Coba lagi.'));
+      reader.onload = () => resolve(String(reader.result));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function loadImage(dataUrl) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onerror = () => reject(new Error('Foto tidak dapat diproses. Coba JPEG atau PNG.'));
+      image.onload = () => resolve(image);
+      image.src = dataUrl;
+    });
+  }
+
+  function canvasBlob(canvas, quality) {
+    return new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+  }
+
+  async function prepareImage(file) {
+    if (!file.type.startsWith('image/')) throw new Error('Pilih berkas gambar.');
+    if (file.size > IMAGE_LIMITS.uploadBytes) throw new Error('Pilih gambar dengan ukuran maksimal 12 MB.');
+    const dataUrl = await readAsDataUrl(file);
+    if (file.size <= IMAGE_LIMITS.storageBytes) return dataUrl;
+
+    const image = await loadImage(dataUrl);
+    const scale = Math.min(1, IMAGE_LIMITS.maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+    let width = Math.max(1, Math.round(image.naturalWidth * scale));
+    let height = Math.max(1, Math.round(image.naturalHeight * scale));
+    let quality = IMAGE_LIMITS.quality;
+
+    for (let attempt = 0; attempt < IMAGE_LIMITS.attempts; attempt += 1) {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(image, 0, 0, width, height);
+      const blob = await canvasBlob(canvas, quality);
+      if (blob && blob.size <= IMAGE_LIMITS.storageBytes) return readAsDataUrl(blob);
+      width = Math.max(1, Math.round(width * IMAGE_LIMITS.resizeFactor));
+      height = Math.max(1, Math.round(height * IMAGE_LIMITS.resizeFactor));
+      quality = Math.max(0, quality - IMAGE_LIMITS.qualityStep);
     }
-    const reader = new FileReader();
-    reader.onerror = () => setTextStatus('depositStatus', 'Foto tidak dapat dibaca. Coba lagi.', 'error');
-    reader.onload = () => {
-      state.foundPhoto = String(reader.result);
+    throw new Error('Foto tidak dapat dikecilkan. Coba foto dengan resolusi lebih rendah.');
+  }
+
+  async function previewFoundPhoto(file) {
+    if (!file) return;
+    try {
+      if (file.size > IMAGE_LIMITS.storageBytes) setTextStatus('depositStatus', 'Mengecilkan foto sebelum disimpan.');
+      state.foundPhoto = await prepareImage(file);
       setTextStatus('depositStatus');
       renderFoundPreview();
       startFoundAiSimulation().catch(() => setTextStatus('depositStatus', 'Pemeriksaan foto tidak dapat dijalankan.', 'error'));
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      setTextStatus('depositStatus', error.message || 'Foto tidak dapat dibaca. Coba lagi.', 'error');
+    }
   }
 
   async function useDemoPhoto() {
@@ -351,9 +403,9 @@
       canvas.width = source.naturalWidth;
       canvas.height = source.naturalHeight;
       canvas.getContext('2d').drawImage(source, 0, 0);
-      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', .92));
+      const blob = await canvasBlob(canvas, IMAGE_LIMITS.quality);
       if (!blob) throw new Error('Foto demo tidak tersedia.');
-      previewFoundPhoto(new File([blob], 'botol-hijau.jpg', { type: 'image/jpeg' }));
+      await previewFoundPhoto(new File([blob], 'botol-hijau.jpg', { type: 'image/jpeg' }));
     } catch (error) {
       setTextStatus('depositStatus', error.message || 'Foto demo tidak dapat digunakan.', 'error');
     } finally {
@@ -454,7 +506,7 @@
   }
 
   function claimFormBody(item, attempt = 0, feedback = '') {
-    return `<p>Sebutkan ciri khusus yang tidak terlihat di katalog.</p><form id="claimForm" class="claim-form" novalidate><section class="claim-photo-field" aria-labelledby="claimPhotoLabel"><span id="claimPhotoLabel">Foto barang <small>opsional</small></span><div id="claimPreview" class="claim-preview" aria-live="polite"></div><label class="sr-only" for="claimCamera">Ambil foto barang untuk klaim</label><button id="claimCameraBtn" class="button button-outline full" type="button">${icons('camera')}Ambil foto barang</button><input id="claimCamera" type="file" accept="image/*" capture="environment" hidden /><p id="claimPhotoError" class="field-error" aria-live="polite"></p></section><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang"></textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><div class="claim-tools"><button id="claimExampleBtn" class="text-button" type="button">Isi jawaban demo</button><span class="claim-attempt">Percobaan ${attempt} dari 3</span></div><p id="claimStatus" class="form-status ${feedback ? 'is-error' : ''}" aria-live="polite">${safe(feedback)}</p><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button></form><p class="simulation-note">Simulasi pencocokan</p>`;
+    return `<p>Sebutkan ciri khusus yang tidak terlihat di katalog.</p><form id="claimForm" class="claim-form" novalidate><section class="claim-photo-field" aria-labelledby="claimPhotoLabel"><span id="claimPhotoLabel">Foto barang <small>opsional, hingga 12 MB</small></span><div id="claimPreview" class="claim-preview" aria-live="polite"></div><label class="sr-only" for="claimCamera">Ambil foto barang untuk klaim</label><button id="claimCameraBtn" class="button button-outline full" type="button">${icons('camera')}Ambil foto barang</button><input id="claimCamera" type="file" accept="image/*" capture="environment" hidden /><p id="claimPhotoError" class="field-error" aria-live="polite"></p></section><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang"></textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><div class="claim-tools"><button id="claimExampleBtn" class="text-button" type="button">Isi jawaban demo</button><span class="claim-attempt">Percobaan ${attempt} dari 3</span></div><p id="claimStatus" class="form-status ${feedback ? 'is-error' : ''}" aria-live="polite">${safe(feedback)}</p><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button></form><p class="simulation-note">Simulasi pencocokan</p>`;
   }
 
   function renderClaimPreview() {
@@ -466,20 +518,16 @@
     preview.innerHTML = `<img src="${safe(state.claimPhoto)}" alt="Foto barang untuk klaim"><div class="scanner-overlay" aria-hidden="true"><span class="scan-line"></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list"><span>Botol minum</span><span>Hijau</span><span>Tutup hijau</span></div></div>`;
   }
 
-  function previewClaimPhoto(file) {
+  async function previewClaimPhoto(file) {
     if (!file) return;
-    if (!file.type.startsWith('image/') || file.size > MAX_IMAGE_BYTES) {
-      setFieldError('claimPhotoError', 'Pilih gambar dengan ukuran maksimal 2 MB.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onerror = () => setFieldError('claimPhotoError', 'Foto tidak dapat dibaca. Coba lagi.');
-    reader.onload = () => {
-      state.claimPhoto = String(reader.result);
+    try {
+      if (file.size > IMAGE_LIMITS.storageBytes) setFieldError('claimPhotoError', 'Mengecilkan foto sebelum disimpan.');
+      state.claimPhoto = await prepareImage(file);
       setFieldError('claimPhotoError');
       renderClaimPreview();
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      setFieldError('claimPhotoError', error.message || 'Foto tidak dapat dibaca. Coba lagi.');
+    }
   }
 
   function wireClaimForm(item, attempt = 0, feedback = '') {

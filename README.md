@@ -26,7 +26,7 @@ Bantuan pengisian foto, pencocokan klaim, PIN, dan loker semuanya simulasi. Tida
 
 ## Penyimpanan lokal
 
-Katalog dan foto penitipan disimpan di `localStorage` pada browser ini. Mode demo memakai key terpisah dan **Reset demo** menghapusnya. Bukti foto klaim juga disimpan bersama data barang selama barang masih ada di katalog.
+Katalog dan foto penitipan disimpan di `localStorage` pada browser ini. Foto kamera hingga 12 MB dikecilkan menjadi maksimal 2 MB sebelum disimpan. Mode demo memakai key terpisah dan **Reset demo** menghapusnya. Bukti foto klaim juga disimpan bersama data barang selama barang masih ada di katalog.
 
 ## Batasan chat
 

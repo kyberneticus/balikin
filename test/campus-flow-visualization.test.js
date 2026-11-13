@@ -55,6 +55,9 @@ test('claim and simulated backend seam cover the demo lifecycle', () => {
   assert.match(script, /Simulasi pencocokan/);
   assert.match(script, /id="claimCameraBtn"/);
   assert.match(script, /function previewClaimPhoto\(/);
+  assert.match(script, /function prepareImage\(/);
+  assert.match(script, /uploadBytes: 12 \* 1024 \* 1024/);
+  assert.match(script, /storageBytes: 2 \* 1024 \* 1024/);
   assert.match(script, /window\.localStorage/);
   assert.match(script, /balikin-(?:demo-)?items-v1/);
   assert.match(script, /class="item-details"/);
