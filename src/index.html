@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f6f8f5" />
-  <meta name="description" content="Balikin — prototipe layanan barang hilang kampus" />
-  <title>Balikin — Lost &amp; Found Kampus</title>
+  <meta name="description" content="Balikin, layanan barang hilang kampus" />
+  <title>Balikin | Lost &amp; Found Kampus</title>
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 </head>
@@ -17,80 +17,137 @@
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
-    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 22h4"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 2 9 4v6c0 5.5-3.5 8.5-9 10-5.5-1.5-9-4.5-9-10V6l9-4Z"/><path d="m9 12 2 2 4-4"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
     <symbol id="i-alert" viewBox="0 0 24 24"><path d="m10.3 3.7-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3.3l-8-14a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4m0 4h.01"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
     <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
-    <symbol id="i-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9"/></symbol>
+    <symbol id="i-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2h4m7 14 5-5-5-5m5 5H9"/></symbol>
     <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
     <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3 21 21M10.5 5.2A11.5 11.5 0 0 1 12 5c6 0 10 7 10 7a15 15 0 0 1-3 3.7M6.2 6.2A15 15 0 0 0 2 12s4 7 10 7c1.6 0 3-.5 4.3-1.3"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M20 15a4 4 0 0 1-4 4H8l-4 3v-7a4 4 0 0 1-2-3.5V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/></symbol>
   </svg>
 
   <header class="site-header">
     <div class="header-inner">
-      <a href="#" id="brandLink" class="brand" aria-label="Balikin beranda"><span class="brand-icon"><svg><use href="#i-package"></use></svg></span><span>balikin<span class="brand-period">.</span></span></a>
-      <div class="header-context"><span class="campus-status"><i></i> Prototipe kampus</span><div class="user-tools" id="userTools" hidden><span class="nim-chip" id="nimDisplay"></span><button type="button" id="logoutBtn" class="nav-button"><svg><use href="#i-log-out"></use></svg><span>Keluar</span></button></div></div>
+      <a href="#" id="brandLink" class="brand" aria-label="Balikin beranda"><span class="brand-icon">B</span><span>balikin<span class="brand-period">.</span></span></a>
+      <div class="header-tools">
+        <span id="demoTag" class="demo-tag" hidden>Mode demo</span>
+        <button id="resetDemoBtn" class="text-button" type="button" hidden>Reset demo</button>
+        <span class="nim-chip" id="nimDisplay" hidden></span>
+        <button type="button" id="logoutBtn" class="icon-button" aria-label="Keluar" hidden><svg><use href="#i-log-out"></use></svg></button>
+      </div>
     </div>
   </header>
 
   <main id="authView" class="auth-layout">
-    <section class="auth-visual">
-      <span class="section-kicker">LOST &amp; FOUND KAMPUS</span>
-      <h1>Barang hilang bukan harus <em>menunggu diumumkan.</em></h1>
-      <p>Satu alur untuk menitipkan, menemukan, mengklaim, dan mengelola barang kampus—dirancang untuk FISIP, FTI, dan Masjid.</p>
-      <div class="auth-flow-preview" aria-label="Ringkasan alur Balikin"><span>Temukan</span><b></b><span>Catat</span><b></b><span>Amankan</span><b></b><span>Kembalikan</span></div>
+    <section class="auth-intro">
+      <p class="kicker">Lost &amp; Found Kampus</p>
+      <h1>Temukan jalan pulang untuk barang kampus.</h1>
+      <p>Catat barang temuan, cari barang hilang, dan hubungi admin bila loker bermasalah.</p>
     </section>
-    <section class="auth-card" aria-label="Masuk Balikin">
-      <span class="eyebrow">AKSES MAHASISWA</span>
-      <h2>Mulai dari kebutuhanmu.</h2>
-      <p class="muted">Gunakan NIM untuk melihat visual alur layanan.</p>
-      <form id="loginForm" autocomplete="off">
-        <label class="field"><span>NIM atau username</span><input id="loginNim" placeholder="Contoh: 20240001" /></label>
-        <label class="field"><span>Password</span><span class="passfield"><input id="loginPassword" type="password" placeholder="Password"/><button class="eye-button" data-target="loginPassword" type="button" aria-label="Tampilkan password"><svg><use href="#i-eye"></use></svg></button></span></label>
-        <button class="button button-main full" type="submit">Masuk ke alur layanan <svg><use href="#i-arrow-right"></use></svg></button>
+    <section class="auth-card" aria-labelledby="loginTitle">
+      <h2 id="loginTitle">Masuk</h2>
+      <p>Gunakan NIM untuk membuka layanan mahasiswa.</p>
+      <form id="loginForm" novalidate>
+        <label class="field" for="loginNim"><span>NIM</span><input id="loginNim" inputmode="numeric" autocomplete="username" placeholder="Contoh: 20240001" /></label>
+        <p id="loginNimError" class="field-error" aria-live="polite"></p>
+        <label class="field" for="loginPassword"><span>Password</span><span class="passfield"><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" /><button class="eye-button" data-target="loginPassword" type="button" aria-label="Tampilkan password"><svg><use href="#i-eye"></use></svg></button></span></label>
+        <p id="loginStatus" class="form-status" aria-live="polite"></p>
+        <button id="loginSubmit" class="button button-main full" type="submit">Masuk <svg><use href="#i-arrow-right"></use></svg></button>
       </form>
-      <p class="auth-footnote">Demo visual: NIM apa pun bisa masuk. Admin: <code>admin</code> / <code>admin123</code>.</p>
+      <p class="auth-note">Admin: <code>admin</code> / <code>admin123</code>.</p>
     </section>
   </main>
 
   <main id="appView" class="app-layout" hidden>
-    <div class="app-titlebar"><div><span class="section-kicker">BALIKIN / LAYANAN KAMPUS</span><h1 id="welcomeTitle">Apa yang ingin kamu lakukan?</h1><p>Pilih alur, lihat statusnya, lalu pahami titik handoff ke loker atau Himatif.</p></div><div class="service-chip"><svg><use href="#i-clock"></use></svg> Visual alur layanan</div></div>
-    <nav class="workspace-tabs" aria-label="Alur Balikin">
-      <button class="tab-button active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg> Saya menemukan</button>
-      <button class="tab-button" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg> Saya kehilangan</button>
-      <button class="tab-button" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg> Titik loker</button>
-      <button class="tab-button" data-tab="bantuan" type="button"><svg><use href="#i-shield"></use></svg> Kondisi khusus</button>
+    <div class="app-titlebar">
+      <div><h1 id="welcomeTitle">Barang temuan dan hilang</h1><p>Pilih layanan yang kamu butuhkan.</p></div>
+    </div>
+
+    <nav class="workspace-tabs" aria-label="Layanan Balikin">
+      <button class="tab-button active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg>Temukan</button>
+      <button class="tab-button" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg>Cari</button>
+      <button class="tab-button" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg>Loker</button>
+      <button class="tab-button" data-tab="bantuan" type="button"><svg><use href="#i-message"></use></svg>Bantuan</button>
     </nav>
 
     <section class="content-section" id="tab-temukan">
-      <div class="flow-heading"><div><span class="eyebrow">01 / PENEMU BARANG</span><h2>Amankan barang tanpa menunggu pengumuman.</h2><p>Visual alur dari foto sampai loker terkunci dan katalog publik diperbarui.</p></div><span class="flow-tag">Estimasi 3–5 menit</span></div>
-      <ol class="flow-steps" aria-label="Langkah penitipan"><li class="active"><b>1</b> Foto &amp; validasi</li><li><b>2</b> Detail rahasia</li><li><b>3</b> Pilih loker</li><li><b>4</b> Konfirmasi pintu</li></ol>
+      <header class="section-heading"><h2>Titipkan barang temuan</h2><p>Foto barangnya. Isi detail publik dan satu ciri privat.</p></header>
+      <ol class="flow-steps" aria-label="Tahap penitipan"><li class="active"><b>1</b>Foto</li><li><b>2</b>Detail</li><li><b>3</b>Loker</li><li><b>4</b>Selesai</li></ol>
       <div class="finder-layout">
-        <section class="panel photo-panel"><div class="panel-title"><div><h3>Foto barang</h3><p>Ambil satu foto bagian luar barang untuk dilampirkan ke laporan.</p></div></div><div id="foundPreview" class="photo-preview finder-photo"><svg><use href="#i-camera"></use></svg><strong>Belum ada foto</strong><span>Gunakan kamera ponsel untuk mengambil foto barang.</span></div><div class="photo-actions"><button id="foundCameraBtn" class="button button-outline" type="button"><svg><use href="#i-camera"></use></svg> Ambil foto</button><button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg> Pilih galeri</button></div><input id="foundCamera" type="file" accept="image/*" capture="environment" hidden /><input id="foundGallery" type="file" accept="image/*" hidden /></section>
-        <form class="panel item-form" id="depositForm"><div class="panel-title"><div><h3>Data barang</h3><p>Isi sendiri detail yang dapat dipublikasikan. Kolom privat tidak tampil di katalog.</p></div></div><div class="fieldgrid"><label class="field"><span>Nama barang</span><input id="itemName" placeholder="Contoh: Botol minum" required/></label><label class="field"><span>Kategori</span><select id="itemCategory" required><option value="">Pilih kategori</option><option>Botol / Tumbler</option><option>Payung</option><option>Dompet</option><option>Elektronik</option><option>Kartu Identitas</option></select></label><label class="field"><span>Warna</span><input id="itemColor" placeholder="Contoh: Hijau"/></label><label class="field"><span>Lokasi ditemukan</span><select id="foundLocation"><option value="fisip">FISIP</option><option value="fti">FTI</option><option value="masjid">Masjid</option></select></label><label class="field"><span>Detail lokasi</span><input id="detailLocation" placeholder="Contoh: depan ruang A201" required/></label></div><label class="field"><span>Ciri umum</span><textarea id="itemGeneral" rows="2" placeholder="Ciri yang boleh diketahui publik"></textarea></label><label class="field"><span>Ciri khusus <em>privat</em></span><textarea id="itemSecret" rows="2" placeholder="Contoh: ada stiker nama di bagian bawah"></textarea></label><button class="button button-main" type="submit">Cari loker yang sesuai <svg><use href="#i-arrow-right"></use></svg></button></form>
+        <section class="panel photo-panel" aria-labelledby="photoTitle">
+          <div class="panel-heading"><div><h3 id="photoTitle">Foto barang</h3><p>Pastikan barang terlihat jelas.</p></div></div>
+          <div id="foundPreview" class="photo-preview" aria-live="polite">
+            <svg><use href="#i-camera"></use></svg><strong>Belum ada foto</strong><span>Ambil foto atau pilih dari galeri.</span>
+          </div>
+          <section id="foundAiProgress" class="ai-progress" aria-live="polite" aria-busy="false" hidden>
+            <div class="ai-progress-head"><span class="ai-mark" aria-hidden="true">AI</span><div><span class="ai-label">BANTUAN AI · SIMULASI</span><strong id="foundAiTitle">Memeriksa foto</strong></div><strong id="foundAiPercent" class="ai-percent">0%</strong></div>
+            <div class="ai-progress-track" aria-hidden="true"><span id="foundAiBar"></span></div>
+            <ol class="ai-progress-steps" aria-label="Tahap pemeriksaan foto"><li data-ai-stage="0"><span>1</span>Validasi foto</li><li data-ai-stage="1"><span>2</span>Baca ciri umum</li><li data-ai-stage="2"><span>3</span>Siapkan isian</li></ol>
+            <p id="foundAiHint">Periksa setiap isian sebelum mengirim.</p>
+          </section>
+          <div class="photo-actions">
+            <button id="foundCameraBtn" class="button button-outline" type="button"><svg><use href="#i-camera"></use></svg>Ambil foto</button>
+            <button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Pilih galeri</button>
+            <button id="foundDemoBtn" class="button button-outline" type="button">Pakai foto demo</button>
+          </div>
+          <input id="foundCamera" type="file" accept="image/*" capture="environment" hidden />
+          <input id="foundGallery" type="file" accept="image/*" hidden />
+          <img id="demoPhotoSource" src="assets/botol-hijau.jpg" alt="" hidden />
+        </section>
+
+        <form class="panel item-form" id="depositForm" novalidate>
+          <div class="panel-heading"><div><h3>Detail barang</h3><p>Ciri khusus tidak tampil di katalog.</p></div></div>
+          <div class="fieldgrid">
+            <div><label class="field" for="itemName"><span>Nama barang <small id="itemNameTag" class="ai-fill-tag" hidden>Diisi AI</small></span><input id="itemName" placeholder="Contoh: Botol minum" /></label><p id="itemNameError" class="field-error" aria-live="polite"></p></div>
+            <div><label class="field" for="itemCategory"><span>Kategori <small id="itemCategoryTag" class="ai-fill-tag" hidden>Diisi AI</small></span><select id="itemCategory"><option value="">Pilih kategori</option><option>Botol / Tumbler</option><option>Payung</option><option>Dompet</option><option>Elektronik</option><option>Kartu Identitas</option></select></label><p id="itemCategoryError" class="field-error" aria-live="polite"></p></div>
+            <div><label class="field" for="itemColor"><span>Warna <small id="itemColorTag" class="ai-fill-tag" hidden>Diisi AI</small></span><input id="itemColor" placeholder="Contoh: Hijau" /></label><p id="itemColorError" class="field-error" aria-live="polite"></p></div>
+            <div><label class="field" for="foundLocation"><span>Lokasi ditemukan</span><select id="foundLocation"><option value="fisip">FISIP</option><option value="fti">FTI</option><option value="masjid">Masjid</option></select></label></div>
+          </div>
+          <label class="field" for="detailLocation"><span>Detail lokasi</span><input id="detailLocation" placeholder="Contoh: depan ruang A201" /></label><p id="detailLocationError" class="field-error" aria-live="polite"></p>
+          <label class="field" for="itemGeneral"><span>Ciri umum <small id="itemGeneralTag" class="ai-fill-tag" hidden>Diisi AI</small></span><textarea id="itemGeneral" rows="2" placeholder="Ciri yang boleh terlihat di katalog"></textarea></label>
+          <label class="field" for="itemSecret"><span>Ciri khusus (privat)</span><textarea id="itemSecret" rows="2" placeholder="Ciri yang hanya diketahui pemilik"></textarea></label>
+          <div class="field-tools"><button id="secretExampleBtn" class="text-button" type="button">Isi contoh</button><p id="itemSecretError" class="field-error" aria-live="polite"></p></div>
+          <p id="depositStatus" class="form-status" aria-live="polite"></p>
+          <div class="finder-submit"><button id="depositSubmit" class="button button-main full" type="submit">Cari loker <svg><use href="#i-arrow-right"></use></svg></button></div>
+        </form>
       </div>
-      <section id="lockerRecommendation" class="recommendation" hidden aria-live="polite"></section>
+      <section id="lockerRecommendation" class="recommendation" aria-live="polite" hidden></section>
     </section>
 
     <section class="content-section" id="tab-cari" hidden>
-      <div class="flow-heading"><div><span class="eyebrow">02 / PEMILIK BARANG</span><h2>Cari dulu. Klaim dengan bukti, bukan tebakan.</h2><p>Barang biasa dapat diverifikasi cepat; barang bernilai masuk antrean peninjauan Himatif.</p></div><button id="showLostReport" type="button" class="button button-outline"><svg><use href="#i-bell"></use></svg> Laporkan kehilangan</button></div>
-      <div class="search-controls"><label class="search-field"><svg><use href="#i-search"></use></svg><input id="searchInput" placeholder="Cari nama, kategori, atau lokasi..." /></label><select id="searchLocation"><option value="">Semua titik</option><option>FISIP</option><option>FTI</option><option>Masjid</option></select><select id="searchDate"><option>7 hari terakhir</option><option>30 hari terakhir</option></select></div>
-      <p id="resultCount" class="result-count"></p>
-      <div id="itemsList" class="item-grid"></div>
-      <section id="lostReportPanel" class="panel lost-report" hidden><div><span class="eyebrow">BELUM MENEMUKAN BARANG?</span><h3>Aktifkan laporan kehilangan.</h3><p>Ketika barang baru memiliki kategori atau ciri yang serupa, pemilik menerima notifikasi.</p></div><div class="lost-report-actions"><button class="button button-main" type="button" id="activateAlertBtn">Aktifkan alert kategori</button><small>Visualisasi notifikasi—belum terkirim ke perangkat nyata.</small></div></section>
+      <header class="section-heading"><h2>Cari barang yang hilang</h2><p>Pilih barang lalu jawab ciri yang tidak terlihat di katalog.</p></header>
+      <div class="search-controls">
+        <label class="search-field" for="searchInput"><svg><use href="#i-search"></use></svg><span class="sr-only">Cari barang</span><input id="searchInput" placeholder="Cari nama, kategori, atau lokasi" /></label>
+        <label class="sr-only" for="searchLocation">Filter lokasi</label><select id="searchLocation"><option value="">Semua lokasi</option><option>FISIP</option><option>FTI</option><option>Masjid</option></select>
+      </div>
+      <p id="resultCount" class="result-count" aria-live="polite"></p>
+      <div id="itemsList" class="item-grid" aria-live="polite"></div>
     </section>
 
     <section class="content-section" id="tab-lokasi" hidden>
-      <div class="flow-heading"><div><span class="eyebrow">03 / JARINGAN LOKER</span><h2>Tiga titik, satu status layanan.</h2><p>Jika lokasi awal penuh atau offline, pengguna melihat alternatif sebelum berjalan ke titik tersebut.</p></div><span class="flow-tag">Ukuran S · M · L</span></div>
+      <header class="section-heading"><h2>Titik loker</h2><p>Lihat ketersediaan sebelum menuju titik loker.</p></header>
       <div id="locationGrid" class="location-grid"></div>
-      <section class="panel route-note"><svg><use href="#i-alert"></use></svg><div><h3>Aturan saat kapasitas habis</h3><p>Jika semua loker penuh, alur mengarah ke pos Himatif/satpam untuk titip manual dengan status <strong>Dititip di Pos</strong>.</p></div></section>
     </section>
 
-    <section class="content-section" id="tab-bantuan" hidden>
-      <div class="flow-heading"><div><span class="eyebrow">04 / KONDISI KHUSUS</span><h2>Alur tetap jelas ketika sesuatu gagal.</h2><p>Setiap kondisi memperlihatkan siapa yang bertindak: mahasiswa, sistem loker, atau Himatif.</p></div></div>
-      <div id="exceptionGrid" class="exception-grid"></div>
+    <section class="content-section support-section" id="tab-bantuan" hidden>
+      <header class="section-heading"><h2>Hubungi admin</h2><p>Kirim pesan tentang barang atau loker.</p></header>
+      <p id="supportContext" class="support-context" hidden></p>
+      <section class="support-topic" aria-labelledby="supportTopicTitle"><h3 id="supportTopicTitle">Pilih topik</h3><div id="supportTopics" class="topic-list" role="radiogroup" aria-label="Topik bantuan">
+        <button type="button" class="topic-button" role="radio" aria-checked="false" data-topic="Loker tidak terbuka">Loker tidak terbuka</button>
+        <button type="button" class="topic-button" role="radio" aria-checked="false" data-topic="PIN salah atau kedaluwarsa">PIN salah atau kedaluwarsa</button>
+        <button type="button" class="topic-button" role="radio" aria-checked="false" data-topic="Barang tidak sesuai">Barang tidak sesuai</button>
+        <button type="button" class="topic-button" role="radio" aria-checked="false" data-topic="Titik loker offline">Titik loker offline</button>
+        <button type="button" class="topic-button" role="radio" aria-checked="false" data-topic="Lainnya">Lainnya</button>
+      </div></section>
+      <p id="supportError" class="field-error" aria-live="polite"></p>
+      <section id="supportThread" class="chat-thread" aria-live="polite" aria-label="Percakapan bantuan"></section>
+      <form id="supportForm" class="support-composer" novalidate>
+        <label class="sr-only" for="supportMessage">Pesan untuk admin</label><textarea id="supportMessage" maxlength="500" rows="1" placeholder="Tulis pesan untuk admin"></textarea>
+        <button id="supportSend" class="button button-main" type="submit" disabled aria-label="Kirim pesan"><svg><use href="#i-send"></use></svg><span>Kirim</span></button>
+      </form>
     </section>
   </main>
 
@@ -98,7 +155,7 @@
     <button class="mobile-nav-item active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg><span>Temukan</span></button>
     <button class="mobile-nav-item" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg><span>Cari</span></button>
     <button class="mobile-nav-item" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg><span>Loker</span></button>
-    <button class="mobile-nav-item" data-tab="bantuan" type="button"><svg><use href="#i-shield"></use></svg><span>Bantuan</span></button>
+    <button class="mobile-nav-item" data-tab="bantuan" type="button"><svg><use href="#i-message"></use></svg><span>Bantuan</span></button>
   </nav>
 
   <main id="adminView" class="admin-layout" hidden>
@@ -107,10 +164,10 @@
     <section class="admin-queue-section"><div class="section-row"><div><span class="eyebrow">ANTREAN TINDAKAN</span><h2>Yang perlu ditangani sekarang</h2></div><span class="queue-count">4 prioritas</span></div><div id="adminQueue" class="admin-queue"></div></section>
     <section class="admin-columns"><section class="panel"><span class="eyebrow">JARINGAN TITIK</span><h2>FISIP, FTI, Masjid</h2><div id="adminLocations" class="admin-locations"></div></section><section class="panel"><span class="eyebrow">AUDIT TRAIL</span><h2>Jejak tindakan</h2><div id="auditLog" class="audit-log"></div></section></section>
     <section class="panel admin-monitoring" aria-labelledby="adminLockerTitle"><div class="admin-monitoring-head"><div><span class="eyebrow">SEMUA LOKER</span><h2 id="adminLockerTitle">Status dan detail barang aktif</h2><p>Visualisasi data yang kelak harus tersimpan di server dan tak dapat diubah.</p></div><p id="adminUpdated" class="admin-updated" aria-live="polite"></p></div><div id="adminLockerList" class="admin-locker-list" aria-live="polite"></div></section>
+    <section class="panel admin-support" aria-labelledby="adminSupportTitle"><div class="panel-heading"><div><h2 id="adminSupportTitle">Pesan masuk</h2><p>Pesan hanya tersimpan di sesi browser ini.</p></div></div><div id="adminSupportContent" class="admin-support-content" aria-live="polite"></div></section>
   </main>
 
-  <div id="modalLayer" class="modal-layer" hidden><div class="modal-backdrop" data-close="true"></div><section id="modalContent" class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalHeading"></section></div>
+  <div id="modalLayer" class="modal-layer" hidden><div class="modal-backdrop" data-close="true"></div><section id="modalContent" class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalHeading" tabindex="-1"></section></div>
   <div id="toastZone" class="toast-zone" aria-live="polite"></div>
-  <footer class="site-footer">Balikin — visualisasi layanan barang hilang kampus. Belum terhubung ke akun kampus, notifikasi, sensor, atau loker fisik.</footer>
 </body>
 </html>

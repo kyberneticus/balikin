@@ -1,7 +1,7 @@
 {
   "name": "balikin",
   "version": "1.0.0",
-  "description": "",
+  "description": "Static Lost & Found campus prototype.",
   "main": "index.js",
   "scripts": {
     "build": "node scripts/build-standalone.js",
@@ -13,5 +13,16 @@
   "type": "commonjs",
   "dependencies": {
     "live-server": "^1.2.2"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kyberneticus/balikin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kyberneticus/balikin/issues"
+  },
+  "homepage": "https://github.com/kyberneticus/balikin#readme"
 }
