@@ -173,7 +173,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .pin-display strong { color: var(--green-dark); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 24px; letter-spacing: .12em; }
 
 .search-controls { display: flex; align-items: center; gap: 12px; }
-.locker-sheet { display: grid; gap: 16px; align-content: start; justify-items: center; min-height: 432px; margin-top: 24px; text-align: center; animation: locker-enter 180ms ease; }
+.locker-sheet { display: grid; gap: 16px; align-content: start; justify-items: center; margin-top: 24px; text-align: center; animation: locker-enter 180ms ease; }
 .locker-sheet > p { margin: 0; font-size: 14px; }
 .locker-sheet .locker-valid { color: var(--muted); font-size: 13px; }
 .locker-pin { display: grid; gap: 8px; justify-items: center; }
@@ -184,8 +184,8 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .locker-bar { width: 100%; height: 4px; overflow: hidden; border-radius: 2px; background: #e3ebe4; }
 .locker-bar span { display: block; height: 100%; background: var(--green); transform-origin: left center; }
 .locker-sheet .button.full { width: 100%; }
-.locker-steps { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
-.locker-steps li { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-size: 14px; opacity: .55; transition: opacity 180ms ease; }
+.locker-steps { display: grid; gap: 8px; justify-items: center; padding: 0; margin: 0; list-style: none; }
+.locker-steps li { display: flex; align-items: center; justify-content: flex-start; gap: 8px; min-width: min(240px, 100%); color: var(--muted); font-size: 14px; opacity: .55; transition: opacity 180ms ease; text-align: left; }
 .locker-steps li > span { width: 20px; height: 20px; border: 1px solid var(--line); border-radius: 50%; }
 .locker-steps li.complete { color: var(--green-dark); opacity: 1; }
 .locker-steps li.complete > span { border-color: var(--green); background: var(--green); }
