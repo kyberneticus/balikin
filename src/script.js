@@ -6,17 +6,37 @@
     api: 160,
     finderStages: [1200, 1200, 800],
     finderField: 250,
+    finderScroll: 450,
     claimCheck: 900,
     claimGauge: 600,
-    claimResult: 200,
+    claimHold: 1200,
     toast: 4200,
   });
   const ADMIN_USERNAME = 'admin';
   const ADMIN_PASSWORD = 'admin123';
   const USER_KEY = 'balikin-visual-user-v2';
   const SUPPORT_KEY = 'balikin-support-v1';
+  const DEMO_LOGOUT_KEY = 'balikin-demo-logged-out-v1';
   const DEMO_MODE = new URLSearchParams(window.location.search).get('demo') === '1';
   const ITEMS_KEY = DEMO_MODE ? 'balikin-demo-items-v1' : 'balikin-items-v1';
+  const DEMO_ITEM = Object.freeze({
+    id: 'bottle',
+    name: 'Botol minum hijau',
+    category: 'Botol / Tumbler',
+    color: 'Hijau',
+    general: 'Botol minum hijau dengan tutup hijau',
+    detection: Object.freeze(['Botol minum', 'Hijau', 'Tutup hijau']),
+    location: 'FISIP · Gedung A',
+    date: 'Hari ini',
+    locker: 'A2',
+    node: 'FISIP',
+    status: 'stored',
+    secret: 'Stiker nama di bagian bawah',
+    finder: '20240001',
+    photo: 'assets/botol-hijau.jpg',
+    depositPin: '184205',
+    claimPin: '482916',
+  });
   const IMAGE_LIMITS = Object.freeze({
     uploadBytes: 12 * 1024 * 1024,
     storageBytes: 2 * 1024 * 1024,
@@ -38,9 +58,9 @@
   ];
 
   function seedItems() {
-    const bottle = { id: 'bottle', name: 'Botol minum hijau', category: 'Botol / Tumbler', color: 'Hijau', location: 'FISIP · Gedung A', date: 'Hari ini', locker: 'A2', node: 'FISIP', status: 'stored', secret: 'Stiker nama di bagian bawah', finder: '20240001', photo: 'assets/botol-hijau.jpg', depositPin: '184205', claimPin: '482916' };
-    const wallet = { id: 'wallet', name: 'Dompet hitam', category: 'Dompet', color: 'Hitam', location: 'FTI · Lobi utama', date: 'Kemarin', locker: 'B1', node: 'FTI', status: 'claimed', secret: 'Ada foto keluarga di bagian dalam', finder: '20240045', depositPin: '—', claimPin: 'Review admin' };
-    const card = { id: 'card', name: 'Kartu identitas', category: 'Kartu Identitas', color: 'Tertutup', location: 'Masjid Kampus', date: '2 hari lalu', locker: 'Pos', node: 'Masjid', status: 'review', secret: 'Data tidak pernah ditampilkan di katalog', finder: '20240120', depositPin: '—', claimPin: 'Verifikasi admin' };
+    const bottle = { ...DEMO_ITEM };
+    const wallet = { id: 'wallet', name: 'Dompet hitam', category: 'Dompet', color: 'Hitam', location: 'FTI · Lobi utama', date: 'Kemarin', locker: 'B1', node: 'FTI', status: 'claimed', secret: 'Ada foto keluarga di bagian dalam', finder: '20240045', depositPin: 'Belum ada', claimPin: 'Review admin' };
+    const card = { id: 'card', name: 'Kartu identitas', category: 'Kartu Identitas', color: 'Tertutup', location: 'Masjid Kampus', date: '2 hari lalu', locker: 'Pos', node: 'Masjid', status: 'review', secret: 'Data tidak pernah ditampilkan di katalog', finder: '20240120', depositPin: 'Belum ada', claimPin: 'Verifikasi admin' };
     return DEMO_MODE ? [wallet, card] : [bottle, wallet, card];
   }
 
@@ -95,6 +115,7 @@
     supportContext: null,
     modalTrigger: null,
     finderRun: 0,
+    finderScanning: false,
   };
 
   function getSupportThreads() {
@@ -262,7 +283,11 @@
   }
 
   function setFinderStep(step) {
-    document.querySelectorAll('.flow-steps li').forEach((element, index) => element.classList.toggle('active', index === step));
+    document.querySelectorAll('.flow-steps li').forEach((element, index) => {
+      element.classList.toggle('active', index === step);
+      element.classList.toggle('complete', index < step);
+      element.querySelector('b').textContent = index < step ? '✓' : String(index + 1);
+    });
   }
 
   function updateVisualViewport() {
@@ -272,9 +297,45 @@
   }
 
   // Finder rendering and flow
+  function detectionMarkup() {
+    return DEMO_ITEM.detection.map((label) => `<span>${safe(label)}</span>`).join('');
+  }
+
+  function scanOverlay(scanning = false) {
+    return `<div class="scanner-overlay${scanning ? ' is-scanning' : ''}" aria-hidden="true"><span class="scan-sweep"><span class="scan-line"></span></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list">${detectionMarkup()}</div></div>`;
+  }
+
+  function setFoundPhotoControls(selected) {
+    $('photoActions').classList.toggle('has-photo', selected);
+    $('foundChangeBtn').hidden = !selected;
+  }
+
+  function setFinderFormHasContent() {
+    $('depositForm').classList.add('has-content');
+  }
+
+  async function scrollFinderFieldsIntoView() {
+    if (window.innerWidth > 670) return;
+    const first = $('itemName').getBoundingClientRect();
+    const last = $('itemGeneral').getBoundingClientRect();
+    const headerBottom = document.querySelector('.site-header').getBoundingClientRect().bottom;
+    const nav = $('mobileNav');
+    const navTop = !nav.hidden ? nav.getBoundingClientRect().top : window.innerHeight;
+    const submit = document.querySelector('.item-form.has-content .finder-submit');
+    const safeTop = headerBottom + 16;
+    const safeBottom = navTop - (submit ? submit.getBoundingClientRect().height : 0) - 36;
+    const range = last.bottom - first.top;
+    const targetTop = Math.max(safeTop, safeBottom - range);
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    window.scrollBy({ top: first.top - targetTop, behavior });
+    await wait(DEMO_TIMING.finderScroll);
+  }
+
   function renderFoundPreview() {
     if (!state.foundPhoto) return;
-    $('foundPreview').innerHTML = `<img src="${safe(state.foundPhoto)}" alt="Foto barang yang akan dititipkan"><div class="scanner-overlay" aria-hidden="true"><span class="scan-line"></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list"><span>Botol minum</span><span>Hijau</span><span>Tutup hijau</span></div></div>`;
+    $('foundPreview').classList.remove('is-empty');
+    $('foundPreview').innerHTML = `<img src="${safe(state.foundPhoto)}" alt="Foto barang yang akan dititipkan">${scanOverlay(state.finderScanning)}`;
+    setFoundPhotoControls(true);
   }
 
   function updateFoundAiProgress(stage) {
@@ -300,9 +361,9 @@
   async function applyFoundAiSuggestions(run) {
     const suggestions = [
       ['itemName', 'itemNameTag', 'Botol minum'],
-      ['itemCategory', 'itemCategoryTag', 'Botol / Tumbler'],
-      ['itemColor', 'itemColorTag', 'Hijau'],
-      ['itemGeneral', 'itemGeneralTag', 'Botol minum hijau dengan tutup hitam'],
+      ['itemCategory', 'itemCategoryTag', DEMO_ITEM.category],
+      ['itemColor', 'itemColorTag', DEMO_ITEM.color],
+      ['itemGeneral', 'itemGeneralTag', DEMO_ITEM.general],
     ];
     for (const [inputId, tagId, value] of suggestions) {
       if (run !== state.finderRun) return;
@@ -327,8 +388,13 @@
     updateFoundAiProgress(2);
     await wait(DEMO_TIMING.finderStages[2]);
     if (run !== state.finderRun) return;
+    setFinderFormHasContent();
+    await scrollFinderFieldsIntoView();
+    if (run !== state.finderRun) return;
     await applyFoundAiSuggestions(run);
     if (run !== state.finderRun) return;
+    state.finderScanning = false;
+    renderFoundPreview();
     setFinderStep(1);
   }
 
@@ -385,6 +451,7 @@
     try {
       if (file.size > IMAGE_LIMITS.storageBytes) setTextStatus('depositStatus', 'Mengecilkan foto sebelum disimpan.');
       state.foundPhoto = await prepareImage(file);
+      state.finderScanning = true;
       setTextStatus('depositStatus');
       renderFoundPreview();
       startFoundAiSimulation().catch(() => setTextStatus('depositStatus', 'Pemeriksaan foto tidak dapat dijalankan.', 'error'));
@@ -505,17 +572,19 @@
     if (trigger && document.contains(trigger)) trigger.focus();
   }
 
-  function claimFormBody(item, attempt = 0, feedback = '') {
-    return `<p>Sebutkan ciri khusus yang tidak terlihat di katalog.</p><form id="claimForm" class="claim-form" novalidate><section class="claim-photo-field" aria-labelledby="claimPhotoLabel"><span id="claimPhotoLabel">Foto barang <small>opsional, hingga 12 MB</small></span><div id="claimPreview" class="claim-preview" aria-live="polite"></div><label class="sr-only" for="claimCamera">Ambil foto barang untuk klaim</label><button id="claimCameraBtn" class="button button-outline full" type="button">${icons('camera')}Ambil foto barang</button><input id="claimCamera" type="file" accept="image/*" capture="environment" hidden /><p id="claimPhotoError" class="field-error" aria-live="polite"></p></section><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang"></textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><div class="claim-tools"><button id="claimExampleBtn" class="text-button" type="button">Isi jawaban demo</button><span class="claim-attempt">Percobaan ${attempt} dari 3</span></div><p id="claimStatus" class="form-status ${feedback ? 'is-error' : ''}" aria-live="polite">${safe(feedback)}</p><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button></form><p class="simulation-note">Simulasi pencocokan</p>`;
+  function claimFormBody(item, attempt = 0, feedback = '', answer = '') {
+    return `<section class="claim-state claim-question"><p class="claim-prompt">Sebutkan ciri khusus yang tidak terlihat di katalog.</p><form id="claimForm" class="claim-form" novalidate><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang">${safe(answer)}</textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><div class="claim-tools"><button id="claimExampleBtn" class="text-button" type="button">Isi jawaban demo</button><span class="claim-attempt">Percobaan ${attempt} dari 3</span></div><p id="claimStatus" class="form-status ${feedback ? 'is-error' : ''}" aria-live="polite">${safe(feedback)}</p><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button><section class="claim-photo-field" aria-labelledby="claimPhotoLabel"><label class="sr-only" for="claimCamera">Tambah foto barang untuk klaim</label><button id="claimCameraBtn" class="button button-outline full claim-photo-toggle" type="button">${icons('camera')}<span id="claimPhotoLabel">Tambah foto (opsional)</span></button><input id="claimCamera" type="file" accept="image/*" capture="environment" hidden /><div id="claimPreview" class="claim-preview" aria-live="polite" hidden></div><p id="claimPhotoError" class="field-error" aria-live="polite"></p></section></form></section><p class="simulation-note">Simulasi pencocokan</p>`;
   }
 
   function renderClaimPreview() {
     const preview = $('claimPreview');
     if (!state.claimPhoto) {
-      preview.innerHTML = `${icons('camera')}<strong>Foto belum ditambahkan</strong><span>Foto membantu admin memeriksa barang.</span>`;
+      preview.hidden = true;
+      preview.innerHTML = '';
       return;
     }
-    preview.innerHTML = `<img src="${safe(state.claimPhoto)}" alt="Foto barang untuk klaim"><div class="scanner-overlay" aria-hidden="true"><span class="scan-line"></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list"><span>Botol minum</span><span>Hijau</span><span>Tutup hijau</span></div></div>`;
+    preview.hidden = false;
+    preview.innerHTML = `<img src="${safe(state.claimPhoto)}" alt="Foto barang untuk klaim">${scanOverlay()}`;
   }
 
   async function previewClaimPhoto(file) {
@@ -530,12 +599,12 @@
     }
   }
 
-  function wireClaimForm(item, attempt = 0, feedback = '') {
-    modalShell(`Klaim ${item.name}`, claimFormBody(item, attempt, feedback));
+  function wireClaimForm(item, attempt = 0, feedback = '', answer = '', replace = true) {
+    if (replace) modalShell(`Klaim ${item.name}`, claimFormBody(item, attempt, feedback, answer));
     renderClaimPreview();
     $('claimCameraBtn').addEventListener('click', () => $('claimCamera').click());
     $('claimCamera').addEventListener('change', (event) => previewClaimPhoto(event.target.files?.[0]));
-    $('claimExampleBtn').addEventListener('click', () => { $('claimAnswer').value = 'Ada stiker nama di bagian bawah botol'; $('claimAnswer').focus(); });
+    $('claimExampleBtn').addEventListener('click', () => { $('claimAnswer').value = `Ada ${DEMO_ITEM.secret.toLocaleLowerCase('id')} botol`; $('claimAnswer').focus(); });
     $('claimForm').addEventListener('submit', (event) => {
       event.preventDefault();
       submitClaim(item).catch((error) => setTextStatus('claimStatus', error.message || 'Klaim tidak dapat diperiksa.', 'error'));
@@ -547,19 +616,11 @@
     if (!item) return toast('Barang sudah tidak ada di katalog.');
     state.claimPhoto = '';
     openModal(`Klaim ${item.name}`, claimFormBody(item), trigger);
-    renderClaimPreview();
-    $('claimCameraBtn').addEventListener('click', () => $('claimCamera').click());
-    $('claimCamera').addEventListener('change', (event) => previewClaimPhoto(event.target.files?.[0]));
-    $('claimExampleBtn').addEventListener('click', () => { $('claimAnswer').value = 'Ada stiker nama di bagian bawah botol'; $('claimAnswer').focus(); });
-    $('claimForm').addEventListener('submit', (event) => {
-      event.preventDefault();
-      submitClaim(item).catch((error) => setTextStatus('claimStatus', error.message || 'Klaim tidak dapat diperiksa.', 'error'));
-    });
+    wireClaimForm(item, 0, '', '', false);
   }
 
   async function submitClaim(item) {
     const answer = $('claimAnswer').value.trim();
-    const attempt = state.claimAttempts[item.id] || 0;
     setFieldError('claimAnswerError');
     if (!answer) {
       setFieldError('claimAnswerError', 'Ciri khusus wajib diisi.');
@@ -568,17 +629,16 @@
     const button = $('claimSubmit');
     setButtonLoading(button, true, 'Memeriksa klaim');
     const result = await api.submitClaim({ itemId: item.id, answer, photo: state.claimPhoto });
-    await runClaimVerification(result);
+    await runClaimVerification(item, result);
     if (result.match) {
-      await wait(DEMO_TIMING.claimResult);
       renderPickup(item);
       return;
     }
     if (result.retryAllowed) {
-      wireClaimForm(item, result.attempt, 'Belum cocok. Coba lagi.');
+      wireClaimForm(item, result.attempt, 'Belum cocok. Coba lagi.', answer);
       return;
     }
-    modalShell(`Klaim ${item.name}`, '<section class="claim-result"><h3>Klaim perlu review</h3><p>Jawaban belum cocok setelah tiga percobaan.</p></section><p class="simulation-note">Simulasi pencocokan</p>');
+    modalShell(`Klaim ${item.name}`, '<section class="claim-state claim-result"><h3>Belum cocok</h3><p>Jawaban belum cocok setelah tiga percobaan.</p></section><p class="simulation-note">Simulasi pencocokan</p>');
   }
 
   async function animateGauge(score) {
@@ -604,17 +664,20 @@
     });
   }
 
-  async function runClaimVerification(result) {
-    modalShell('Verifikasi klaim', `<section class="claim-verification" aria-live="polite"><ol class="claim-checks"><li id="claimCheck0"><span>1</span>Membandingkan jawaban</li><li id="claimCheck1"><span>2</span>Mencocokkan detail rahasia</li><li id="claimCheck2"><span>3</span>Menghitung skor</li></ol><div class="claim-gauge-wrap"><svg class="claim-gauge" viewBox="0 0 120 120" aria-label="Skor kecocokan"><circle class="gauge-track" cx="60" cy="60" r="52"></circle><circle id="claimGaugeValue" class="gauge-value" cx="60" cy="60" r="52"></circle></svg><strong id="claimScore" class="claim-score">0%</strong><p>Skor simulasi</p></div></section>`);
+  async function runClaimVerification(item, result) {
+    modalShell(`Klaim ${item.name}`, `<section class="claim-state claim-verification" aria-live="polite"><ol class="claim-checks"><li id="claimCheck0"><span>1</span>Membandingkan jawaban</li><li id="claimCheck1"><span>2</span>Mencocokkan detail rahasia</li><li id="claimCheck2"><span>3</span>Menghitung skor</li></ol><div class="claim-gauge-wrap"><div class="claim-gauge-display"><svg class="claim-gauge" viewBox="0 0 120 120" aria-label="Skor kecocokan"><circle class="gauge-track" cx="60" cy="60" r="52"></circle><circle id="claimGaugeValue" class="gauge-value" cx="60" cy="60" r="52"></circle></svg><strong id="claimScore" class="claim-score">0%</strong></div><h3 id="claimResultHeadline" class="claim-result-headline" hidden></h3><p>Skor simulasi</p></div></section>`);
     for (let index = 0; index < 3; index += 1) {
       await wait(DEMO_TIMING.claimCheck);
       $(`claimCheck${index}`).classList.add('complete');
     }
     await animateGauge(result.score);
+    $('claimResultHeadline').textContent = result.match ? 'Cocok' : 'Belum cocok';
+    $('claimResultHeadline').hidden = false;
+    await wait(DEMO_TIMING.claimHold);
   }
 
   function renderPickup(item) {
-    modalShell('Klaim terverifikasi', `<section class="claim-result"><h3>Cocok. Klaim terverifikasi.</h3><p>Gunakan PIN ini di loker ${safe(item.locker)}.</p><div class="pickup-pin"><span>PIN pengambilan</span><strong>482916</strong><span>Berlaku 3 hari</span></div><p id="pickupStatus" class="form-status" aria-live="polite"></p><button id="pickupBtn" class="button button-main full" type="button">Simulasikan buka loker</button><button id="lockerProblemBtn" class="link-button" type="button">Loker bermasalah?</button></section><p class="simulation-note">Simulasi pencocokan</p>`);
+    modalShell(`Klaim ${item.name}`, `<section class="claim-state claim-result"><h3>Cocok</h3><p>Gunakan PIN ini di loker ${safe(item.locker)}.</p><div class="pickup-pin"><span>PIN pengambilan</span><strong>${safe(item.claimPin)}</strong><span>Berlaku 3 hari</span></div><p id="pickupStatus" class="form-status" aria-live="polite"></p><button id="pickupBtn" class="button button-main full" type="button">Simulasikan buka loker</button><button id="lockerProblemBtn" class="link-button" type="button">Loker bermasalah?</button></section><p class="simulation-note">Simulasi pencocokan</p>`);
     $('pickupBtn').addEventListener('click', () => confirmPickup(item).catch((error) => setTextStatus('pickupStatus', error.message || 'Barang tidak dapat diambil.', 'error')));
     $('lockerProblemBtn').addEventListener('click', () => {
       state.supportContext = { itemName: item.name, locker: item.locker };
@@ -717,7 +780,7 @@
     const summary = [
       ['Loker tersedia', 10, 'available'], ['Klaim perlu review', 2, 'waiting'], ['Barang > 30 hari', 1, 'alert'], ['Titik offline', 1, 'alert'],
     ];
-    $('adminSummary').innerHTML = summary.map(([label, count, tone]) => `<article class="admin-summary-card ${tone}"><span>${label}</span><strong>${count}</strong><small>butuh keputusan operasional</small></article>`).join('');
+    $('adminSummary').innerHTML = summary.map(([label, count, tone]) => `<article class="admin-summary-card ${tone}"><span><i class="summary-dot ${tone}" aria-hidden="true"></i>${label}</span><strong>${count}</strong></article>`).join('');
     const queue = [
       ['alert', 'Kartu Identitas dari Masjid', 'Hubungi pemilik bila NIM terbaca; jangan tampilkan data di katalog.', 'Buka prosedur', 'shield'],
       ['waiting', 'Klaim Dompet hitam', 'Bukti kepemilikan perlu dicocokkan sebelum PIN pengambilan diterbitkan.', 'Tinjau klaim', 'search'],
@@ -736,7 +799,7 @@
     ];
     const labels = { available: 'KOSONG', held: 'DIPESAN', stored: 'TERSIMPAN', claimed: 'SIAP DIAMBIL', offline: 'OFFLINE' };
     $('adminLockerList').innerHTML = lockers.map(([locker, node, status, item]) => `<article class="admin-locker-row ${status}"><div class="admin-locker-code"><strong>${safe(locker)}</strong><span class="admin-status ${status}">${labels[status]}</span></div>${item ? `<div class="admin-locker-detail"><strong>${safe(item.name)}</strong><span>${safe(node)} · ${safe(item.category)} · ${safe(item.color)}</span><span>Penemu: ${safe(item.finder)} · ${safe(item.location)}</span><span>Ciri khusus: ${safe(item.secret)}</span><span>PIN penitipan ${safe(item.depositPin)} · PIN ambil ${safe(item.claimPin)}</span></div>` : `<p class="admin-empty">${status === 'offline' ? 'Titik sedang offline; status pintu perlu sinkronisasi.' : 'Tidak ada barang aktif di loker ini.'}</p>`}</article>`).join('');
-    $('adminUpdated').textContent = `Visual data · ${timeLabel(new Date().toISOString())}`;
+    $('adminUpdated').textContent = `Diperbarui ${timeLabel(new Date().toISOString())}`;
     renderAdminSupport().catch(() => { $('adminSupportContent').textContent = 'Pesan tidak dapat dimuat.'; });
   }
 
@@ -744,6 +807,8 @@
     const target = $('adminSupportContent');
     target.textContent = 'Memuat pesan...';
     const threads = await api.listSupportThreads();
+    const unread = threads.filter((entry) => entry.messages.some((message) => message.sender === 'student' && !message.read)).length;
+    $('adminUnreadCount').textContent = unread ? `${unread} belum dibaca` : 'Tidak ada pesan baru';
     const thread = threads.find((entry) => entry.id === threadId);
     if (!thread) {
       target.innerHTML = threads.length ? `<div class="support-ticket-list">${threads.map((entry) => {
@@ -767,6 +832,7 @@
   async function openAdminThread(threadId) {
     await api.markSupportRead(threadId);
     await renderAdminSupport(threadId);
+    $('adminSupportContent').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   async function replyToSupportThread(threadId) {
@@ -813,6 +879,7 @@
   }
 
   function logout() {
+    if (DEMO_MODE) storage.setItem(DEMO_LOGOUT_KEY, '1');
     state.user = null;
     storage.removeItem(USER_KEY);
     closeModal();
@@ -829,6 +896,7 @@
 
   function resetDemo() {
     storage.removeItem(USER_KEY);
+    storage.removeItem(DEMO_LOGOUT_KEY);
     storage.removeItem(SUPPORT_KEY);
     persistentStorage.removeItem(ITEMS_KEY);
     window.location.reload();
@@ -878,9 +946,16 @@
     $('foundCameraBtn').addEventListener('click', () => $('foundCamera').click());
     $('foundGalleryBtn').addEventListener('click', () => $('foundGallery').click());
     $('foundDemoBtn').addEventListener('click', () => useDemoPhoto());
+    $('foundChangeBtn').addEventListener('click', () => setFoundPhotoControls(false));
     $('foundCamera').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
     $('foundGallery').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
     $('secretExampleBtn').addEventListener('click', () => { $('itemSecret').value = 'Stiker nama di bagian bawah'; setFieldError('itemSecretError'); $('itemSecret').focus(); });
+    $('depositForm').addEventListener('input', (event) => {
+      if (event.target.value?.trim()) setFinderFormHasContent();
+    });
+    $('depositForm').addEventListener('change', (event) => {
+      if (event.target.value?.trim()) setFinderFormHasContent();
+    });
     $('depositForm').addEventListener('submit', (event) => {
       event.preventDefault();
       const payload = validateFoundForm();
@@ -931,7 +1006,7 @@
       $('demoTag').hidden = false;
       $('resetDemoBtn').hidden = false;
       $('resetDemoBtn').addEventListener('click', resetDemo);
-      setUser({ nim: '20240001' });
+      if (!storage.getItem(DEMO_LOGOUT_KEY)) setUser({ nim: '20240001' });
       return;
     }
     let saved = null;

@@ -51,7 +51,8 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .nim-chip, .demo-tag { display: inline-flex; min-height: 28px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 4px 8px; color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; }
 .demo-tag { border-color: #b9d7c0; background: var(--green-pale); color: var(--green-dark); }
 .icon-button, .text-button { min-height: 44px; border: 0; border-radius: 12px; background: transparent; color: var(--green); font-size: 13px; font-weight: 700; }
-.icon-button { display: grid; width: 44px; place-items: center; }
+.icon-button { display: inline-flex; width: 44px; align-items: center; justify-content: center; gap: 8px; }
+.logout-label { display: none; }
 .icon-button:hover, .text-button:hover { background: var(--green-pale); }
 
 .auth-layout { display: grid; grid-template-columns: 1.15fr .85fr; align-items: center; gap: 64px; max-width: 1120px; min-height: calc(100svh - 72px); padding: 64px 24px; margin: 0 auto; }
@@ -73,6 +74,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .field textarea, .support-composer textarea, .admin-reply-form textarea { resize: vertical; }
 .field input::placeholder, .field textarea::placeholder, .support-composer textarea::placeholder { color: #718078; }
 .field-error { min-height: 18px; margin: 4px 0 8px; color: var(--red); font-size: 12px; }
+.field-error:empty { display: none; }
 .form-status { min-height: 20px; margin: 8px 0; color: var(--muted); font-size: 13px; }
 .form-status.is-success { color: var(--green-dark); }
 .form-status.is-error { color: var(--red); }
@@ -105,33 +107,39 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .flow-steps li:last-child { border-right: 0; }
 .flow-steps b { display: grid; width: 24px; height: 24px; place-items: center; border-radius: 50%; background: #edf2ee; color: var(--muted); font-size: 12px; }
 .flow-steps .active { background: var(--green-pale); color: var(--green-dark); }
-.flow-steps .active b { background: var(--green); color: var(--white); }
+.flow-steps .active b, .flow-steps .complete b { background: var(--green); color: var(--white); }
 .finder-layout { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); gap: 24px; align-items: start; }
 .panel { padding: 24px; }
 .panel-heading { display: flex; align-items: start; justify-content: space-between; gap: 16px; }
 .panel-heading h2, .panel-heading h3 { margin: 0; font-size: 20px; letter-spacing: -.03em; }
 .panel-heading p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
 
-.photo-preview { position: relative; display: grid; width: 100%; aspect-ratio: 3 / 4; place-items: center; overflow: hidden; border: 1px dashed #a8c1ad; border-radius: 12px; margin: 20px 0 16px; background: #eff4f0; color: var(--muted); text-align: center; }
+.photo-preview { position: relative; display: grid; width: 100%; aspect-ratio: 3 / 4; place-items: center; overflow: hidden; border: 1px solid #a8c1ad; border-radius: 12px; margin: 20px 0 16px; background: #eff4f0; color: var(--muted); text-align: center; }
+.photo-preview.is-empty { display: flex; flex-direction: column; justify-content: center; gap: 8px; }
 .photo-preview > svg { width: 40px; height: 40px; color: var(--green); }
-.photo-preview strong { color: var(--ink); font-size: 15px; }
-.photo-preview > span { max-width: 200px; font-size: 13px; }
-.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-preview > span { max-width: 240px; font-size: 13px; }
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .scanner-overlay { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.scan-line { position: absolute; top: 0; right: 12px; left: 12px; height: 1px; background: var(--green); animation: scan-sweep 2.8s linear infinite; }
+.scan-sweep { position: absolute; inset: 0; }
+.scanner-overlay.is-scanning .scan-sweep { animation: scan-sweep 2.8s linear infinite; }
+.scan-line { position: absolute; top: 0; right: 12px; left: 12px; height: 1px; background: var(--green); }
 .scan-corner { position: absolute; width: 24px; height: 24px; border-color: var(--white); border-style: solid; border-width: 0; }
 .scan-corner.top-left { top: 12px; left: 12px; border-top-width: 2px; border-left-width: 2px; }
 .scan-corner.top-right { top: 12px; right: 12px; border-top-width: 2px; border-right-width: 2px; }
 .scan-corner.bottom-left { bottom: 12px; left: 12px; border-bottom-width: 2px; border-left-width: 2px; }
 .scan-corner.bottom-right { right: 12px; bottom: 12px; border-right-width: 2px; border-bottom-width: 2px; }
-.detection-list { position: absolute; right: 12px; bottom: 12px; left: 12px; display: grid; gap: 8px; }
+.detection-list { position: absolute; bottom: 52px; left: 16px; display: grid; gap: 8px; }
 .detection-list span { width: max-content; max-width: 100%; border: 1px solid rgb(255 255 255 / 72%); border-radius: 12px; padding: 4px 8px; background: rgb(32 51 43 / 84%); color: var(--white); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; opacity: 0; transform: translateY(8px); animation: detection-enter .32s ease forwards; }
 .detection-list span:nth-child(2) { animation-delay: .4s; }
 .detection-list span:nth-child(3) { animation-delay: .8s; }
-@keyframes scan-sweep { from { transform: translateY(12px); } to { transform: translateY(calc(100% - 36px)); } }
+@keyframes scan-sweep { from { transform: translateY(0); } to { transform: translateY(calc(100% - 1px)); } }
 @keyframes detection-enter { to { opacity: 1; transform: translateY(0); } }
-.photo-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.photo-actions .button { padding: 8px; font-size: 13px; }
+.photo-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.photo-actions .button { min-width: 0; padding: 8px; font-size: 13px; }
+.photo-actions .button:first-child { grid-column: 1 / -1; }
+.photo-actions.has-photo { display: none; }
+.photo-change { display: inline-flex; align-items: center; gap: 8px; padding: 0; }
+.photo-change svg { width: 20px; height: 20px; }
 .ai-progress { border-top: 1px solid var(--line); padding-top: 16px; margin-bottom: 16px; }
 .ai-progress-head { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
 .ai-mark { display: grid; width: 32px; height: 32px; place-items: center; border: 1px solid var(--green); border-radius: 12px; color: var(--green); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 800; }
@@ -162,17 +170,17 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 
 .search-controls { display: flex; align-items: center; gap: 12px; }
 .search-field { display: flex; min-height: 48px; flex: 1; align-items: center; gap: 8px; border: 1px solid #bfd0c2; border-radius: 12px; padding: 0 12px; background: var(--white); }
-.search-field input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 16px; }
+.search-field input { width: 100%; min-width: 0; min-height: 44px; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 16px; }
 .search-controls select { width: 176px; }
 .result-count { margin: 16px 0; color: var(--muted); font-size: 13px; }
 .item-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; align-items: stretch; }
-.item-card { display: flex; min-height: 100%; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--white); }
-.item-cover { display: grid; height: 160px; place-items: center; background: #edf3ee; color: #698674; }
+.item-card { display: flex; min-height: 512px; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--white); }
+.item-cover { display: grid; aspect-ratio: 16 / 10; place-items: center; overflow: hidden; background: #edf3ee; color: #698674; }
 .item-cover img { width: 100%; height: 100%; object-fit: cover; }
 .item-cover svg { width: 40px; height: 40px; }
 .item-info { display: flex; flex: 1; flex-direction: column; padding: 16px; }
 .item-info h3 { margin: 0; font-size: 18px; letter-spacing: -.025em; }
-.item-info small, .item-info p { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+.item-info small, .item-info p { min-height: 36px; margin: 8px 0 0; color: var(--muted); font-size: 12px; }
 .item-info .button { margin-top: auto; }
 .item-meta { margin-bottom: 8px; color: var(--green); font-size: 12px; font-weight: 700; }
 .item-details { display: grid; gap: 8px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 16px 0 0; }
@@ -215,11 +223,12 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .support-composer .button { min-width: 88px; }
 
 .admin-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-.admin-summary-card { display: flex; min-height: 136px; flex-direction: column; justify-content: space-between; border: 1px solid var(--line); border-radius: 16px; padding: 20px; background: var(--white); }
-.admin-summary-card span, .admin-summary-card small { color: var(--muted); font-size: 12px; }
+.admin-summary-card { display: flex; min-height: 112px; flex-direction: column; justify-content: space-between; border: 1px solid var(--line); border-radius: 16px; padding: 16px; background: var(--white); }
+.admin-summary-card span { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
 .admin-summary-card strong { font-size: 36px; line-height: 1; }
-.admin-summary-card.alert { border-color: #e8c8c1; }
-.admin-summary-card.waiting { border-color: #e7d3a8; }
+.summary-dot { width: 8px; height: 8px; border-radius: 50%; background: #9ca9a0; }
+.summary-dot.waiting { background: var(--amber); }
+.summary-dot.alert { background: var(--red); }
 .location-status { min-height: 24px; color: var(--green-dark); font-size: 12px; }
 .admin-updated { white-space: nowrap; }
 .admin-queue-section { border: 1px solid var(--line); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: var(--white); }
@@ -251,7 +260,8 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .admin-locker-detail { display: grid; gap: 4px; color: var(--muted); font-size: 13px; }
 .admin-locker-detail strong { color: var(--ink); font-size: 14px; }
 .admin-empty { margin: 0; color: var(--muted); font-size: 13px; }
-.admin-support { margin-top: 24px; }
+.admin-support { margin-bottom: 24px; }
+.admin-unread-count { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
 .admin-support-content { margin-top: 16px; }
 .support-ticket-list { display: grid; gap: 8px; }
 .support-ticket { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; width: 100%; min-height: 72px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--white); color: var(--ink); text-align: left; }
@@ -270,46 +280,43 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .modal-backdrop { position: absolute; inset: 0; background: rgb(23 41 31 / 64%); }
 .modal-panel { position: relative; width: min(560px, 100%); max-height: min(720px, calc(100svh - 48px)); overflow-y: auto; border-radius: 16px; padding: 24px; background: var(--white); box-shadow: var(--shadow); }
 .sheet-handle { display: none; }
-.modal-close { display: grid; float: right; width: 44px; height: 44px; place-items: center; border: 0; border-radius: 12px; background: transparent; color: var(--muted); font-size: 24px; }
+.modal-close { position: absolute; top: 16px; right: 16px; display: grid; width: 44px; height: 44px; place-items: center; border: 0; border-radius: 12px; background: transparent; color: var(--muted); font-size: 24px; }
 .modal-close:hover { background: var(--green-pale); }
-.modal-panel h2 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
+.modal-panel h2 { margin: 0 52px 0 0; font-size: 26px; letter-spacing: -.04em; }
 .modal-panel > p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+.claim-state { min-height: 432px; }
+.claim-prompt { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
 .claim-form { display: grid; gap: 12px; margin-top: 24px; }
 .claim-form .field-error { margin: 0; }
 .claim-photo-field { display: grid; gap: 8px; }
-.claim-photo-field > span { color: var(--ink); font-size: 13px; font-weight: 750; }
-.claim-photo-field small { color: var(--muted); font-size: 12px; font-weight: 400; }
-.claim-preview { position: relative; display: grid; aspect-ratio: 4 / 3; place-items: center; overflow: hidden; border: 1px dashed #a8c1ad; border-radius: 12px; background: #eff4f0; color: var(--muted); text-align: center; }
-.claim-preview > svg { width: 32px; height: 32px; color: var(--green); }
-.claim-preview > strong, .claim-preview > span { display: block; font-size: 13px; }
-.claim-preview > span { max-width: 220px; }
+.claim-photo-toggle { justify-content: flex-start; }
+.claim-preview { position: relative; display: grid; width: 160px; max-height: 120px; aspect-ratio: 4 / 3; place-items: center; overflow: hidden; border: 1px solid #a8c1ad; border-radius: 12px; background: #eff4f0; color: var(--muted); text-align: center; }
 .claim-preview img { width: 100%; height: 100%; object-fit: cover; }
 .claim-tools { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .claim-attempt { color: var(--muted); font-size: 12px; }
-.claim-verification { display: grid; gap: 16px; padding-top: 24px; }
+.claim-verification, .claim-result { display: grid; align-content: center; justify-items: center; gap: 16px; text-align: center; }
 .claim-checks { display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; }
-.claim-checks li { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 14px; }
+.claim-checks li { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--muted); font-size: 14px; }
 .claim-checks span { display: grid; width: 24px; height: 24px; place-items: center; border: 1px solid var(--line); border-radius: 50%; font-size: 12px; }
 .claim-checks .complete { color: var(--green-dark); }
 .claim-checks .complete span { border-color: var(--green); background: var(--green); color: var(--white); }
 .claim-gauge-wrap { display: grid; justify-items: center; gap: 8px; padding: 8px 0; }
+.claim-gauge-display { position: relative; width: 144px; height: 144px; }
 .claim-gauge { width: 144px; height: 144px; transform: rotate(-90deg); }
 .claim-gauge circle { fill: none; stroke-width: 8; }
 .claim-gauge .gauge-track { stroke: #e2ebe3; }
 .claim-gauge .gauge-value { stroke: var(--green); stroke-dasharray: 326.73; stroke-dashoffset: 326.73; transition: stroke-dashoffset 40ms linear; }
-.claim-score { margin-top: -92px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 24px; font-weight: 800; }
-.claim-gauge-wrap p { margin: 48px 0 0; color: var(--muted); font-size: 12px; }
-.claim-result { border-top: 1px solid var(--line); padding-top: 16px; }
-.claim-result h3 { margin: 0; font-size: 20px; }
-.claim-result p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+.claim-score { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 24px; font-weight: 800; }
+.claim-result-headline, .claim-result h3 { margin: 0; font-size: 20px; }
+.claim-gauge-wrap p, .claim-result p { margin: 0; color: var(--muted); font-size: 14px; }
 .simulation-note { margin-top: 16px !important; color: var(--muted); font-size: 12px !important; }
-.pickup-pin { margin: 24px 0; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.pickup-pin { width: 100%; margin: 8px 0; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: center; }
 .pickup-pin span { display: block; color: var(--muted); font-size: 13px; }
 .pickup-pin strong { display: block; margin: 8px 0; color: var(--green-dark); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 40px; letter-spacing: .12em; line-height: 1; }
 .link-button { min-height: 44px; border: 0; padding: 0; background: transparent; color: var(--green); font-size: 13px; font-weight: 750; text-decoration: underline; text-underline-offset: 4px; }
-.pickup-success { display: grid; justify-items: start; gap: 16px; }
+.pickup-success { display: grid; justify-items: center; gap: 16px; text-align: center; }
 
-.toast-zone { position: fixed; z-index: 70; right: 16px; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 12px); display: grid; gap: 8px; width: min(360px, calc(100vw - 32px)); }
+.toast-zone { position: fixed; z-index: 50; right: 16px; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 12px); display: grid; gap: 8px; width: min(360px, calc(100vw - 32px)); }
 .toast { border-radius: 12px; padding: 12px 16px; background: var(--ink); color: var(--white); box-shadow: var(--shadow); font-size: 13px; }
 
 .mobile-bottom-nav { display: none; }
@@ -327,17 +334,22 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 @media (max-width: 670px) {
   :root { --nav-height: 72px; }
   .site-header { position: sticky; }
-  .header-inner { min-height: 64px; padding: 0 16px; }
-  .brand { font-size: 22px; }
+  .header-inner { min-height: 64px; gap: 8px; padding: 0 16px; }
+  .brand { flex: none; font-size: 22px; }
   .brand-icon { width: 32px; height: 32px; }
-  .nim-chip, #logoutBtn { display: none !important; }
+  .header-tools { flex: none; gap: 0; }
+  .nim-chip, .demo-tag { display: none !important; }
+  #logoutBtn:not([hidden]) { display: inline-flex !important; width: auto; min-width: 44px; padding: 0 8px; }
+  .logout-label { display: inline; }
+  #resetDemoBtn { padding: 0 8px; white-space: nowrap; }
   .auth-layout { min-height: calc(100svh - 64px); gap: 24px; padding: 32px 16px 48px; }
   .auth-intro h1 { font-size: 40px; }
   .auth-intro > p:last-child { margin-top: 16px; font-size: 14px; }
   .auth-card { padding: 24px 16px; }
   .app-layout, .admin-layout { padding: 24px 16px calc(96px + env(safe-area-inset-bottom)); }
-  .app-titlebar, .admin-titlebar { padding: 0 0 16px; }
-  .app-titlebar h1, .admin-titlebar h1 { font-size: 30px; }
+  .app-titlebar { display: none; }
+  .admin-titlebar { padding: 0 0 16px; }
+  .admin-titlebar h1 { font-size: 30px; }
   .workspace-tabs { display: none; }
   .section-heading { margin-bottom: 16px; }
   .section-heading h2 { font-size: 24px; }
@@ -346,10 +358,13 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   .flow-steps li:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
   .panel { padding: 16px; }
   .fieldgrid { grid-template-columns: 1fr; }
-  .photo-actions { grid-template-columns: 1fr; }
-  .photo-actions .button { justify-content: start; padding-left: 16px; }
-  .ai-progress-steps { grid-template-columns: 1fr; }
-  .finder-submit { position: sticky; z-index: 5; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom)); margin: 0 -16px -16px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--white); }
+  .photo-preview { aspect-ratio: 4 / 3; max-height: 36svh; }
+  .photo-actions .button { justify-content: center; }
+  .ai-progress-steps { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .ai-progress-steps li { min-width: 0; gap: 4px; font-size: 12px; white-space: nowrap; }
+  .ai-progress p { overflow: hidden; margin-top: 12px; text-overflow: ellipsis; white-space: nowrap; }
+  .finder-submit { position: static; margin-top: 8px; }
+  .item-form.has-content .finder-submit { position: sticky; z-index: 5; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom)); margin: 0 -16px -16px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--white); }
   .recommendation { padding: 16px; }
   .recommendation-grid { grid-template-columns: 1fr; gap: 16px; }
   .recommendation .button { width: 100%; }
@@ -361,16 +376,22 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   .support-composer .button { width: 48px; min-width: 48px; padding: 0; }
   .support-composer .button span { display: none; }
   .admin-summary { gap: 12px; }
-  .admin-summary-card { min-height: 120px; padding: 16px; }
+  .admin-summary-card { min-height: 112px; padding: 16px; }
   .admin-queue-section { padding: 16px; }
+  .queue-item { grid-template-columns: 40px minmax(0, 1fr); }
+  .queue-item .button { grid-column: 2; width: 100%; }
   .admin-monitoring-head { display: block; padding: 16px; }
   .admin-updated { margin-top: 8px !important; }
   .admin-locker-row { grid-template-columns: 1fr; gap: 8px; padding: 16px; }
   .support-ticket small { max-width: 220px; }
+  .admin-thread { max-height: 34svh; }
+  .admin-reply-form { position: sticky; bottom: env(safe-area-inset-bottom); padding: 12px 0 env(safe-area-inset-bottom); background: var(--white); }
   .modal-layer { align-items: end; padding: 0; }
   .modal-panel { width: 100%; max-height: 90svh; border-radius: 16px 16px 0 0; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
   .sheet-handle { display: block; width: 40px; height: 4px; border-radius: 12px; margin: 0 auto 12px; background: #b8c5ba; }
   .modal-panel h2 { font-size: 24px; }
+  .claim-state { min-height: 432px; }
+  .claim-form { margin-top: 16px; }
   .mobile-bottom-nav:not([hidden]) { position: fixed; z-index: 25; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); background: var(--white); }
   .mobile-nav-item { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 4px; border: 0; border-radius: 12px; padding: 4px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 750; }
   .mobile-nav-item svg { width: 20px; height: 20px; }
@@ -392,17 +413,37 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     api: 160,
     finderStages: [1200, 1200, 800],
     finderField: 250,
+    finderScroll: 450,
     claimCheck: 900,
     claimGauge: 600,
-    claimResult: 200,
+    claimHold: 1200,
     toast: 4200,
   });
   const ADMIN_USERNAME = 'admin';
   const ADMIN_PASSWORD = 'admin123';
   const USER_KEY = 'balikin-visual-user-v2';
   const SUPPORT_KEY = 'balikin-support-v1';
+  const DEMO_LOGOUT_KEY = 'balikin-demo-logged-out-v1';
   const DEMO_MODE = new URLSearchParams(window.location.search).get('demo') === '1';
   const ITEMS_KEY = DEMO_MODE ? 'balikin-demo-items-v1' : 'balikin-items-v1';
+  const DEMO_ITEM = Object.freeze({
+    id: 'bottle',
+    name: 'Botol minum hijau',
+    category: 'Botol / Tumbler',
+    color: 'Hijau',
+    general: 'Botol minum hijau dengan tutup hijau',
+    detection: Object.freeze(['Botol minum', 'Hijau', 'Tutup hijau']),
+    location: 'FISIP · Gedung A',
+    date: 'Hari ini',
+    locker: 'A2',
+    node: 'FISIP',
+    status: 'stored',
+    secret: 'Stiker nama di bagian bawah',
+    finder: '20240001',
+    photo: 'src/assets/botol-hijau.jpg',
+    depositPin: '184205',
+    claimPin: '482916',
+  });
   const IMAGE_LIMITS = Object.freeze({
     uploadBytes: 12 * 1024 * 1024,
     storageBytes: 2 * 1024 * 1024,
@@ -424,9 +465,9 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   ];
 
   function seedItems() {
-    const bottle = { id: 'bottle', name: 'Botol minum hijau', category: 'Botol / Tumbler', color: 'Hijau', location: 'FISIP · Gedung A', date: 'Hari ini', locker: 'A2', node: 'FISIP', status: 'stored', secret: 'Stiker nama di bagian bawah', finder: '20240001', photo: 'src/assets/botol-hijau.jpg', depositPin: '184205', claimPin: '482916' };
-    const wallet = { id: 'wallet', name: 'Dompet hitam', category: 'Dompet', color: 'Hitam', location: 'FTI · Lobi utama', date: 'Kemarin', locker: 'B1', node: 'FTI', status: 'claimed', secret: 'Ada foto keluarga di bagian dalam', finder: '20240045', depositPin: '—', claimPin: 'Review admin' };
-    const card = { id: 'card', name: 'Kartu identitas', category: 'Kartu Identitas', color: 'Tertutup', location: 'Masjid Kampus', date: '2 hari lalu', locker: 'Pos', node: 'Masjid', status: 'review', secret: 'Data tidak pernah ditampilkan di katalog', finder: '20240120', depositPin: '—', claimPin: 'Verifikasi admin' };
+    const bottle = { ...DEMO_ITEM };
+    const wallet = { id: 'wallet', name: 'Dompet hitam', category: 'Dompet', color: 'Hitam', location: 'FTI · Lobi utama', date: 'Kemarin', locker: 'B1', node: 'FTI', status: 'claimed', secret: 'Ada foto keluarga di bagian dalam', finder: '20240045', depositPin: 'Belum ada', claimPin: 'Review admin' };
+    const card = { id: 'card', name: 'Kartu identitas', category: 'Kartu Identitas', color: 'Tertutup', location: 'Masjid Kampus', date: '2 hari lalu', locker: 'Pos', node: 'Masjid', status: 'review', secret: 'Data tidak pernah ditampilkan di katalog', finder: '20240120', depositPin: 'Belum ada', claimPin: 'Verifikasi admin' };
     return DEMO_MODE ? [wallet, card] : [bottle, wallet, card];
   }
 
@@ -481,6 +522,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     supportContext: null,
     modalTrigger: null,
     finderRun: 0,
+    finderScanning: false,
   };
 
   function getSupportThreads() {
@@ -648,7 +690,11 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   }
 
   function setFinderStep(step) {
-    document.querySelectorAll('.flow-steps li').forEach((element, index) => element.classList.toggle('active', index === step));
+    document.querySelectorAll('.flow-steps li').forEach((element, index) => {
+      element.classList.toggle('active', index === step);
+      element.classList.toggle('complete', index < step);
+      element.querySelector('b').textContent = index < step ? '✓' : String(index + 1);
+    });
   }
 
   function updateVisualViewport() {
@@ -658,9 +704,45 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   }
 
   // Finder rendering and flow
+  function detectionMarkup() {
+    return DEMO_ITEM.detection.map((label) => `<span>${safe(label)}</span>`).join('');
+  }
+
+  function scanOverlay(scanning = false) {
+    return `<div class="scanner-overlay${scanning ? ' is-scanning' : ''}" aria-hidden="true"><span class="scan-sweep"><span class="scan-line"></span></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list">${detectionMarkup()}</div></div>`;
+  }
+
+  function setFoundPhotoControls(selected) {
+    $('photoActions').classList.toggle('has-photo', selected);
+    $('foundChangeBtn').hidden = !selected;
+  }
+
+  function setFinderFormHasContent() {
+    $('depositForm').classList.add('has-content');
+  }
+
+  async function scrollFinderFieldsIntoView() {
+    if (window.innerWidth > 670) return;
+    const first = $('itemName').getBoundingClientRect();
+    const last = $('itemGeneral').getBoundingClientRect();
+    const headerBottom = document.querySelector('.site-header').getBoundingClientRect().bottom;
+    const nav = $('mobileNav');
+    const navTop = !nav.hidden ? nav.getBoundingClientRect().top : window.innerHeight;
+    const submit = document.querySelector('.item-form.has-content .finder-submit');
+    const safeTop = headerBottom + 16;
+    const safeBottom = navTop - (submit ? submit.getBoundingClientRect().height : 0) - 36;
+    const range = last.bottom - first.top;
+    const targetTop = Math.max(safeTop, safeBottom - range);
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    window.scrollBy({ top: first.top - targetTop, behavior });
+    await wait(DEMO_TIMING.finderScroll);
+  }
+
   function renderFoundPreview() {
     if (!state.foundPhoto) return;
-    $('foundPreview').innerHTML = `<img src="${safe(state.foundPhoto)}" alt="Foto barang yang akan dititipkan"><div class="scanner-overlay" aria-hidden="true"><span class="scan-line"></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list"><span>Botol minum</span><span>Hijau</span><span>Tutup hijau</span></div></div>`;
+    $('foundPreview').classList.remove('is-empty');
+    $('foundPreview').innerHTML = `<img src="${safe(state.foundPhoto)}" alt="Foto barang yang akan dititipkan">${scanOverlay(state.finderScanning)}`;
+    setFoundPhotoControls(true);
   }
 
   function updateFoundAiProgress(stage) {
@@ -686,9 +768,9 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   async function applyFoundAiSuggestions(run) {
     const suggestions = [
       ['itemName', 'itemNameTag', 'Botol minum'],
-      ['itemCategory', 'itemCategoryTag', 'Botol / Tumbler'],
-      ['itemColor', 'itemColorTag', 'Hijau'],
-      ['itemGeneral', 'itemGeneralTag', 'Botol minum hijau dengan tutup hitam'],
+      ['itemCategory', 'itemCategoryTag', DEMO_ITEM.category],
+      ['itemColor', 'itemColorTag', DEMO_ITEM.color],
+      ['itemGeneral', 'itemGeneralTag', DEMO_ITEM.general],
     ];
     for (const [inputId, tagId, value] of suggestions) {
       if (run !== state.finderRun) return;
@@ -713,8 +795,13 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     updateFoundAiProgress(2);
     await wait(DEMO_TIMING.finderStages[2]);
     if (run !== state.finderRun) return;
+    setFinderFormHasContent();
+    await scrollFinderFieldsIntoView();
+    if (run !== state.finderRun) return;
     await applyFoundAiSuggestions(run);
     if (run !== state.finderRun) return;
+    state.finderScanning = false;
+    renderFoundPreview();
     setFinderStep(1);
   }
 
@@ -771,6 +858,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     try {
       if (file.size > IMAGE_LIMITS.storageBytes) setTextStatus('depositStatus', 'Mengecilkan foto sebelum disimpan.');
       state.foundPhoto = await prepareImage(file);
+      state.finderScanning = true;
       setTextStatus('depositStatus');
       renderFoundPreview();
       startFoundAiSimulation().catch(() => setTextStatus('depositStatus', 'Pemeriksaan foto tidak dapat dijalankan.', 'error'));
@@ -891,17 +979,19 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     if (trigger && document.contains(trigger)) trigger.focus();
   }
 
-  function claimFormBody(item, attempt = 0, feedback = '') {
-    return `<p>Sebutkan ciri khusus yang tidak terlihat di katalog.</p><form id="claimForm" class="claim-form" novalidate><section class="claim-photo-field" aria-labelledby="claimPhotoLabel"><span id="claimPhotoLabel">Foto barang <small>opsional, hingga 12 MB</small></span><div id="claimPreview" class="claim-preview" aria-live="polite"></div><label class="sr-only" for="claimCamera">Ambil foto barang untuk klaim</label><button id="claimCameraBtn" class="button button-outline full" type="button">${icons('camera')}Ambil foto barang</button><input id="claimCamera" type="file" accept="image/*" capture="environment" hidden /><p id="claimPhotoError" class="field-error" aria-live="polite"></p></section><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang"></textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><div class="claim-tools"><button id="claimExampleBtn" class="text-button" type="button">Isi jawaban demo</button><span class="claim-attempt">Percobaan ${attempt} dari 3</span></div><p id="claimStatus" class="form-status ${feedback ? 'is-error' : ''}" aria-live="polite">${safe(feedback)}</p><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button></form><p class="simulation-note">Simulasi pencocokan</p>`;
+  function claimFormBody(item, attempt = 0, feedback = '', answer = '') {
+    return `<section class="claim-state claim-question"><p class="claim-prompt">Sebutkan ciri khusus yang tidak terlihat di katalog.</p><form id="claimForm" class="claim-form" novalidate><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang">${safe(answer)}</textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><div class="claim-tools"><button id="claimExampleBtn" class="text-button" type="button">Isi jawaban demo</button><span class="claim-attempt">Percobaan ${attempt} dari 3</span></div><p id="claimStatus" class="form-status ${feedback ? 'is-error' : ''}" aria-live="polite">${safe(feedback)}</p><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button><section class="claim-photo-field" aria-labelledby="claimPhotoLabel"><label class="sr-only" for="claimCamera">Tambah foto barang untuk klaim</label><button id="claimCameraBtn" class="button button-outline full claim-photo-toggle" type="button">${icons('camera')}<span id="claimPhotoLabel">Tambah foto (opsional)</span></button><input id="claimCamera" type="file" accept="image/*" capture="environment" hidden /><div id="claimPreview" class="claim-preview" aria-live="polite" hidden></div><p id="claimPhotoError" class="field-error" aria-live="polite"></p></section></form></section><p class="simulation-note">Simulasi pencocokan</p>`;
   }
 
   function renderClaimPreview() {
     const preview = $('claimPreview');
     if (!state.claimPhoto) {
-      preview.innerHTML = `${icons('camera')}<strong>Foto belum ditambahkan</strong><span>Foto membantu admin memeriksa barang.</span>`;
+      preview.hidden = true;
+      preview.innerHTML = '';
       return;
     }
-    preview.innerHTML = `<img src="${safe(state.claimPhoto)}" alt="Foto barang untuk klaim"><div class="scanner-overlay" aria-hidden="true"><span class="scan-line"></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list"><span>Botol minum</span><span>Hijau</span><span>Tutup hijau</span></div></div>`;
+    preview.hidden = false;
+    preview.innerHTML = `<img src="${safe(state.claimPhoto)}" alt="Foto barang untuk klaim">${scanOverlay()}`;
   }
 
   async function previewClaimPhoto(file) {
@@ -916,12 +1006,12 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     }
   }
 
-  function wireClaimForm(item, attempt = 0, feedback = '') {
-    modalShell(`Klaim ${item.name}`, claimFormBody(item, attempt, feedback));
+  function wireClaimForm(item, attempt = 0, feedback = '', answer = '', replace = true) {
+    if (replace) modalShell(`Klaim ${item.name}`, claimFormBody(item, attempt, feedback, answer));
     renderClaimPreview();
     $('claimCameraBtn').addEventListener('click', () => $('claimCamera').click());
     $('claimCamera').addEventListener('change', (event) => previewClaimPhoto(event.target.files?.[0]));
-    $('claimExampleBtn').addEventListener('click', () => { $('claimAnswer').value = 'Ada stiker nama di bagian bawah botol'; $('claimAnswer').focus(); });
+    $('claimExampleBtn').addEventListener('click', () => { $('claimAnswer').value = `Ada ${DEMO_ITEM.secret.toLocaleLowerCase('id')} botol`; $('claimAnswer').focus(); });
     $('claimForm').addEventListener('submit', (event) => {
       event.preventDefault();
       submitClaim(item).catch((error) => setTextStatus('claimStatus', error.message || 'Klaim tidak dapat diperiksa.', 'error'));
@@ -933,19 +1023,11 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     if (!item) return toast('Barang sudah tidak ada di katalog.');
     state.claimPhoto = '';
     openModal(`Klaim ${item.name}`, claimFormBody(item), trigger);
-    renderClaimPreview();
-    $('claimCameraBtn').addEventListener('click', () => $('claimCamera').click());
-    $('claimCamera').addEventListener('change', (event) => previewClaimPhoto(event.target.files?.[0]));
-    $('claimExampleBtn').addEventListener('click', () => { $('claimAnswer').value = 'Ada stiker nama di bagian bawah botol'; $('claimAnswer').focus(); });
-    $('claimForm').addEventListener('submit', (event) => {
-      event.preventDefault();
-      submitClaim(item).catch((error) => setTextStatus('claimStatus', error.message || 'Klaim tidak dapat diperiksa.', 'error'));
-    });
+    wireClaimForm(item, 0, '', '', false);
   }
 
   async function submitClaim(item) {
     const answer = $('claimAnswer').value.trim();
-    const attempt = state.claimAttempts[item.id] || 0;
     setFieldError('claimAnswerError');
     if (!answer) {
       setFieldError('claimAnswerError', 'Ciri khusus wajib diisi.');
@@ -954,17 +1036,16 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     const button = $('claimSubmit');
     setButtonLoading(button, true, 'Memeriksa klaim');
     const result = await api.submitClaim({ itemId: item.id, answer, photo: state.claimPhoto });
-    await runClaimVerification(result);
+    await runClaimVerification(item, result);
     if (result.match) {
-      await wait(DEMO_TIMING.claimResult);
       renderPickup(item);
       return;
     }
     if (result.retryAllowed) {
-      wireClaimForm(item, result.attempt, 'Belum cocok. Coba lagi.');
+      wireClaimForm(item, result.attempt, 'Belum cocok. Coba lagi.', answer);
       return;
     }
-    modalShell(`Klaim ${item.name}`, '<section class="claim-result"><h3>Klaim perlu review</h3><p>Jawaban belum cocok setelah tiga percobaan.</p></section><p class="simulation-note">Simulasi pencocokan</p>');
+    modalShell(`Klaim ${item.name}`, '<section class="claim-state claim-result"><h3>Belum cocok</h3><p>Jawaban belum cocok setelah tiga percobaan.</p></section><p class="simulation-note">Simulasi pencocokan</p>');
   }
 
   async function animateGauge(score) {
@@ -990,17 +1071,20 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     });
   }
 
-  async function runClaimVerification(result) {
-    modalShell('Verifikasi klaim', `<section class="claim-verification" aria-live="polite"><ol class="claim-checks"><li id="claimCheck0"><span>1</span>Membandingkan jawaban</li><li id="claimCheck1"><span>2</span>Mencocokkan detail rahasia</li><li id="claimCheck2"><span>3</span>Menghitung skor</li></ol><div class="claim-gauge-wrap"><svg class="claim-gauge" viewBox="0 0 120 120" aria-label="Skor kecocokan"><circle class="gauge-track" cx="60" cy="60" r="52"></circle><circle id="claimGaugeValue" class="gauge-value" cx="60" cy="60" r="52"></circle></svg><strong id="claimScore" class="claim-score">0%</strong><p>Skor simulasi</p></div></section>`);
+  async function runClaimVerification(item, result) {
+    modalShell(`Klaim ${item.name}`, `<section class="claim-state claim-verification" aria-live="polite"><ol class="claim-checks"><li id="claimCheck0"><span>1</span>Membandingkan jawaban</li><li id="claimCheck1"><span>2</span>Mencocokkan detail rahasia</li><li id="claimCheck2"><span>3</span>Menghitung skor</li></ol><div class="claim-gauge-wrap"><div class="claim-gauge-display"><svg class="claim-gauge" viewBox="0 0 120 120" aria-label="Skor kecocokan"><circle class="gauge-track" cx="60" cy="60" r="52"></circle><circle id="claimGaugeValue" class="gauge-value" cx="60" cy="60" r="52"></circle></svg><strong id="claimScore" class="claim-score">0%</strong></div><h3 id="claimResultHeadline" class="claim-result-headline" hidden></h3><p>Skor simulasi</p></div></section>`);
     for (let index = 0; index < 3; index += 1) {
       await wait(DEMO_TIMING.claimCheck);
       $(`claimCheck${index}`).classList.add('complete');
     }
     await animateGauge(result.score);
+    $('claimResultHeadline').textContent = result.match ? 'Cocok' : 'Belum cocok';
+    $('claimResultHeadline').hidden = false;
+    await wait(DEMO_TIMING.claimHold);
   }
 
   function renderPickup(item) {
-    modalShell('Klaim terverifikasi', `<section class="claim-result"><h3>Cocok. Klaim terverifikasi.</h3><p>Gunakan PIN ini di loker ${safe(item.locker)}.</p><div class="pickup-pin"><span>PIN pengambilan</span><strong>482916</strong><span>Berlaku 3 hari</span></div><p id="pickupStatus" class="form-status" aria-live="polite"></p><button id="pickupBtn" class="button button-main full" type="button">Simulasikan buka loker</button><button id="lockerProblemBtn" class="link-button" type="button">Loker bermasalah?</button></section><p class="simulation-note">Simulasi pencocokan</p>`);
+    modalShell(`Klaim ${item.name}`, `<section class="claim-state claim-result"><h3>Cocok</h3><p>Gunakan PIN ini di loker ${safe(item.locker)}.</p><div class="pickup-pin"><span>PIN pengambilan</span><strong>${safe(item.claimPin)}</strong><span>Berlaku 3 hari</span></div><p id="pickupStatus" class="form-status" aria-live="polite"></p><button id="pickupBtn" class="button button-main full" type="button">Simulasikan buka loker</button><button id="lockerProblemBtn" class="link-button" type="button">Loker bermasalah?</button></section><p class="simulation-note">Simulasi pencocokan</p>`);
     $('pickupBtn').addEventListener('click', () => confirmPickup(item).catch((error) => setTextStatus('pickupStatus', error.message || 'Barang tidak dapat diambil.', 'error')));
     $('lockerProblemBtn').addEventListener('click', () => {
       state.supportContext = { itemName: item.name, locker: item.locker };
@@ -1103,7 +1187,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     const summary = [
       ['Loker tersedia', 10, 'available'], ['Klaim perlu review', 2, 'waiting'], ['Barang > 30 hari', 1, 'alert'], ['Titik offline', 1, 'alert'],
     ];
-    $('adminSummary').innerHTML = summary.map(([label, count, tone]) => `<article class="admin-summary-card ${tone}"><span>${label}</span><strong>${count}</strong><small>butuh keputusan operasional</small></article>`).join('');
+    $('adminSummary').innerHTML = summary.map(([label, count, tone]) => `<article class="admin-summary-card ${tone}"><span><i class="summary-dot ${tone}" aria-hidden="true"></i>${label}</span><strong>${count}</strong></article>`).join('');
     const queue = [
       ['alert', 'Kartu Identitas dari Masjid', 'Hubungi pemilik bila NIM terbaca; jangan tampilkan data di katalog.', 'Buka prosedur', 'shield'],
       ['waiting', 'Klaim Dompet hitam', 'Bukti kepemilikan perlu dicocokkan sebelum PIN pengambilan diterbitkan.', 'Tinjau klaim', 'search'],
@@ -1122,7 +1206,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     ];
     const labels = { available: 'KOSONG', held: 'DIPESAN', stored: 'TERSIMPAN', claimed: 'SIAP DIAMBIL', offline: 'OFFLINE' };
     $('adminLockerList').innerHTML = lockers.map(([locker, node, status, item]) => `<article class="admin-locker-row ${status}"><div class="admin-locker-code"><strong>${safe(locker)}</strong><span class="admin-status ${status}">${labels[status]}</span></div>${item ? `<div class="admin-locker-detail"><strong>${safe(item.name)}</strong><span>${safe(node)} · ${safe(item.category)} · ${safe(item.color)}</span><span>Penemu: ${safe(item.finder)} · ${safe(item.location)}</span><span>Ciri khusus: ${safe(item.secret)}</span><span>PIN penitipan ${safe(item.depositPin)} · PIN ambil ${safe(item.claimPin)}</span></div>` : `<p class="admin-empty">${status === 'offline' ? 'Titik sedang offline; status pintu perlu sinkronisasi.' : 'Tidak ada barang aktif di loker ini.'}</p>`}</article>`).join('');
-    $('adminUpdated').textContent = `Visual data · ${timeLabel(new Date().toISOString())}`;
+    $('adminUpdated').textContent = `Diperbarui ${timeLabel(new Date().toISOString())}`;
     renderAdminSupport().catch(() => { $('adminSupportContent').textContent = 'Pesan tidak dapat dimuat.'; });
   }
 
@@ -1130,6 +1214,8 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     const target = $('adminSupportContent');
     target.textContent = 'Memuat pesan...';
     const threads = await api.listSupportThreads();
+    const unread = threads.filter((entry) => entry.messages.some((message) => message.sender === 'student' && !message.read)).length;
+    $('adminUnreadCount').textContent = unread ? `${unread} belum dibaca` : 'Tidak ada pesan baru';
     const thread = threads.find((entry) => entry.id === threadId);
     if (!thread) {
       target.innerHTML = threads.length ? `<div class="support-ticket-list">${threads.map((entry) => {
@@ -1153,6 +1239,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   async function openAdminThread(threadId) {
     await api.markSupportRead(threadId);
     await renderAdminSupport(threadId);
+    $('adminSupportContent').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   async function replyToSupportThread(threadId) {
@@ -1199,6 +1286,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   }
 
   function logout() {
+    if (DEMO_MODE) storage.setItem(DEMO_LOGOUT_KEY, '1');
     state.user = null;
     storage.removeItem(USER_KEY);
     closeModal();
@@ -1215,6 +1303,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 
   function resetDemo() {
     storage.removeItem(USER_KEY);
+    storage.removeItem(DEMO_LOGOUT_KEY);
     storage.removeItem(SUPPORT_KEY);
     persistentStorage.removeItem(ITEMS_KEY);
     window.location.reload();
@@ -1264,9 +1353,16 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
     $('foundCameraBtn').addEventListener('click', () => $('foundCamera').click());
     $('foundGalleryBtn').addEventListener('click', () => $('foundGallery').click());
     $('foundDemoBtn').addEventListener('click', () => useDemoPhoto());
+    $('foundChangeBtn').addEventListener('click', () => setFoundPhotoControls(false));
     $('foundCamera').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
     $('foundGallery').addEventListener('change', (event) => previewFoundPhoto(event.target.files?.[0]));
     $('secretExampleBtn').addEventListener('click', () => { $('itemSecret').value = 'Stiker nama di bagian bawah'; setFieldError('itemSecretError'); $('itemSecret').focus(); });
+    $('depositForm').addEventListener('input', (event) => {
+      if (event.target.value?.trim()) setFinderFormHasContent();
+    });
+    $('depositForm').addEventListener('change', (event) => {
+      if (event.target.value?.trim()) setFinderFormHasContent();
+    });
     $('depositForm').addEventListener('submit', (event) => {
       event.preventDefault();
       const payload = validateFoundForm();
@@ -1317,7 +1413,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
       $('demoTag').hidden = false;
       $('resetDemoBtn').hidden = false;
       $('resetDemoBtn').addEventListener('click', resetDemo);
-      setUser({ nim: '20240001' });
+      if (!storage.getItem(DEMO_LOGOUT_KEY)) setUser({ nim: '20240001' });
       return;
     }
     let saved = null;
@@ -1357,7 +1453,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
         <span id="demoTag" class="demo-tag" hidden>Mode demo</span>
         <button id="resetDemoBtn" class="text-button" type="button" hidden>Reset demo</button>
         <span class="nim-chip" id="nimDisplay" hidden></span>
-        <button type="button" id="logoutBtn" class="icon-button" aria-label="Keluar" hidden><svg><use href="#i-log-out"></use></svg></button>
+        <button type="button" id="logoutBtn" class="icon-button" aria-label="Keluar" hidden><svg><use href="#i-log-out"></use></svg><span class="logout-label">Keluar</span></button>
       </div>
     </div>
   </header>
@@ -1400,8 +1496,8 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
       <div class="finder-layout">
         <section class="panel photo-panel" aria-labelledby="photoTitle">
           <div class="panel-heading"><div><h3 id="photoTitle">Foto barang</h3><p>Foto hingga 12 MB dikecilkan sebelum disimpan.</p></div></div>
-          <div id="foundPreview" class="photo-preview" aria-live="polite">
-            <svg><use href="#i-camera"></use></svg><strong>Belum ada foto</strong><span>Ambil foto atau pilih dari galeri.</span>
+          <div id="foundPreview" class="photo-preview is-empty" aria-live="polite">
+            <svg><use href="#i-camera"></use></svg><span>Ambil foto atau pilih dari galeri.</span>
           </div>
           <section id="foundAiProgress" class="ai-progress" aria-live="polite" aria-busy="false" hidden>
             <div class="ai-progress-head"><span class="ai-mark" aria-hidden="true">AI</span><div><span class="ai-label">BANTUAN AI · SIMULASI</span><strong id="foundAiTitle">Memeriksa foto</strong></div><strong id="foundAiPercent" class="ai-percent">0%</strong></div>
@@ -1409,11 +1505,12 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
             <ol class="ai-progress-steps" aria-label="Tahap pemeriksaan foto"><li data-ai-stage="0"><span>1</span>Validasi foto</li><li data-ai-stage="1"><span>2</span>Baca ciri umum</li><li data-ai-stage="2"><span>3</span>Siapkan isian</li></ol>
             <p id="foundAiHint">Periksa setiap isian sebelum mengirim.</p>
           </section>
-          <div class="photo-actions">
-            <button id="foundCameraBtn" class="button button-outline" type="button"><svg><use href="#i-camera"></use></svg>Ambil foto</button>
-            <button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Pilih galeri</button>
-            <button id="foundDemoBtn" class="button button-outline" type="button">Pakai foto demo</button>
+          <div id="photoActions" class="photo-actions">
+            <button id="foundCameraBtn" class="button button-main" type="button"><svg><use href="#i-camera"></use></svg>Ambil foto</button>
+            <button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Galeri</button>
+            <button id="foundDemoBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Foto demo</button>
           </div>
+          <button id="foundChangeBtn" class="text-button photo-change" type="button" hidden><svg><use href="#i-image"></use></svg>Ganti foto</button>
           <input id="foundCamera" type="file" accept="image/*" capture="environment" hidden />
           <input id="foundGallery" type="file" accept="image/*" hidden />
           <img id="demoPhotoSource" src="src/assets/botol-hijau.jpg" alt="" hidden />
@@ -1480,12 +1577,12 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
   </nav>
 
   <main id="adminView" class="admin-layout" hidden>
-    <div class="admin-titlebar"><div><span class="section-kicker">HIMATIF / OPERASIONAL</span><h1>Jangan pantau semuanya. Kerjakan antreannya.</h1><p>Dashboard visual untuk deposit, klaim, kapasitas, barang lama, dan gangguan titik loker.</p></div><span class="service-chip"><svg><use href="#i-shield"></use></svg> Operator Himatif</span></div>
+    <div class="admin-titlebar"><div><h1>Admin Himatif</h1><p>Pantau loker, klaim, dan pesan mahasiswa pada sesi ini.</p></div></div>
     <div id="adminSummary" class="admin-summary" aria-label="Ringkasan status loker"></div>
-    <section class="admin-queue-section"><div class="section-row"><div><span class="eyebrow">ANTREAN TINDAKAN</span><h2>Yang perlu ditangani sekarang</h2></div><span class="queue-count">4 prioritas</span></div><div id="adminQueue" class="admin-queue"></div></section>
-    <section class="admin-columns"><section class="panel"><span class="eyebrow">JARINGAN TITIK</span><h2>FISIP, FTI, Masjid</h2><div id="adminLocations" class="admin-locations"></div></section><section class="panel"><span class="eyebrow">AUDIT TRAIL</span><h2>Jejak tindakan</h2><div id="auditLog" class="audit-log"></div></section></section>
-    <section class="panel admin-monitoring" aria-labelledby="adminLockerTitle"><div class="admin-monitoring-head"><div><span class="eyebrow">SEMUA LOKER</span><h2 id="adminLockerTitle">Status dan detail barang aktif</h2><p>Visualisasi data yang kelak harus tersimpan di server dan tak dapat diubah.</p></div><p id="adminUpdated" class="admin-updated" aria-live="polite"></p></div><div id="adminLockerList" class="admin-locker-list" aria-live="polite"></div></section>
-    <section class="panel admin-support" aria-labelledby="adminSupportTitle"><div class="panel-heading"><div><h2 id="adminSupportTitle">Pesan masuk</h2><p>Pesan hanya tersimpan di sesi browser ini.</p></div></div><div id="adminSupportContent" class="admin-support-content" aria-live="polite"></div></section>
+    <section class="panel admin-support" aria-labelledby="adminSupportTitle"><div class="panel-heading"><div><h2 id="adminSupportTitle">Pesan masuk</h2><p id="adminUnreadCount" class="admin-unread-count" aria-live="polite">Memuat pesan</p></div></div><div id="adminSupportContent" class="admin-support-content" aria-live="polite"></div></section>
+    <section class="admin-queue-section"><div class="section-row"><h2>Antrean tindakan</h2><span class="queue-count">4 prioritas</span></div><div id="adminQueue" class="admin-queue"></div></section>
+    <section class="admin-columns"><section class="panel"><h2>FISIP, FTI, Masjid</h2><div id="adminLocations" class="admin-locations"></div></section><section class="panel"><h2>Jejak tindakan</h2><div id="auditLog" class="audit-log"></div></section></section>
+    <section class="panel admin-monitoring" aria-labelledby="adminLockerTitle"><div class="admin-monitoring-head"><div><h2 id="adminLockerTitle">Status dan detail barang aktif</h2></div><p id="adminUpdated" class="admin-updated" aria-live="polite"></p></div><div id="adminLockerList" class="admin-locker-list" aria-live="polite"></div></section>
   </main>
 
   <div id="modalLayer" class="modal-layer" hidden><div class="modal-backdrop" data-close="true"></div><section id="modalContent" class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalHeading" tabindex="-1"></section></div>

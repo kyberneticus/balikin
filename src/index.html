@@ -36,7 +36,7 @@
         <span id="demoTag" class="demo-tag" hidden>Mode demo</span>
         <button id="resetDemoBtn" class="text-button" type="button" hidden>Reset demo</button>
         <span class="nim-chip" id="nimDisplay" hidden></span>
-        <button type="button" id="logoutBtn" class="icon-button" aria-label="Keluar" hidden><svg><use href="#i-log-out"></use></svg></button>
+        <button type="button" id="logoutBtn" class="icon-button" aria-label="Keluar" hidden><svg><use href="#i-log-out"></use></svg><span class="logout-label">Keluar</span></button>
       </div>
     </div>
   </header>
@@ -79,8 +79,8 @@
       <div class="finder-layout">
         <section class="panel photo-panel" aria-labelledby="photoTitle">
           <div class="panel-heading"><div><h3 id="photoTitle">Foto barang</h3><p>Foto hingga 12 MB dikecilkan sebelum disimpan.</p></div></div>
-          <div id="foundPreview" class="photo-preview" aria-live="polite">
-            <svg><use href="#i-camera"></use></svg><strong>Belum ada foto</strong><span>Ambil foto atau pilih dari galeri.</span>
+          <div id="foundPreview" class="photo-preview is-empty" aria-live="polite">
+            <svg><use href="#i-camera"></use></svg><span>Ambil foto atau pilih dari galeri.</span>
           </div>
           <section id="foundAiProgress" class="ai-progress" aria-live="polite" aria-busy="false" hidden>
             <div class="ai-progress-head"><span class="ai-mark" aria-hidden="true">AI</span><div><span class="ai-label">BANTUAN AI · SIMULASI</span><strong id="foundAiTitle">Memeriksa foto</strong></div><strong id="foundAiPercent" class="ai-percent">0%</strong></div>
@@ -88,11 +88,12 @@
             <ol class="ai-progress-steps" aria-label="Tahap pemeriksaan foto"><li data-ai-stage="0"><span>1</span>Validasi foto</li><li data-ai-stage="1"><span>2</span>Baca ciri umum</li><li data-ai-stage="2"><span>3</span>Siapkan isian</li></ol>
             <p id="foundAiHint">Periksa setiap isian sebelum mengirim.</p>
           </section>
-          <div class="photo-actions">
-            <button id="foundCameraBtn" class="button button-outline" type="button"><svg><use href="#i-camera"></use></svg>Ambil foto</button>
-            <button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Pilih galeri</button>
-            <button id="foundDemoBtn" class="button button-outline" type="button">Pakai foto demo</button>
+          <div id="photoActions" class="photo-actions">
+            <button id="foundCameraBtn" class="button button-main" type="button"><svg><use href="#i-camera"></use></svg>Ambil foto</button>
+            <button id="foundGalleryBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Galeri</button>
+            <button id="foundDemoBtn" class="button button-outline" type="button"><svg><use href="#i-image"></use></svg>Foto demo</button>
           </div>
+          <button id="foundChangeBtn" class="text-button photo-change" type="button" hidden><svg><use href="#i-image"></use></svg>Ganti foto</button>
           <input id="foundCamera" type="file" accept="image/*" capture="environment" hidden />
           <input id="foundGallery" type="file" accept="image/*" hidden />
           <img id="demoPhotoSource" src="assets/botol-hijau.jpg" alt="" hidden />
@@ -159,12 +160,12 @@
   </nav>
 
   <main id="adminView" class="admin-layout" hidden>
-    <div class="admin-titlebar"><div><span class="section-kicker">HIMATIF / OPERASIONAL</span><h1>Jangan pantau semuanya. Kerjakan antreannya.</h1><p>Dashboard visual untuk deposit, klaim, kapasitas, barang lama, dan gangguan titik loker.</p></div><span class="service-chip"><svg><use href="#i-shield"></use></svg> Operator Himatif</span></div>
+    <div class="admin-titlebar"><div><h1>Admin Himatif</h1><p>Pantau loker, klaim, dan pesan mahasiswa pada sesi ini.</p></div></div>
     <div id="adminSummary" class="admin-summary" aria-label="Ringkasan status loker"></div>
-    <section class="admin-queue-section"><div class="section-row"><div><span class="eyebrow">ANTREAN TINDAKAN</span><h2>Yang perlu ditangani sekarang</h2></div><span class="queue-count">4 prioritas</span></div><div id="adminQueue" class="admin-queue"></div></section>
-    <section class="admin-columns"><section class="panel"><span class="eyebrow">JARINGAN TITIK</span><h2>FISIP, FTI, Masjid</h2><div id="adminLocations" class="admin-locations"></div></section><section class="panel"><span class="eyebrow">AUDIT TRAIL</span><h2>Jejak tindakan</h2><div id="auditLog" class="audit-log"></div></section></section>
-    <section class="panel admin-monitoring" aria-labelledby="adminLockerTitle"><div class="admin-monitoring-head"><div><span class="eyebrow">SEMUA LOKER</span><h2 id="adminLockerTitle">Status dan detail barang aktif</h2><p>Visualisasi data yang kelak harus tersimpan di server dan tak dapat diubah.</p></div><p id="adminUpdated" class="admin-updated" aria-live="polite"></p></div><div id="adminLockerList" class="admin-locker-list" aria-live="polite"></div></section>
-    <section class="panel admin-support" aria-labelledby="adminSupportTitle"><div class="panel-heading"><div><h2 id="adminSupportTitle">Pesan masuk</h2><p>Pesan hanya tersimpan di sesi browser ini.</p></div></div><div id="adminSupportContent" class="admin-support-content" aria-live="polite"></div></section>
+    <section class="panel admin-support" aria-labelledby="adminSupportTitle"><div class="panel-heading"><div><h2 id="adminSupportTitle">Pesan masuk</h2><p id="adminUnreadCount" class="admin-unread-count" aria-live="polite">Memuat pesan</p></div></div><div id="adminSupportContent" class="admin-support-content" aria-live="polite"></div></section>
+    <section class="admin-queue-section"><div class="section-row"><h2>Antrean tindakan</h2><span class="queue-count">4 prioritas</span></div><div id="adminQueue" class="admin-queue"></div></section>
+    <section class="admin-columns"><section class="panel"><h2>FISIP, FTI, Masjid</h2><div id="adminLocations" class="admin-locations"></div></section><section class="panel"><h2>Jejak tindakan</h2><div id="auditLog" class="audit-log"></div></section></section>
+    <section class="panel admin-monitoring" aria-labelledby="adminLockerTitle"><div class="admin-monitoring-head"><div><h2 id="adminLockerTitle">Status dan detail barang aktif</h2></div><p id="adminUpdated" class="admin-updated" aria-live="polite"></p></div><div id="adminLockerList" class="admin-locker-list" aria-live="polite"></div></section>
   </main>
 
   <div id="modalLayer" class="modal-layer" hidden><div class="modal-backdrop" data-close="true"></div><section id="modalContent" class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalHeading" tabindex="-1"></section></div>
