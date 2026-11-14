@@ -1057,10 +1057,14 @@
     storage.setItem(USER_KEY, JSON.stringify(data));
     const admin = data.role === 'admin';
     $('authView').hidden = true;
+    $('profileView').hidden = true;
     $('appView').hidden = admin;
     $('adminView').hidden = !admin;
     $('nimDisplay').hidden = false;
     $('nimDisplay').textContent = admin ? 'Admin Himatif' : `NIM ${data.nim}`;
+    $('profileBtn').hidden = false;
+    $('profileName').textContent = admin ? 'Admin Himatif' : `NIM ${data.nim}`;
+    $('profileMeta').textContent = admin ? 'Akses dashboard admin' : 'Mahasiswa · Layanan Balikin';
     $('logoutBtn').hidden = false;
     $('mobileNav').hidden = admin;
     if (admin) renderAdminDashboard();
@@ -1076,11 +1080,20 @@
     $('authView').hidden = false;
     $('appView').hidden = true;
     $('adminView').hidden = true;
+    $('profileView').hidden = true;
     $('nimDisplay').hidden = true;
+    $('profileBtn').hidden = true;
     $('logoutBtn').hidden = true;
     $('mobileNav').hidden = true;
     $('loginPassword').value = '';
     window.scrollTo(0, 0);
+  }
+
+  function goHome() {
+    $('profileView').hidden = true;
+    if (state.user?.role === 'admin') { $('adminView').hidden = false; renderAdminDashboard(); }
+    else if (state.user) { $('appView').hidden = false; $('mobileNav').hidden = false; showTab('temukan'); }
+    else window.scrollTo(0, 0);
   }
 
   function resetDemo() {
@@ -1169,11 +1182,16 @@
     $('supportForm').addEventListener('submit', (event) => { event.preventDefault(); sendSupportMessage(); });
 
     $('logoutBtn').addEventListener('click', logout);
+    $('profileBtn').addEventListener('click', () => {
+      $('appView').hidden = true;
+      $('adminView').hidden = true;
+      $('mobileNav').hidden = true;
+      $('profileView').hidden = false;
+      window.scrollTo(0, 0);
+    });
     $('brandLink').addEventListener('click', (event) => {
       event.preventDefault();
-      if (state.user?.role === 'admin') renderAdminDashboard();
-      else if (state.user) showTab('temukan');
-      else window.scrollTo(0, 0);
+      goHome();
     });
     $('modalLayer').addEventListener('click', (event) => { if (event.target.dataset.close === 'true') closeModal(); });
     document.addEventListener('keydown', (event) => {

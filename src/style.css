@@ -44,7 +44,7 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .demo-tag { border-color: #b9d7c0; background: var(--green-pale); color: var(--green-dark); }
 .icon-button, .text-button { min-height: 44px; border: 0; border-radius: 12px; background: transparent; color: var(--green); font-size: 13px; font-weight: 700; }
 .icon-button { display: inline-flex; width: 44px; align-items: center; justify-content: center; gap: 8px; }
-.logout-label { display: none; }
+.logout-label, .profile-label { display: none; }
 .icon-button:hover, .text-button:hover { background: var(--green-pale); }
 
 .auth-layout { display: grid; grid-template-columns: 1.15fr .85fr; align-items: center; gap: 64px; max-width: 1120px; min-height: calc(100svh - 72px); padding: 64px 24px; margin: 0 auto; }
@@ -60,6 +60,11 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 #loginForm { display: flex; flex-direction: column; gap: 14px; }
 #loginForm .field-error, #loginForm .form-status { margin: 0; }
 .auth-note { margin: 16px 0 0 !important; font-size: 12px !important; }
+.profile-card { display: flex; max-width: 480px; align-items: center; gap: 16px; padding: 24px; }
+.profile-avatar { display: grid; width: 56px; height: 56px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--green-pale); color: var(--green-dark); }
+.profile-avatar svg { width: 26px; height: 26px; }
+.profile-card strong { font-size: 18px; }
+.profile-card p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
 .auth-note code { padding: 2px 4px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); }
 
 .field { display: flex; flex-direction: column; gap: 8px; margin: 0; }
