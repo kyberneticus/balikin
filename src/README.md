@@ -17,7 +17,7 @@ Foto botol contoh ada di `assets/botol-hijau.jpg` untuk katalog awal. Build meng
 
 ## Demo
 
-Tambahkan `?demo=1` pada URL untuk masuk sebagai NIM `20240001`, membuka Temuin, dan menampilkan Reset demo. Alurnya: ambil foto atau pilih dari galeri, titipkan botol, cari dengan detail warna yang jelas, lalu klaim botol dengan foto opsional dan jawaban demo sebelum mengambil barang.
+Tambahkan `?demo=1` pada URL untuk masuk sebagai NIM `20240001`, membuka Temuin, dan menampilkan Reset demo. Alurnya: ambil foto atau pilih dari galeri, titipkan botol, cari dengan detail warna yang jelas, lalu klaim botol dengan foto opsional dan jawaban ciri khusus sebelum mengambil barang.
 
 Semua bantuan pengisian, pencocokan, PIN, dan loker disimulasikan di `script.js`. Objek `api` adalah seam untuk mengganti simulasi dengan backend di masa depan. Data katalog dan foto disimpan melalui `localStorage`; foto kamera hingga 12 MB dikecilkan menjadi maksimal 2 MB dan key demo terpisah dihapus oleh Reset demo.
 

@@ -12,8 +12,8 @@ Buka http://localhost:8080/?demo=1.
 - Sistem masuk sebagai NIM 20240001 dan membuka Temuin.
 - Ambil foto atau pilih dari galeri untuk memulai alur botol hijau.
 - Isi ciri khusus, dapatkan PIN penitipan, lalu pilih Buka loker.
-- Cari botol di katalog, lihat warna barang, lalu ambil foto barang bila perlu sebelum memakai Isi jawaban demo.
-- Simulasikan buka loker untuk menghapus barang dari katalog.
+- Buka Cariin dan temukan botol di katalog, lihat warna barang, lalu ambil foto barang bila perlu sebelum menjawab ciri khusus.
+- Pilih Buka loker untuk menghapus barang dari katalog.
 - Gunakan Bantuan untuk mengirim pesan ke admin.
 
 Admin demo: username admin, password admin123.

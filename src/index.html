@@ -68,7 +68,7 @@
 
     <nav class="workspace-tabs" aria-label="Layanan Balikin">
       <button class="tab-button active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg>Temuin</button>
-      <button class="tab-button" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg>Cari</button>
+      <button class="tab-button" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg>Cariin</button>
       <button class="tab-button" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg>Loker</button>
       <button class="tab-button" data-tab="bantuan" type="button"><svg><use href="#i-message"></use></svg>Bantuan</button>
     </nav>
@@ -122,7 +122,7 @@
         <label class="sr-only" for="searchLocation">Filter lokasi</label><select id="searchLocation"><option value="">Semua lokasi</option><option>FISIP</option><option>FTI</option><option>Masjid</option></select>
       </div>
       <p id="resultCount" class="result-count" aria-live="polite"></p>
-      <div id="itemsList" class="item-grid" aria-live="polite"></div>
+      <div id="itemsList" class="item-grid" aria-live="polite" tabindex="-1"></div>
     </section>
 
     <section class="content-section" id="tab-lokasi" hidden>
@@ -151,7 +151,7 @@
 
   <nav id="mobileNav" class="mobile-bottom-nav" aria-label="Menu layanan" hidden>
     <button class="mobile-nav-item active" data-tab="temukan" type="button"><svg><use href="#i-camera"></use></svg><span>Temuin</span></button>
-    <button class="mobile-nav-item" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg><span>Cari</span></button>
+    <button class="mobile-nav-item" data-tab="cari" type="button"><svg><use href="#i-search"></use></svg><span>Cariin</span></button>
     <button class="mobile-nav-item" data-tab="lokasi" type="button"><svg><use href="#i-pin"></use></svg><span>Loker</span></button>
     <button class="mobile-nav-item" data-tab="bantuan" type="button"><svg><use href="#i-message"></use></svg><span>Bantuan</span></button>
   </nav>

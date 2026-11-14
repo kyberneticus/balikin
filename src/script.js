@@ -140,6 +140,20 @@
   }
 
   // Simulated backend seam
+  const CLAIM_STOPWORDS = new Set(['yang', 'di', 'ke', 'dan', 'atau', 'ada', 'ini', 'itu', 'dengan', 'pada', 'untuk', 'dari', 'bagian', 'saya', 'punya', 'adalah']);
+
+  function matchSecret(answer, secret) {
+    const words = (text) => String(text || '').toLocaleLowerCase('id').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((word) => word && !CLAIM_STOPWORDS.has(word));
+    const secretWords = [...new Set(words(secret))];
+    if (!secretWords.length) return { ratio: 0, score: 0, match: false };
+    const answerWords = new Set(words(answer));
+    const found = secretWords.filter((word) => answerWords.has(word)).length;
+    const ratio = found / secretWords.length;
+    const match = ratio >= 0.5;
+    const score = match ? Math.round(80 + ratio * 17) : Math.min(45, Math.round(ratio * 60));
+    return { ratio, score, match };
+  }
+
   const api = {
     async submitFound(payload) {
       await wait(DEMO_TIMING.api);
@@ -187,8 +201,8 @@
       }
       const attempt = (state.claimAttempts[itemId] || 0) + 1;
       state.claimAttempts[itemId] = attempt;
-      const match = /(stiker|nama)/i.test(answer);
-      return { itemId, attempt, score: match ? 94 : 38, match, retryAllowed: !match && attempt < 3 };
+      const { score, match } = matchSecret(answer, item.secret);
+      return { itemId, attempt, score, match, retryAllowed: !match && attempt < 3 };
     },
 
     async confirmPickup({ itemId }) {
@@ -301,12 +315,12 @@
   }
 
   // Finder rendering and flow
-  function detectionMarkup() {
-    return DEMO_ITEM.detection.map((label) => `<span>${safe(label)}</span>`).join('');
+  function detectionMarkup(chips) {
+    return (chips || DEMO_ITEM.detection).map((label) => `<span>${safe(label)}</span>`).join('');
   }
 
-  function scanOverlay(scanning = false) {
-    return `<div class="scanner-overlay${scanning ? ' is-scanning' : ''}" aria-hidden="true"><span class="scan-sweep"><span class="scan-line"></span></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list">${detectionMarkup()}</div></div>`;
+  function scanOverlay(scanning = false, chips = null) {
+    return `<div class="scanner-overlay${scanning ? ' is-scanning' : ''}" aria-hidden="true"><span class="scan-sweep"><span class="scan-line"></span></span><span class="scan-corner top-left"></span><span class="scan-corner top-right"></span><span class="scan-corner bottom-left"></span><span class="scan-corner bottom-right"></span><div class="detection-list">${detectionMarkup(chips)}</div></div>`;
   }
 
   function setFoundPhotoControls(selected) {
@@ -591,10 +605,11 @@
     $('openLockerBtn').addEventListener('click', () => openLockerSignal(title).catch((error) => setTextStatus('depositStatus', error.message || 'Loker tidak dapat dibuka.', 'error')));
   }
 
-  async function openLockerSignal(title) {
+  async function runLockerDoorSequence({ titleA, titleB, showCountdown, lineB, renderDone }) {
     const run = ++lockerRun;
     const steps = ['Perintah terkirim', 'Menunggu respons loker', 'Pintu terbuka'];
-    modalShell('Menghubungi loker', `<section class="locker-sheet is-busy">${lockerCountdownMarkup()}<div class="indeterminate" aria-hidden="true"><span></span></div><ol class="locker-steps">${steps.map((label, index) => `<li id="lockerStep${index}"><span></span>${safe(label)}</li>`).join('')}</ol></section>`);
+    state.modalPersistent = true;
+    modalShell(titleA, `<section class="locker-sheet is-busy">${showCountdown ? lockerCountdownMarkup() : ''}<div class="indeterminate" aria-hidden="true"><span></span></div><ol class="locker-steps">${steps.map((label, index) => `<li id="lockerStep${index}"><span></span>${safe(label)}</li>`).join('')}</ol></section>`);
     const closeA = $('modalClose');
     if (closeA) closeA.hidden = true;
     const stepWait = DEMO_TIMING.lockerSignal / (steps.length + 1);
@@ -606,33 +621,44 @@
     }
     await wait(stepWait);
     if (run !== lockerRun) return;
-    stopLockerCountdown();
-    modalShell('Loker terbuka', `<section class="locker-sheet"><p>Masukkan barang, lalu tutup pintu.</p><p class="locker-wait"><span class="spinner" aria-hidden="true"></span>Menunggu pintu tertutup</p></section>`);
+    if (showCountdown) stopLockerCountdown();
+    modalShell(titleB, `<section class="locker-sheet"><p>${safe(lineB)}</p><p class="locker-wait"><span class="spinner" aria-hidden="true"></span>Menunggu pintu tertutup</p></section>`);
     const closeB = $('modalClose');
     if (closeB) closeB.hidden = true;
     await wait(DEMO_TIMING.doorClose);
     if (run !== lockerRun) return;
-    let item = null;
-    try {
-      item = await api.submitFound(state.pendingFound);
-    } catch (error) {
-      setTextStatus('depositStatus', error.message || 'Barang tidak dapat disimpan.', 'error');
-      document.body.classList.remove('locker-open');
-      closeModal(true);
-      return;
-    }
-    if (run !== lockerRun) return;
-    state.pendingFound = null;
-    setFinderStep(3);
-    setTextStatus('depositStatus', 'Barang berhasil disimpan.', 'success');
-    modalShell('Barang tercatat', `<section class="locker-sheet"><p>${safe(item.name)} sudah masuk katalog.</p><button id="viewCatalogBtn" class="button button-main full" type="button">Lihat di katalog</button></section>`);
-    const closeC = $('modalClose');
-    if (closeC) closeC.hidden = true;
-    $('viewCatalogBtn').addEventListener('click', () => {
-      document.body.classList.remove('locker-open');
-      closeModal(true);
-      resetDepositForm();
-      showTab('cari');
+    await renderDone();
+  }
+
+  async function openLockerSignal(title) {
+    await runLockerDoorSequence({
+      titleA: 'Menghubungi loker',
+      titleB: 'Loker terbuka',
+      showCountdown: true,
+      lineB: 'Masukkan barang, lalu tutup pintu.',
+      renderDone: async () => {
+        let item = null;
+        try {
+          item = await api.submitFound(state.pendingFound);
+        } catch (error) {
+          setTextStatus('depositStatus', error.message || 'Barang tidak dapat disimpan.', 'error');
+          document.body.classList.remove('locker-open');
+          closeModal(true);
+          return;
+        }
+        state.pendingFound = null;
+        setFinderStep(3);
+        setTextStatus('depositStatus', 'Barang berhasil disimpan.', 'success');
+        modalShell('Barang tercatat', `<section class="locker-sheet"><p>${safe(item.name)} sudah masuk katalog.</p><button id="viewCatalogBtn" class="button button-main full" type="button">Lihat di katalog</button></section>`);
+        const closeC = $('modalClose');
+        if (closeC) closeC.hidden = true;
+        $('viewCatalogBtn').addEventListener('click', () => {
+          document.body.classList.remove('locker-open');
+          closeModal(true);
+          resetDepositForm();
+          showTab('cari');
+        });
+      },
     });
   }
 
@@ -660,6 +686,7 @@
   function openModal(title, body, trigger, options = {}) {
     state.modalTrigger = trigger || document.activeElement;
     state.modalPersistent = Boolean(options.persistent);
+    document.body.classList.add('sheet-open');
     $('modalLayer').hidden = false;
     document.body.style.overflow = 'hidden';
     modalShell(title, body);
@@ -672,17 +699,25 @@
     $('modalLayer').hidden = true;
     $('modalContent').innerHTML = '';
     document.body.style.overflow = '';
+    document.body.classList.remove('sheet-open');
     const trigger = state.modalTrigger;
     state.modalTrigger = null;
     state.modalPersistent = false;
     if (trigger && document.contains(trigger)) trigger.focus();
   }
 
-  function claimFormBody(item, attempt = 0, feedback = '', answer = '') {
-    return `<section class="claim-state claim-question"><p class="claim-prompt">Sebutkan ciri khusus yang tidak terlihat di katalog.</p><form id="claimForm" class="claim-form" novalidate><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang">${safe(answer)}</textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><div class="claim-tools"><button id="claimExampleBtn" class="text-button" type="button">Isi jawaban demo</button><span class="claim-attempt">Percobaan ${attempt} dari 3</span></div><p id="claimStatus" class="form-status ${feedback ? 'is-error' : ''}" aria-live="polite">${safe(feedback)}</p><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button><section class="claim-photo-field" aria-labelledby="claimPhotoLabel"><label class="sr-only" for="claimCamera">Tambah foto barang untuk klaim</label><button id="claimCameraBtn" class="button button-outline full claim-photo-toggle" type="button">${icons('camera')}<span id="claimPhotoLabel">Tambah foto (opsional)</span></button><input id="claimCamera" type="file" accept="image/*" capture="environment" hidden /><div id="claimPreview" class="claim-preview" aria-live="polite" hidden></div><p id="claimPhotoError" class="field-error" aria-live="polite"></p></section></form></section><p class="simulation-note">Simulasi pencocokan</p>`;
+  function setClaimPersistent(on) {
+    state.modalPersistent = on;
+    const close = $('modalClose');
+    if (close) close.hidden = on;
   }
 
-  function renderClaimPreview() {
+  function claimFormBody(item, attempt = 0, feedback = '', answer = '') {
+    const attemptLine = attempt === 0 ? 'Maksimal 3 percobaan' : `Percobaan ${attempt} dari 3`;
+    return `<section class="claim-state claim-question"><form id="claimForm" class="claim-form" novalidate><div class="claim-scroll"><p class="claim-prompt">Sebutkan ciri khusus yang tidak terlihat di katalog.</p><label class="field" for="claimAnswer"><span>Ciri khusus</span><textarea id="claimAnswer" data-autofocus rows="3" maxlength="500" placeholder="Tulis ciri khusus barang">${safe(answer)}</textarea></label><p id="claimAnswerError" class="field-error" aria-live="polite"></p><p id="claimStatus" class="form-status${feedback ? ' is-error' : ''}" aria-live="polite">${safe(feedback)}</p><p class="claim-attempt">${attemptLine}</p><section class="claim-photo-field" aria-labelledby="claimPhotoLabel"><button id="claimCameraBtn" class="button button-outline full claim-photo-toggle" type="button">${icons('camera')}<span id="claimPhotoLabel">Tambah foto (opsional)</span></button><input id="claimCamera" type="file" accept="image/*" capture="environment" hidden /><div id="claimPreview" class="claim-preview" aria-live="polite" hidden></div><p id="claimPhotoError" class="field-error" aria-live="polite"></p></section></div><div class="claim-footer"><button id="claimSubmit" class="button button-main full" type="submit">Verifikasi klaim</button></div></form></section><p class="simulation-note">Simulasi pencocokan</p>`;
+  }
+
+  function renderClaimPreview(item) {
     const preview = $('claimPreview');
     if (!state.claimPhoto) {
       preview.hidden = true;
@@ -690,7 +725,8 @@
       return;
     }
     preview.hidden = false;
-    preview.innerHTML = `<img src="${safe(state.claimPhoto)}" alt="Foto barang untuk klaim">${scanOverlay()}`;
+    const chips = item ? [item.name, item.color].filter(Boolean) : null;
+    preview.innerHTML = `<img src="${safe(state.claimPhoto)}" alt="Foto barang untuk klaim">${scanOverlay(false, chips)}`;
   }
 
   async function previewClaimPhoto(file) {
@@ -699,18 +735,36 @@
       if (file.size > IMAGE_LIMITS.storageBytes) setFieldError('claimPhotoError', 'Mengecilkan foto sebelum disimpan.');
       state.claimPhoto = await prepareImage(file);
       setFieldError('claimPhotoError');
-      renderClaimPreview();
+      renderClaimPreview(state.claimItem);
     } catch (error) {
       setFieldError('claimPhotoError', error.message || 'Foto tidak dapat dibaca. Coba lagi.');
     }
   }
 
+  function claimEscalationBody() {
+    return '<section class="claim-state claim-result"><p>Tiga percobaan belum cocok. Hubungi admin untuk verifikasi.</p><button id="contactAdminBtn" class="button button-main full" type="button">Hubungi admin</button></section><p class="simulation-note">Simulasi pencocokan</p>';
+  }
+
+  function wireContactAdmin(item) {
+    $('contactAdminBtn').addEventListener('click', () => {
+      state.supportContext = { itemName: item.name, locker: item.locker };
+      closeModal(true);
+      showTab('bantuan');
+    });
+  }
+
+  function renderClaimEscalation(item) {
+    setClaimPersistent(false);
+    modalShell(`Klaim ${item.name}`, claimEscalationBody());
+    wireContactAdmin(item);
+  }
+
   function wireClaimForm(item, attempt = 0, feedback = '', answer = '', replace = true) {
+    state.claimItem = item;
     if (replace) modalShell(`Klaim ${item.name}`, claimFormBody(item, attempt, feedback, answer));
-    renderClaimPreview();
+    renderClaimPreview(item);
     $('claimCameraBtn').addEventListener('click', () => $('claimCamera').click());
     $('claimCamera').addEventListener('change', (event) => previewClaimPhoto(event.target.files?.[0]));
-    $('claimExampleBtn').addEventListener('click', () => { $('claimAnswer').value = `Ada ${DEMO_ITEM.secret.toLocaleLowerCase('id')} botol`; $('claimAnswer').focus(); });
     $('claimForm').addEventListener('submit', (event) => {
       event.preventDefault();
       submitClaim(item).catch((error) => setTextStatus('claimStatus', error.message || 'Klaim tidak dapat diperiksa.', 'error'));
@@ -720,6 +774,11 @@
   function openClaim(id, trigger) {
     const item = state.items.find((entry) => entry.id === id);
     if (!item) return toast('Barang sudah tidak ada di katalog.');
+    if ((state.claimAttempts[id] || 0) >= 3) {
+      openModal(`Klaim ${item.name}`, claimEscalationBody(), trigger);
+      wireContactAdmin(item);
+      return;
+    }
     state.claimPhoto = '';
     openModal(`Klaim ${item.name}`, claimFormBody(item), trigger);
     wireClaimForm(item, 0, '', '', false);
@@ -732,6 +791,11 @@
       setFieldError('claimAnswerError', 'Ciri khusus wajib diisi.');
       return;
     }
+    if ((state.claimAttempts[item.id] || 0) >= 3) {
+      renderClaimEscalation(item);
+      return;
+    }
+    setClaimPersistent(true);
     const button = $('claimSubmit');
     setButtonLoading(button, true, 'Memeriksa klaim');
     const result = await api.submitClaim({ itemId: item.id, answer, photo: state.claimPhoto });
@@ -741,10 +805,11 @@
       return;
     }
     if (result.retryAllowed) {
+      setClaimPersistent(false);
       wireClaimForm(item, result.attempt, 'Belum cocok. Coba lagi.', answer);
       return;
     }
-    modalShell(`Klaim ${item.name}`, '<section class="claim-state claim-result"><h3>Belum cocok</h3><p>Jawaban belum cocok setelah tiga percobaan.</p></section><p class="simulation-note">Simulasi pencocokan</p>');
+    renderClaimEscalation(item);
   }
 
   async function animateGauge(score) {
@@ -771,7 +836,7 @@
   }
 
   async function runClaimVerification(item, result) {
-    modalShell(`Klaim ${item.name}`, `<section class="claim-state claim-verification" aria-live="polite"><ol class="claim-checks"><li id="claimCheck0"><span>1</span>Membandingkan jawaban</li><li id="claimCheck1"><span>2</span>Mencocokkan detail rahasia</li><li id="claimCheck2"><span>3</span>Menghitung skor</li></ol><div class="claim-gauge-wrap"><div class="claim-gauge-display"><svg class="claim-gauge" viewBox="0 0 120 120" aria-label="Skor kecocokan"><circle class="gauge-track" cx="60" cy="60" r="52"></circle><circle id="claimGaugeValue" class="gauge-value" cx="60" cy="60" r="52"></circle></svg><strong id="claimScore" class="claim-score">0%</strong></div><h3 id="claimResultHeadline" class="claim-result-headline" hidden></h3><p>Skor simulasi</p></div></section>`);
+    modalShell(`Klaim ${item.name}`, `<section class="claim-state claim-verification" aria-live="polite"><ol class="claim-checks"><li id="claimCheck0"><span>1</span>Membandingkan jawaban</li><li id="claimCheck1"><span>2</span>Mencocokkan detail rahasia</li><li id="claimCheck2"><span>3</span>Menghitung skor</li></ol><div class="claim-gauge-wrap"><div class="claim-gauge-display"><svg class="claim-gauge" viewBox="0 0 120 120" aria-label="Skor kecocokan"><circle class="gauge-track" cx="60" cy="60" r="52"></circle><circle id="claimGaugeValue" class="gauge-value" cx="60" cy="60" r="52"></circle></svg><strong id="claimScore" class="claim-score">0%</strong></div><h3 id="claimResultHeadline" class="claim-result-headline" hidden></h3><p>Skor simulasi</p></div></section><p class="simulation-note">Simulasi pencocokan</p>`);
     for (let index = 0; index < 3; index += 1) {
       await wait(DEMO_TIMING.claimCheck);
       $(`claimCheck${index}`).classList.add('complete');
@@ -783,8 +848,9 @@
   }
 
   function renderPickup(item) {
-    modalShell(`Klaim ${item.name}`, `<section class="claim-state claim-result"><h3>Cocok</h3><p>Gunakan PIN ini di loker ${safe(item.locker)}.</p><div class="pickup-pin"><span>PIN pengambilan</span><strong>${safe(item.claimPin)}</strong><span>Berlaku 3 hari</span></div><p id="pickupStatus" class="form-status" aria-live="polite"></p><button id="pickupBtn" class="button button-main full" type="button">Simulasikan buka loker</button><button id="lockerProblemBtn" class="link-button" type="button">Loker bermasalah?</button></section><p class="simulation-note">Simulasi pencocokan</p>`);
-    $('pickupBtn').addEventListener('click', () => confirmPickup(item).catch((error) => setTextStatus('pickupStatus', error.message || 'Barang tidak dapat diambil.', 'error')));
+    setClaimPersistent(false);
+    modalShell(`Klaim ${item.name}`, `<section class="claim-state claim-result"><h3>Cocok</h3><p>Gunakan PIN ini di loker ${safe(item.locker)}.</p><div class="pickup-pin"><span>PIN pengambilan</span><strong>${safe(item.claimPin)}</strong><span>Berlaku 3 hari</span></div><p id="pickupStatus" class="form-status" aria-live="polite"></p><button id="pickupBtn" class="button button-main full" type="button">Buka loker</button><button id="lockerProblemBtn" class="link-button" type="button">Loker bermasalah?</button></section><p class="simulation-note">Simulasi pencocokan</p>`);
+    $('pickupBtn').addEventListener('click', () => openPickupDoor(item).catch((error) => setTextStatus('pickupStatus', error.message || 'Loker tidak dapat dibuka.', 'error')));
     $('lockerProblemBtn').addEventListener('click', () => {
       state.supportContext = { itemName: item.name, locker: item.locker };
       closeModal();
@@ -792,13 +858,30 @@
     });
   }
 
-  async function confirmPickup(item) {
-    const button = $('pickupBtn');
-    setButtonLoading(button, true, 'Membuka loker');
-    const pickedUp = await api.confirmPickup({ itemId: item.id });
-    modalShell('Pengambilan selesai', `<section class="pickup-success"><div><h3>Barang sudah diambil</h3><p>${safe(pickedUp.name)} sudah dihapus dari katalog.</p></div><button id="closePickupBtn" class="button button-main" type="button">Selesai</button></section>`);
-    $('closePickupBtn').addEventListener('click', closeModal);
-    toast('Barang sudah diambil.');
+  async function openPickupDoor(item) {
+    await runLockerDoorSequence({
+      titleA: `Klaim ${item.name}`,
+      titleB: `Klaim ${item.name}`,
+      showCountdown: false,
+      lineB: 'Ambil barangmu, lalu tutup pintu.',
+      renderDone: async () => {
+        try {
+          await api.confirmPickup({ itemId: item.id });
+        } catch (error) {
+          toast(error.message || 'Barang tidak dapat diambil.');
+          closeModal(true);
+          return;
+        }
+        setClaimPersistent(false);
+        modalShell(`Klaim ${item.name}`, '<section class="claim-state claim-result"><p>Barang sudah diambil.</p><button id="closePickupBtn" class="button button-main full" type="button">Selesai</button></section><p class="simulation-note">Simulasi pencocokan</p>');
+        $('closePickupBtn').addEventListener('click', () => {
+          closeModal(true);
+          renderItems().catch(() => {});
+          const first = document.querySelector('#itemsList [data-claim]') || $('itemsList');
+          if (first) first.focus();
+        });
+      },
+    });
   }
 
   // Locations and support chat rendering

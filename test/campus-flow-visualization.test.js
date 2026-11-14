@@ -87,11 +87,33 @@ test('finder exposes scan, simulated assistance, and private-detail helper', () 
   assert.match(script, /setFinderStep\(1\)/);
 });
 
+test('cari tab reads Cariin without touching other copy', () => {
+  const html = read('src/index.html');
+  assert.match(html, /data-tab="cari"[\s\S]*?Cariin<\/button>/);
+  assert.match(html, /<span>Cariin<\/span>/);
+  assert.doesNotMatch(html, />Cari</);
+  assert.match(html, /Cari barang yang hilang/);
+  assert.match(html, /Cari loker/);
+  assert.match(html, /Cari nama, kategori, atau lokasi/);
+});
+
 test('claim and simulated backend seam cover the demo lifecycle', () => {
   const html = read('src/index.html');
   const script = read('src/script.js');
   assert.match(script, /Sebutkan ciri khusus yang tidak terlihat di katalog/);
-  assert.match(script, /Isi jawaban demo/);
+  assert.doesNotMatch(script, /Isi jawaban demo/);
+  assert.doesNotMatch(script, /claimExampleBtn/);
+  assert.doesNotMatch(script, /Simulasikan buka loker/);
+  assert.doesNotMatch(script, /function confirmPickup\(item\)/);
+  assert.match(script, /Maksimal 3 percobaan/);
+  assert.match(script, /Tiga percobaan belum cocok\. Hubungi admin untuk verifikasi\./);
+  assert.match(script, /Hubungi admin/);
+  assert.match(script, /Ambil barangmu, lalu tutup pintu\./);
+  assert.match(script, /Barang sudah diambil\./);
+  assert.match(script, /function matchSecret\(answer, secret\)/);
+  assert.match(script, /ratio >= 0\.5/);
+  assert.match(script, /80 \+ ratio \* 17/);
+  assert.match(script, /function runLockerDoorSequence\(/);
   for (const marker of ['submitFound', 'searchItems', 'submitClaim', 'confirmPickup', 'sendSupportMessage', 'listSupportThreads', 'replySupport']) {
     assert.match(script, new RegExp(`async ${marker}\\(`));
   }
@@ -105,7 +127,6 @@ test('claim and simulated backend seam cover the demo lifecycle', () => {
   assert.match(script, /window\.localStorage/);
   assert.match(script, /balikin-(?:demo-)?items-v1/);
   assert.match(script, /class="item-details"/);
-  assert.match(script, /score: match \? 94 : 38/);
 });
 
 test('student prototype restores the fixed four-item mobile menu', () => {
