@@ -742,7 +742,7 @@
   }
 
   function claimEscalationBody() {
-    return '<section class="claim-state claim-result"><p>Tiga percobaan belum cocok. Hubungi admin untuk verifikasi.</p><button id="contactAdminBtn" class="button button-main full" type="button">Hubungi admin</button></section><p class="simulation-note">Simulasi pencocokan</p>';
+    return '<section class="claim-state claim-result claim-state--compact"><p>Tiga percobaan belum cocok. Hubungi admin untuk verifikasi.</p><button id="contactAdminBtn" class="button button-main full" type="button">Hubungi admin</button></section><p class="simulation-note">Simulasi pencocokan</p>';
   }
 
   function wireContactAdmin(item) {
@@ -873,7 +873,7 @@
           return;
         }
         setClaimPersistent(false);
-        modalShell(`Klaim ${item.name}`, '<section class="claim-state claim-result"><p>Barang sudah diambil.</p><button id="closePickupBtn" class="button button-main full" type="button">Selesai</button></section><p class="simulation-note">Simulasi pencocokan</p>');
+        modalShell(`Klaim ${item.name}`, '<section class="claim-state claim-result claim-state--compact"><p>Barang sudah diambil.</p><button id="closePickupBtn" class="button button-main full" type="button">Selesai</button></section><p class="simulation-note">Simulasi pencocokan</p>');
         $('closePickupBtn').addEventListener('click', () => {
           closeModal(true);
           renderItems().catch(() => {});
