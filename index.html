@@ -63,9 +63,11 @@ svg { display: inline-block; flex: none; width: 20px; height: 20px; fill: none; 
 .auth-intro h1 { max-width: 600px; margin: 0; font-size: clamp(40px, 6vw, 72px); letter-spacing: -.06em; line-height: 1.04; }
 .auth-intro > p:last-child { max-width: 520px; margin: 24px 0 0; color: var(--muted); font-size: 17px; }
 .auth-card, .panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); }
-.auth-card { padding: 32px; }
+.auth-card { padding: 40px; }
 .auth-card h2 { margin: 0; font-size: 28px; letter-spacing: -.04em; }
 .auth-card > p { margin: 8px 0 24px; color: var(--muted); font-size: 14px; }
+#loginForm { display: flex; flex-direction: column; gap: 14px; }
+#loginForm .field-error, #loginForm .form-status { margin: 0; }
 .auth-note { margin: 16px 0 0 !important; font-size: 12px !important; }
 .auth-note code { padding: 2px 4px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); }
 
